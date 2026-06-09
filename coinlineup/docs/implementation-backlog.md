@@ -2,6 +2,23 @@
 
 This backlog turns the migration plan into concrete build phases.
 
+## Current Progress Snapshot (2026-06-09)
+
+- Phase 0.1 completed:
+  - `source-demo/` kept as reference only
+  - `site/` established as the active Next.js 16 app
+  - imported build artifacts and nested git history removed from the working app
+- Phase 1 partially completed:
+  - WordPress REST client and normalization layer are in place in `site/lib/wordpress.ts`
+  - homepage and catch-all content resolution already use live WordPress content
+- Phase 2 partially completed:
+  - root-level posts and pages resolve through `app/[...slug]/page.tsx`
+  - `guides/` index and `guides/<category>/` archive now render from live WordPress data
+  - legacy demo route `guides/<category>/<slug>/` now redirects to the canonical root-level post URL instead of serving duplicate content
+- Next recommended target:
+  - apply the same canonical cleanup to `news/<category>/<slug>/`
+  - then migrate `projects/` archives from demo content to WordPress data
+
 ## Phase 0: Foundation
 
 ### 0.1 Normalize the imported demo
@@ -202,4 +219,3 @@ The following must still be confirmed:
 - account route strategy
 - analytics, ad scripts, consent stack
 - final staging and production domains
-

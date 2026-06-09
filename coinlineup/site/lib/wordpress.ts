@@ -16,6 +16,7 @@ export interface WpTerm {
   slug: string;
   parent: number;
   link: string;
+  count?: number;
   taxonomy?: string;
 }
 
@@ -304,6 +305,47 @@ export async function getPostsByCategoryTreeSlug(slug: string, limit = 12): Prom
 
   const results = await Promise.all(ids.map((id) => getPostsByCategoryId(id, Math.max(limit, 6))));
   return dedupePosts(results.flat()).slice(0, limit);
+}
+
+export async function getCategoryArchiveByPath(segments: string[], limit = 12) {
+  const category = await resolveCategoryByPath(segments);
+  if (!category) return null;
+
+  const [children, posts] = await Promise.all([
+    getCategoriesByParent(category.id),
+    getPostsByCategoryId(category.id, limit),
+  ]);
+
+  return { category, children, posts };
+}
+
+export async function getCategoryTreeArchiveBySlug(slug: string, limit = 12) {
+  const category = await getCategoryBySlug(slug);
+  if (!category) return null;
+
+  const [children, posts] = await Promise.all([
+    getCategoriesByParent(category.id),
+    getPostsByCategoryTreeSlug(slug, limit),
+  ]);
+
+  return { category, children, posts };
+}
+
+export async function getPostForCategoryPath(segments: string[], slug: string) {
+  const [category, post] = await Promise.all([
+    resolveCategoryByPath(segments),
+    getPostBySlug(slug),
+  ]);
+
+  if (!category || !post) {
+    return null;
+  }
+
+  if (!post.categories.includes(category.id)) {
+    return null;
+  }
+
+  return { category, post };
 }
 
 export async function resolveCategoryByPath(segments: string[]): Promise<WpTerm | null> {
