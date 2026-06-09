@@ -5,6 +5,8 @@ This folder is the working area for migrating `https://coinlineup.com/` from a W
 ## Current status
 
 - Existing demo app exists and is useful as a UI shell.
+- `site/` is now the active Next.js 16 migration app.
+- `source-demo/` is kept as a cleaned reference copy only.
 - Existing demo is not production-ready for cutover.
 - WordPress remains the source of truth for content.
 - Migration should be done in phases, with WordPress staying live during validation.
@@ -40,3 +42,4 @@ This folder is the working area for migrating `https://coinlineup.com/` from a W
 ## Source Reference
 
 - [`source-demo/`](./source-demo/) - cleaned source extracted from the original demo archive
+- [`site/`](./site/) - active Next.js app for the headless WordPress migration
