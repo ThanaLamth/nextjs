@@ -26,7 +26,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="light">
       <body className="antialiased" style={{ background: "var(--page-bg)", color: "var(--text-primary)" }}>
         <ThemeProvider>
           <div className="sticky top-0 z-50">
