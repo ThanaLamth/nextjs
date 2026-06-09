@@ -29,11 +29,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className="light">
       <body className="antialiased" style={{ background: "var(--page-bg)", color: "var(--text-primary)" }}>
         <ThemeProvider>
-          <div className="sticky top-0 z-50">
+          <div className="fixed inset-x-0 top-0 z-50">
             <CryptoTicker />
             <Navbar />
           </div>
-          <main className="min-h-screen">{children}</main>
+          <main className="min-h-screen pt-[92px]">{children}</main>
           <Footer />
         </ThemeProvider>
       </body>
