@@ -183,12 +183,12 @@ html.light .category-pill {
 
 .article-body {
   color: var(--text-primary);
-  font-size: 1rem;
-  line-height: 1.8;
+  font-size: 1.0625rem;
+  line-height: 1.85;
 }
 
 .article-body > * + * {
-  margin-top: 1.1rem;
+  margin-top: 1.15rem;
 }
 
 .article-body h2,
@@ -214,8 +214,15 @@ html.light .category-pill {
   color: var(--text-secondary);
 }
 
+.article-body strong {
+  color: var(--text-primary);
+}
+
 .article-body a {
   color: #F7931A;
+  text-decoration: underline;
+  text-decoration-color: rgba(247, 147, 26, 0.28);
+  text-underline-offset: 0.16em;
 }
 
 .article-body img {
@@ -237,4 +244,16 @@ html.light .category-pill {
 
 .article-body figure {
   margin: 1.5rem 0;
+}
+
+.article-body figcaption {
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+@media (min-width: 768px) {
+  .article-body {
+    font-size: 1.125rem;
+  }
 }

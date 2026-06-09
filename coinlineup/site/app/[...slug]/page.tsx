@@ -12,7 +12,7 @@ import {
   pathFromWpLink,
   resolveContentByPath,
 } from "@/lib/wordpress";
-import { decodeHtml, formatDate } from "@/lib/content";
+import { decodeHtml, estimateReadTime, formatDate, stripHtml } from "@/lib/content";
 
 interface Props {
   params: Promise<{ slug: string[] }>;
@@ -134,10 +134,13 @@ async function CatchAllContent({ params }: Props) {
   const related = await getRelatedPosts(resolved.post, 3);
   const relatedArticles = related.map((post) => mapWpPostToArticle(post));
   const primaryCategory = resolved.post._embedded?.["wp:term"]?.[0]?.[0];
+  const excerpt = decodeHtml(stripHtml(resolved.post.excerpt.rendered)).trim();
+  const authorName = decodeHtml(resolved.post._embedded?.author?.[0]?.name ?? "CoinLineup Editorial Team");
+  const readTime = estimateReadTime(resolved.post.content.rendered);
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <div className="mb-6 text-xs flex items-center gap-2" style={{ color: "var(--text-muted)" }}>
+      <div className="mb-6 text-xs flex flex-wrap items-center gap-2" style={{ color: "var(--text-muted)" }}>
         <Link href="/" className="hover:text-brand-orange transition-colors">Home</Link>
         <span>/</span>
         {primaryCategory ? (
@@ -155,18 +158,27 @@ async function CatchAllContent({ params }: Props) {
         <div className="mb-4">
           {primaryCategory ? <span className="category-pill">{primaryCategory.name}</span> : null}
         </div>
-        <h1 className="font-display font-bold text-3xl md:text-5xl leading-tight mb-4" style={{ color: "var(--text-primary)" }}>
+        <h1 className="max-w-4xl font-display font-bold text-3xl md:text-5xl leading-tight mb-4" style={{ color: "var(--text-primary)" }}>
           {decodeHtml(resolved.post.title.rendered)}
         </h1>
-        <div className="flex flex-wrap items-center gap-4 text-sm mb-8" style={{ color: "var(--text-secondary)" }}>
-          <span>{decodeHtml(resolved.post._embedded?.author?.[0]?.name ?? "CoinLineup Editorial Team")}</span>
+        {excerpt ? (
+          <p className="max-w-3xl text-lg leading-8 mb-5" style={{ color: "var(--text-secondary)" }}>
+            {excerpt}
+          </p>
+        ) : null}
+        <div className="flex flex-wrap items-center gap-3 text-sm mb-8" style={{ color: "var(--text-secondary)" }}>
+          <span className="font-medium" style={{ color: "var(--text-primary)" }}>By {authorName}</span>
           <span className="text-[10px]">•</span>
-          <span className="inline-flex items-center gap-1"><Clock size={14} />{formatDate(resolved.post.date)}</span>
+          <span>Updated {formatDate(resolved.post.modified)}</span>
+          <span className="text-[10px]">•</span>
+          <span className="inline-flex items-center gap-1"><Clock size={14} />{readTime}</span>
         </div>
-        <div
-          className="article-body"
-          dangerouslySetInnerHTML={{ __html: resolved.post.content.rendered }}
-        />
+        <div className="max-w-3xl">
+          <div
+            className="article-body"
+            dangerouslySetInnerHTML={{ __html: resolved.post.content.rendered }}
+          />
+        </div>
       </article>
 
       {relatedArticles.length > 0 ? (
