@@ -10,6 +10,13 @@ interface WordPressAuthUser {
   link: string;
 }
 
+interface WordPressPreviewEntity {
+  id: number;
+  slug: string;
+  status?: string;
+  link: string;
+}
+
 function getWordPressApiBaseUrl(): string {
   return process.env.WORDPRESS_API_BASE_URL ?? DEFAULT_API_BASE_URL;
 }
@@ -73,4 +80,26 @@ export async function fetchWordPressAuthenticatedJson<T>(
 
 export async function getAuthenticatedWordPressUser(): Promise<WordPressAuthUser> {
   return fetchWordPressAuthenticatedJson<WordPressAuthUser>("users/me");
+}
+
+export async function getAuthenticatedPostById(id: number): Promise<WordPressPreviewEntity | null> {
+  try {
+    return await fetchWordPressAuthenticatedJson<WordPressPreviewEntity>(`posts/${id}`, {
+      context: "edit",
+      _fields: "id,slug,status,link",
+    });
+  } catch {
+    return null;
+  }
+}
+
+export async function getAuthenticatedPageById(id: number): Promise<WordPressPreviewEntity | null> {
+  try {
+    return await fetchWordPressAuthenticatedJson<WordPressPreviewEntity>(`pages/${id}`, {
+      context: "edit",
+      _fields: "id,slug,status,link",
+    });
+  } catch {
+    return null;
+  }
 }

@@ -30,6 +30,29 @@ This is the working Next.js application for the CoinLineup migration.
 These are only for server-side authenticated WordPress REST calls such as preview or editorial flows.
 Do not expose them through `NEXT_PUBLIC_*` variables or client components.
 
+## Preview Flow
+
+- Public verification path:
+  - `/api/draft?secret=...&slug=/some-known-public-path`
+- Authenticated preview path:
+  - `/api/draft?secret=...&id=123&type=post`
+  - `/api/draft?secret=...&id=456&type=page`
+
+The `slug` path is verified against WordPress before redirecting.
+The `id/type` path uses authenticated WordPress REST when `WORDPRESS_API_USERNAME` and `WORDPRESS_API_APP_PASSWORD` are set.
+
+## Server Env Checklist
+
+Set these on the deployment target before enabling editorial preview:
+
+- `NEXT_PUBLIC_SITE_URL`
+- `WORDPRESS_SITE_URL`
+- `WORDPRESS_API_BASE_URL`
+- `WORDPRESS_API_USERNAME`
+- `WORDPRESS_API_APP_PASSWORD`
+- `WORDPRESS_DRAFT_SECRET`
+- `WORDPRESS_REVALIDATE_SECRET`
+
 ## Still incomplete
 
 - several legacy demo routes still need to be converted from mock data
