@@ -54,7 +54,7 @@ export default function Navbar() {
   const [dropdown, setDropdown] = useState<string | null>(null);
 
   return (
-    <header className="w-full">
+    <header className="relative w-full">
       <nav className="backdrop-blur-md border-b" style={{ background: "var(--nav-bg)", borderColor: "var(--nav-border)" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14">
@@ -140,10 +140,21 @@ export default function Navbar() {
         {/* Mobile menu */}
         <AnimatePresence>
           {mobileOpen && (
-            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.18 }}
-              className="md:hidden overflow-hidden border-t" style={{ borderColor: "var(--nav-border)" }}>
-              <div className="px-4 py-3 space-y-1" style={{ background: "var(--nav-dropdown-bg)" }}>
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.18 }}
+              className="absolute inset-x-0 top-full md:hidden border-t shadow-2xl"
+              style={{ borderColor: "var(--nav-border)" }}
+            >
+              <div
+                className="px-4 py-3 space-y-1 overflow-y-auto"
+                style={{
+                  background: "var(--nav-dropdown-bg)",
+                  maxHeight: "calc(100svh - 92px)",
+                }}
+              >
                 {NAV_LINKS.map((link) => (
                   <div key={link.label}>
                     <Link href={link.href} onClick={() => setMobileOpen(false)}
