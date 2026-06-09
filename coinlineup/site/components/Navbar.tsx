@@ -54,7 +54,7 @@ export default function Navbar() {
   const [dropdown, setDropdown] = useState<string | null>(null);
 
   return (
-    <header className="sticky top-0 z-40 w-full">
+    <header className="w-full">
       <nav className="backdrop-blur-md border-b" style={{ background: "var(--nav-bg)", borderColor: "var(--nav-border)" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14">
