@@ -28,5 +28,15 @@ This folder is the working area for migrating `https://coinlineup.com/` from a W
 ## Docs
 
 - [`docs/migration-plan.md`](./docs/migration-plan.md)
+- [`docs/demo-audit.md`](./docs/demo-audit.md)
+- [`docs/implementation-backlog.md`](./docs/implementation-backlog.md)
 - [`docs/required-data.md`](./docs/required-data.md)
 
+## Inputs
+
+- [`inputs/uiux.csv`](./inputs/uiux.csv)
+- [`inputs/demo-checklist.csv`](./inputs/demo-checklist.csv)
+
+## Source Reference
+
+- [`source-demo/`](./source-demo/) - cleaned source extracted from the original demo archive

@@ -1,0 +1,239 @@
+﻿,,,,,,,,,,,,,
+No,Area,Screenshot,Issue ,Recommendation,Design,Dev,Note,,,,,,
+1,Homepage,,- Lỗi Duplicate content,,- Thiết kế lại hierarchy homepage để mỗi block có purpose riêng,- Add anti-duplicate query logic trong CMS,- Không để article xuất hiện 2 lần trên homepage,,,,,,
+2,Structure,,"- Biến homepage thành 5 nhóm mới:
+  News 
+  Guides 
+  Markets 
+  Projects 
+  Sponsored",,- Rebuild homepage layout theo content pillar,- Update category query + CMS mapping,- Re-map toàn bộ homepage theo category mới,,Website gốc ,Hình mẫu minh họa ,,,
+3,UI Consistency,,"- Chỉ có News và Guides có image nền, còn 4 mục còn lại hiện tại không có ",,- Add background image/card visual cho tất cả section,- Create reusable card component,"- Đồng bộ visual card style cho toàn bộ category section. 
+- Feature/widget Market Intelligence lấy data từ CoinGecko hoặc CoinMarketCap API. Các block cần gồm Top Gainers, Top Losers, Top Coins và ticker bar. Dev nên tạo API nội bộ để normalize data, cache 1-10 phút tùy block, tránh gọi trực tiếp từ frontend",,,,,,
+4,Navigation,,"- Ở CMC, Sponsored Articles, Press Release không có VIEW ALL ",,- Đồng bộ heading action style,- Add archive/category link dynamic,- Add VIEW ALL cho tất cả section,,,,,,
+5,Content,,- Phần Forex Market không có bài viết nào,,- Hide empty category state,- Add conditional rendering nếu không có bài,- Remove empty section hoặc replace bằng content có bài,,,,,,
+6,Mobile UX,,"- Ở mobile, phần đầu trang đang bị cách khoảng khá dài ",,- Re-adjust mobile padding/margin,- Optimize responsive spacing CSS,- Giảm top spacing mobile hero,,,,,,
+7,Readability,,"- phông chữ ở các author đang bị mờ, nên để màu khác",,- Dùng màu dark gray thay vì light gray,- Update typography token/color variable,- Increase contrast cho author/meta text,,,,,,
+8,Social Links,,- Update lại link instagram của coinlineup,,- Đồng bộ social icon style,- Replace Instagram URL trong footer/header,- Tránh social dead link,,,,,,
+9,Content Structure,,- Nên đổi mục Crypto News để tránh lặp lại phía trên ,,- Re-structure homepage flow,- Update section title + query source,- Tránh repetitive content block,,"TEXT THEO TỪNG SECTION 
+
+HEADER
+Logo
+CoinLineup
+Menu
+  News 
+  Markets 
+  Guides 
+  Projects 
+  About 
+ 
+Header Actions
+  Search 
+  Dark Mode Toggle 
+  Subscribe Button 
+ 
+HERO SECTION
+Left Sidebar — Latest News
+Section Title
+Latest News
+Articles
+  FedNow vs XRP: Why the Fed Threatens XRP’s Payment Use Case 
+  Hyperbridge Exploit Mints 1B Fake DOT on Ethereum, Nets $237K 
+  Ondo SEC Relief for Tokenized Securities on Ethereum 
+  Bridged DOT Exploit on Ethereum Mints 1B Tokens 
+  Bitcoin Price Eyes $70K as ETF Inflows Continue 
+ 
+Center Hero
+Tag
+Breaking
+Headline
+FedNow vs XRP: Why the Fed Threatens XRP’s Payment Use Case
+Meta
+  Yuki Matsuda 
+  Apr 20, 2025 
+  10 min read 
+ 
+Right Sidebar — Most Read
+Section Title
+Most Read
+Articles
+  Why Ethereum Could Outperform Bitcoin in Q2 2025 
+  Solana Breaks Key Resistance — What’s Next? 
+  Top 10 AI Crypto Coins to Watch in 2025 
+  How to Stake Ethereum: A Beginner’s Guide 
+  What is DeFi? The Ultimate Beginner Guide 
+ 
+MARKET INTELLIGENCE
+Top Gainers
+Coins
+  Bitensor (TAO) 
+  Official Trump (TRUMP) 
+  Collector Crypt (CARDS) 
+  MANTRA (OM) 
+  Syndicate (SYN) 
+ 
+Top Losers
+Coins
+  AXEL 
+  WhiteBridge 
+  Initia 
+  Telos Network 
+  FUNToken 
+ 
+Top Coins
+Coins
+  Bitcoin (BTC) 
+  Ethereum (ETH) 
+  Tether (USDT) 
+  XRP 
+  BNB 
+ 
+EDITOR’S PICKS
+Section Title
+Editor’s Picks
+Cards
+  Why Ethereum Staking Is Quietly Dominating 
+  The Real Story Behind XRP vs FedNow 
+  Inside Meme Coin Liquidity Cycles 
+ 
+EXPLORE TOPICS
+Section Title
+Explore Topics
+Topics
+  Bitcoin (BTC) 
+  Ethereum (ETH) 
+  DeFi 
+  AI Crypto 
+  Meme Coins 
+  Altcoins 
+ 
+GUIDES LEARNING HUB
+Section Title
+Guides Learning Hub
+Subtitle
+Your complete learning path to master crypto
+Featured Guide
+Label
+Featured Guide
+Title
+What is Bitcoin? A Beginner’s Guide to BTC
+Description
+Everything you need to know about Bitcoin, how it works, and why it matters.
+Meta
+  CoinLineup Research Team 
+  12 min read 
+  Beginner 
+  Updated Apr 19, 2025 
+ 
+CTA
+Read Guide
+Learning Paths
+Title
+Learning Paths
+Description
+Step-by-step courses to build your knowledge
+Items
+  Start Here: Crypto Basics 
+  Trading Basics 
+  DeFi Fundamentals 
+ 
+Quick Answers
+Title
+Quick Answers
+Subtitle
+Crypto explained in 60 seconds
+Items
+  What is Ethereum? 
+  What is DeFi? 
+  What is NFT? 
+  What is Staking? 
+  What is Web3? 
+ 
+Trusted & Reviewed
+Checklist
+  Tested by our team 
+  Fact-checked 
+  Regularly updated 
+  Trusted by 50K+ readers 
+ 
+CONTENT GRID
+News
+Featured Article
+FedNow vs XRP: Why the Fed Threatens XRP’s Payment Use Case
+Smaller Articles
+  Solana Breaks Key Resistance — What’s Next? 
+  Ethereum Layer 2 TVL Hits All-Time High 
+  Bitcoin Price Eyes $70K as ETF Inflows Continue 
+ 
+Markets
+Featured Article
+Bitcoin Price Analysis: BTC Eyes Breakout Above $70K
+Smaller Articles
+  Ethereum Price Analysis: ETH Holds Key Support 
+  XRP Price Prediction: Targets and Levels 
+  Altcoin Market Cap Rebounds Above $1.2T 
+ 
+Projects
+Featured Article
+Top 10 Promising Crypto Projects to Watch in 2025
+Smaller Articles
+  Review: Solaxy — The Next Solana L2? 
+  New Projects to Watch This Week 
+  Deep Dive: Ethena (ENA) Explained 
+ 
+Sponsored Articles
+Sponsored Items
+  Start Your Crypto Journey with OKX 
+  Earn Passive Income with Nexo 
+  Secure Your Assets with Ledger Wallet 
+ 
+NEWSLETTER SECTION
+Headline
+Stay Ahead of the Market
+Description
+Get daily crypto insights before the market moves
+Input Placeholder
+Enter your email
+CTA
+Subscribe
+Trust Text
+  No spam 
+  Unsubscribe anytime 
+ 
+COMMUNITY TRUST BLOCK
+Headline
+Join 50,000+ crypto enthusiasts
+Rating
+4.8/5 from 2,300+ reviews
+FOOTER
+Brand Description
+Your go-to source for crypto news, guides, and market insights.
+Footer Menu — Explore
+  News 
+  Markets 
+  Guides 
+  Projects 
+  About 
+ 
+Footer Menu — Resources
+  About Us 
+  Contact 
+  Privacy Policy 
+  Terms of Use 
+ 
+Footer Menu — Community
+  Newsletter 
+  Twitter (X) 
+  Discord 
+ 
+Copyright
+© 2025 CoinLineup. All rights reserved.
+Footer Note
+Made with ❤️ for the crypto community",,,,
+10,Newsletter,,"- Newsletter CTA yếu, nên đổi lại thành như sau 
+Get daily crypto insights before the market moves
+Stay ahead with the latest crypto news, market trends, and key updates delivered to your inbox.
+[Email] | Subscribe
+Free to join. No spam. Unsubscribe anytime.",,- Add email mockup/review/social proof,- Add newsletter component improvements,- Add stronger CTA + trust signal,,,,,,
+,,,,,,,,,,,,,
+11,"
+Layout / UX",,- Di chuyển phần Follow Us xuống cuối trang như hình minh họa ,,- Re-balance sidebar/layout spacing,- Reorder homepage section position,- Move social section xuống gần footer,,,,,,
