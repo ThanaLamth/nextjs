@@ -15,11 +15,20 @@ This is the working Next.js application for the CoinLineup migration.
 - upgraded onto the local Next.js 16 line
 - homepage now starts from live WordPress content
 - root-level catch-all resolution exists for live post/page/category paths
+- authenticated WordPress REST access is now isolated to a `server-only` helper
 - production support files now exist:
   - `app/robots.ts`
   - `app/sitemap.ts`
   - `app/api/draft/route.ts`
   - `app/api/revalidate/route.ts`
+
+## Environment
+
+- `WORDPRESS_API_USERNAME`
+- `WORDPRESS_API_APP_PASSWORD`
+
+These are only for server-side authenticated WordPress REST calls such as preview or editorial flows.
+Do not expose them through `NEXT_PUBLIC_*` variables or client components.
 
 ## Still incomplete
 
