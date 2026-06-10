@@ -1,4 +1,5 @@
 import "server-only";
+import type { WpPage, WpPost } from "@/lib/wordpress";
 
 const DEFAULT_SITE_URL = "https://coinlineup.com";
 const DEFAULT_API_BASE_URL = `${DEFAULT_SITE_URL}/wp-json/wp/v2`;
@@ -98,6 +99,28 @@ export async function getAuthenticatedPageById(id: number): Promise<WordPressPre
     return await fetchWordPressAuthenticatedJson<WordPressPreviewEntity>(`pages/${id}`, {
       context: "edit",
       _fields: "id,slug,status,link",
+    });
+  } catch {
+    return null;
+  }
+}
+
+export async function getAuthenticatedPreviewPostById(id: number): Promise<WpPost | null> {
+  try {
+    return await fetchWordPressAuthenticatedJson<WpPost>(`posts/${id}`, {
+      context: "edit",
+      _embed: 1,
+    });
+  } catch {
+    return null;
+  }
+}
+
+export async function getAuthenticatedPreviewPageById(id: number): Promise<WpPage | null> {
+  try {
+    return await fetchWordPressAuthenticatedJson<WpPage>(`pages/${id}`, {
+      context: "edit",
+      _embed: 1,
     });
   } catch {
     return null;

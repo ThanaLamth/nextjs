@@ -45,11 +45,20 @@ async function resolveDraftEntityPath(
 
   if (postType === "page") {
     const page = await getAuthenticatedPageById(postId);
-    return page ? pathFromWpLink(page.link) : null;
+    if (!page) return null;
+    const pagePath = pathFromWpLink(page.link);
+    return page.status === "publish" && pagePath !== "/"
+      ? pagePath
+      : `/_preview/page/${page.id}`;
   }
 
   const post = await getAuthenticatedPostById(postId);
-  return post ? pathFromWpLink(post.link) : null;
+  if (!post) return null;
+
+  const postPath = pathFromWpLink(post.link);
+  return post.status === "publish" && postPath !== "/"
+    ? postPath
+    : `/_preview/post/${post.id}`;
 }
 
 export async function GET(request: Request) {
