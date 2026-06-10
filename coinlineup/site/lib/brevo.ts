@@ -15,6 +15,13 @@ interface BrevoSendEmailPayload {
   htmlContent: string;
 }
 
+interface BrevoDoubleOptInPayload {
+  email: string;
+  includeListIds: number[];
+  templateId: number;
+  redirectionUrl: string;
+}
+
 function getBrevoApiKey(): string | undefined {
   return process.env.BREVO_API_KEY?.trim() || undefined;
 }
@@ -29,6 +36,18 @@ function getBrevoListId(): number | undefined {
 
 export function hasBrevoNewsletterConfig(): boolean {
   return Boolean(getBrevoApiKey() && getBrevoListId());
+}
+
+function getBrevoDoiTemplateId(): number | undefined {
+  const raw = process.env.BREVO_DOI_TEMPLATE_ID?.trim();
+  if (!raw) return undefined;
+
+  const parsed = Number.parseInt(raw, 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined;
+}
+
+function getBrevoDoiRedirectUrl(): string | undefined {
+  return process.env.BREVO_DOI_REDIRECT_URL?.trim() || undefined;
 }
 
 function getBrevoSenderEmail(): string | undefined {
@@ -49,6 +68,10 @@ function getBrevoReplyToName(): string | undefined {
 
 export function hasBrevoWelcomeEmailConfig(): boolean {
   return Boolean(getBrevoApiKey() && getBrevoSenderEmail());
+}
+
+export function hasBrevoDoubleOptInConfig(): boolean {
+  return Boolean(getBrevoApiKey() && getBrevoListId() && getBrevoDoiTemplateId() && getBrevoDoiRedirectUrl());
 }
 
 interface BrevoContactPayload {
@@ -84,6 +107,41 @@ export async function subscribeEmailToBrevo(email: string): Promise<void> {
   if (!response.ok) {
     const details = await response.text();
     throw new Error(`Brevo subscribe failed: ${response.status} ${details}`);
+  }
+}
+
+export async function createBrevoDoubleOptInContact(email: string): Promise<void> {
+  const apiKey = getBrevoApiKey();
+  const listId = getBrevoListId();
+  const templateId = getBrevoDoiTemplateId();
+  const redirectionUrl = getBrevoDoiRedirectUrl();
+
+  if (!apiKey || !listId || !templateId || !redirectionUrl) {
+    throw new Error(
+      "Missing Brevo DOI configuration. Set BREVO_API_KEY, BREVO_LIST_ID, BREVO_DOI_TEMPLATE_ID, and BREVO_DOI_REDIRECT_URL.",
+    );
+  }
+
+  const payload: BrevoDoubleOptInPayload = {
+    email,
+    includeListIds: [listId],
+    templateId,
+    redirectionUrl,
+  };
+
+  const response = await fetch(`${BREVO_API_BASE_URL}/contacts/doubleOptinConfirmation`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      "api-key": apiKey,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const details = await response.text();
+    throw new Error(`Brevo DOI subscribe failed: ${response.status} ${details}`);
   }
 }
 

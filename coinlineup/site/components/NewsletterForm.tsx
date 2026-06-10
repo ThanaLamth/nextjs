@@ -21,6 +21,7 @@ export default function NewsletterForm({
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState("Check your inbox to confirm your subscription.");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -38,12 +39,13 @@ export default function NewsletterForm({
         body: JSON.stringify({ email }),
       });
 
-      const payload = (await response.json()) as { error?: string };
+      const payload = (await response.json()) as { error?: string; message?: string };
       if (!response.ok) {
         setError(payload.error ?? "Subscription failed. Please try again.");
         return;
       }
 
+      setSuccessMessage(payload.message ?? "Check your inbox to confirm your subscription.");
       setSubmitted(true);
       setEmail("");
     } catch {
@@ -56,7 +58,7 @@ export default function NewsletterForm({
   if (submitted) {
     return (
       <div className="text-center py-3">
-        <p className="price-up font-semibold text-sm">✓ You&apos;re subscribed! Check your inbox.</p>
+        <p className="price-up font-semibold text-sm">✓ {successMessage}</p>
       </div>
     );
   }

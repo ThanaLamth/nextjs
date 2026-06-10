@@ -1,4 +1,6 @@
 import {
+  createBrevoDoubleOptInContact,
+  hasBrevoDoubleOptInConfig,
   hasBrevoNewsletterConfig,
   hasBrevoWelcomeEmailConfig,
   sendBrevoWelcomeEmail,
@@ -34,6 +36,22 @@ export async function POST(request: Request) {
     );
   }
 
+  if (hasBrevoDoubleOptInConfig()) {
+    try {
+      await createBrevoDoubleOptInContact(email);
+      return Response.json({
+        ok: true,
+        confirmationRequired: true,
+        message: "Check your inbox and confirm your subscription to join CoinLineup Daily.",
+      });
+    } catch {
+      return Response.json(
+        { error: "Confirmation email could not be sent. Please try again." },
+        { status: 502 },
+      );
+    }
+  }
+
   try {
     await subscribeEmailToBrevo(email);
   } catch {
@@ -54,5 +72,9 @@ export async function POST(request: Request) {
     }
   }
 
-  return Response.json({ ok: true, welcomeEmailSent });
+  return Response.json({
+    ok: true,
+    welcomeEmailSent,
+    message: "You’re subscribed. Check your inbox for a welcome note.",
+  });
 }
