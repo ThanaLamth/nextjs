@@ -19,10 +19,38 @@ export default function NewsletterForm({
   const inputClass = dark ? "footer-input" : "themed-input";
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (email) setSubmitted(true);
+    if (!email) return;
+
+    setSubmitting(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const payload = (await response.json()) as { error?: string };
+      if (!response.ok) {
+        setError(payload.error ?? "Subscription failed. Please try again.");
+        return;
+      }
+
+      setSubmitted(true);
+      setEmail("");
+    } catch {
+      setError("Subscription failed. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   if (submitted) {
@@ -45,27 +73,37 @@ export default function NewsletterForm({
           className={`w-full rounded-lg px-3 py-2.5 text-sm border focus:outline-none focus:ring-1 focus:ring-brand-orange ${inputClass}`}
         />
         <button type="submit"
+          disabled={submitting}
           className="w-full bg-brand-orange hover:bg-brand-orange-dark text-white font-display font-bold py-2.5 rounded-lg text-sm transition-colors flex items-center justify-center gap-2">
-          <Send size={13} />{buttonText}
+          <Send size={13} />{submitting ? "Submitting..." : buttonText}
         </button>
+        {error ? (
+          <p className="text-xs text-center" style={{ color: "#E63946" }}>{error}</p>
+        ) : null}
       </form>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex gap-2">
-      <input
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder={placeholder}
-        required
-        className={`flex-1 min-w-0 rounded-lg px-4 py-3 text-sm border focus:outline-none focus:ring-1 focus:ring-brand-orange ${inputClass}`}
-      />
-      <button type="submit"
-        className="flex items-center gap-2 bg-brand-orange hover:bg-brand-orange-dark text-white font-display font-bold px-5 py-3 rounded-lg text-sm transition-colors whitespace-nowrap flex-shrink-0">
-        <Send size={14} />{buttonText}
-      </button>
+    <form onSubmit={handleSubmit} className="space-y-2">
+      <div className="flex gap-2">
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder={placeholder}
+          required
+          className={`flex-1 min-w-0 rounded-lg px-4 py-3 text-sm border focus:outline-none focus:ring-1 focus:ring-brand-orange ${inputClass}`}
+        />
+        <button type="submit"
+          disabled={submitting}
+          className="flex items-center gap-2 bg-brand-orange hover:bg-brand-orange-dark disabled:opacity-70 disabled:cursor-not-allowed text-white font-display font-bold px-5 py-3 rounded-lg text-sm transition-colors whitespace-nowrap flex-shrink-0">
+          <Send size={14} />{submitting ? "Submitting..." : buttonText}
+        </button>
+      </div>
+      {error ? (
+        <p className="text-xs" style={{ color: "#E63946" }}>{error}</p>
+      ) : null}
     </form>
   );
 }
