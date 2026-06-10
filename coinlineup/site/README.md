@@ -32,8 +32,6 @@ This is the working Next.js application for the CoinLineup migration.
 - `BREVO_SENDER_NAME`
 - `BREVO_REPLY_TO_EMAIL`
 - `BREVO_REPLY_TO_NAME`
-- `BREVO_DOI_TEMPLATE_ID`
-- `BREVO_DOI_REDIRECT_URL`
 - `NEWSLETTER_CONFIRM_SECRET`
 
 These are only for server-side authenticated WordPress REST calls such as preview or editorial flows.
@@ -75,8 +73,6 @@ Set these on the deployment target before enabling editorial preview:
 - `BREVO_SENDER_NAME`
 - `BREVO_REPLY_TO_EMAIL`
 - `BREVO_REPLY_TO_NAME`
-- `BREVO_DOI_TEMPLATE_ID`
-- `BREVO_DOI_REDIRECT_URL`
 - `NEWSLETTER_CONFIRM_SECRET`
 
 ## Still incomplete
