@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import "./globals.css";
 import CryptoTicker from "@/components/CryptoTicker";
 import Navbar from "@/components/Navbar";
@@ -28,14 +29,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className="light">
       <body className="antialiased" style={{ background: "var(--page-bg)", color: "var(--text-primary)" }}>
-        <ThemeProvider>
-          <div className="fixed inset-x-0 top-0 z-50">
-            <CryptoTicker />
-            <Navbar />
-          </div>
-          <main className="min-h-screen pt-[92px]">{children}</main>
-          <Footer />
-        </ThemeProvider>
+        <Suspense fallback={<main className="min-h-screen pt-[92px]" />}>
+          <ThemeProvider>
+            <div className="fixed inset-x-0 top-0 z-50">
+              <CryptoTicker />
+              <Navbar />
+            </div>
+            <main className="min-h-screen pt-[92px]">{children}</main>
+            <Footer />
+          </ThemeProvider>
+        </Suspense>
       </body>
     </html>
   );
