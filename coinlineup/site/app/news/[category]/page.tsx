@@ -3,11 +3,11 @@ import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import NewsCard from "@/components/NewsCard";
 import CategoryStrip from "@/components/CategoryStrip";
-import { ALL_NEWS } from "@/lib/mockNews";
 import NewsletterForm from "@/components/NewsletterForm";
 import {
   getCategoryBySlug,
   getPostsByCategoryId,
+  getPostsByCategoryTreeSlug,
   mapWpPostToArticle,
   resolveCategoryByPath,
 } from "@/lib/wordpress";
@@ -38,10 +38,6 @@ function displayLabel(category: string) {
   return CATEGORY_LABELS[category.toLowerCase()] ?? (category.charAt(0).toUpperCase() + category.slice(1));
 }
 
-function normalize(s: string) {
-  return s.toLowerCase().replace(/-/g, " ").trim();
-}
-
 interface Props {
   params: Promise<{ category: string }>;
 }
@@ -69,12 +65,13 @@ async function CategoryContent({ params }: Props) {
 
   const label = liveCategory?.name ?? displayLabel(category);
   const livePosts = liveCategory ? await getPostsByCategoryId(liveCategory.id, 18) : [];
-  const articles = livePosts.length
-    ? livePosts.map((post) => mapWpPostToArticle(post, "news"))
-    : ALL_NEWS.filter((n) => normalize(n.category) === normalize(category));
-  const allOthers = livePosts.length
-    ? ALL_NEWS.slice(0, 4)
-    : ALL_NEWS.filter((n) => normalize(n.category) !== normalize(category)).slice(0, 4);
+  const articles = livePosts.map((post) => mapWpPostToArticle(post, "news"));
+  const allOthers = liveCategory
+    ? (await getPostsByCategoryTreeSlug("news", 8))
+        .filter((post) => !livePosts.some((item) => item.id === post.id))
+        .slice(0, 4)
+        .map((post) => mapWpPostToArticle(post, "news"))
+    : [];
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

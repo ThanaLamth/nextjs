@@ -3,7 +3,6 @@ import Link from "next/link";
 import { Flame, Clock3 } from "lucide-react";
 import NewsCard from "@/components/NewsCard";
 import CategoryStrip from "@/components/CategoryStrip";
-import { LATEST_NEWS, MOST_READ } from "@/lib/mockNews";
 import NewsletterForm from "@/components/NewsletterForm";
 import { getPostsByCategoryTreeSlug, mapWpPostToArticle } from "@/lib/wordpress";
 
@@ -11,8 +10,8 @@ export const metadata: Metadata = { title: "News — Crypto & Blockchain Headlin
 
 export default async function NewsPage() {
   const liveNews = await getPostsByCategoryTreeSlug("news", 12);
-  const latestNews = liveNews.length ? liveNews.map((post) => mapWpPostToArticle(post, "news")) : LATEST_NEWS.slice(0, 12);
-  const mostRead = latestNews.slice(0, 5).length ? latestNews.slice(0, 5) : MOST_READ.slice(0, 5);
+  const latestNews = liveNews.map((post) => mapWpPostToArticle(post, "news"));
+  const mostRead = latestNews.slice(0, 5);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -40,17 +39,27 @@ export default async function NewsPage() {
             </h2>
           </div>
 
-          {/* Featured first article */}
-          <div className="mb-5">
-            <NewsCard article={latestNews[0]} variant="featured" index={0} />
-          </div>
-
-          {/* News grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {latestNews.slice(1).map((a, i) => (
-              <NewsCard key={a.id} article={a} variant="default" index={i + 1} />
-            ))}
-          </div>
+          {latestNews.length > 0 ? (
+            <>
+              <div className="mb-5">
+                <NewsCard article={latestNews[0]} variant="featured" index={0} />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {latestNews.slice(1).map((a, i) => (
+                  <NewsCard key={a.id} article={a} variant="default" index={i + 1} />
+                ))}
+              </div>
+            </>
+          ) : (
+            <div className="rounded-2xl border px-6 py-12 text-center" style={{ borderColor: "var(--border)" }}>
+              <p className="font-display font-semibold text-lg mb-2" style={{ color: "var(--text-primary)" }}>
+                News feed is being populated
+              </p>
+              <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
+                WordPress has not returned any live news articles for this section yet.
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Sidebar */}
@@ -61,9 +70,15 @@ export default async function NewsPage() {
               <Flame size={18} className="text-brand-orange" />
               Most Read
             </h2>
-            {mostRead.map((a, i) => (
-              <NewsCard key={a.id} article={a} variant="compact" index={i} />
-            ))}
+            {mostRead.length > 0 ? (
+              mostRead.map((a, i) => (
+                <NewsCard key={a.id} article={a} variant="compact" index={i} />
+              ))
+            ) : (
+              <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
+                Most-read rankings will appear once live articles are available.
+              </p>
+            )}
           </div>
 
           {/* Newsletter CTA */}
@@ -83,16 +98,16 @@ export default async function NewsPage() {
               Browse by Topic
             </h3>
             <div className="flex flex-wrap gap-2">
-              {[
-                { label: "Bitcoin", href: "/news/bitcoin-news" },
-                { label: "Ethereum", href: "/news/ethereum" },
-                { label: "Altcoins", href: "/news/altcoins" },
-                { label: "Regulation", href: "/news/regulation" },
-                { label: "Banking", href: "/news/bank" },
-                { label: "Exchanges", href: "/news/exchanges" },
-                { label: "DeFi", href: "/news/defi" },
-                { label: "Blockchain Events", href: "/news/blockchain-events" },
-              ].map((tag) => (
+                {[
+                  { label: "Bitcoin", href: "/news/bitcoin-news" },
+                  { label: "Ethereum", href: "/news/ethereum" },
+                  { label: "Altcoins", href: "/news/altcoins" },
+                  { label: "Regulation", href: "/news/regulation" },
+                  { label: "Banking", href: "/news/banking" },
+                  { label: "Exchanges", href: "/news/exchanges" },
+                  { label: "DeFi", href: "/news/defi" },
+                  { label: "Blockchain Events", href: "/news/blockchain-events" },
+                ].map((tag) => (
                 <Link key={tag.href} href={tag.href}
                   className="px-3 py-1 rounded-full text-xs transition-colors hover:bg-brand-orange hover:text-white"
                   style={{ background: "var(--surface)", border: "1px solid var(--border)", color: "var(--text-secondary)" }}>

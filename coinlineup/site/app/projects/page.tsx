@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
 import NewsCard from "@/components/NewsCard";
-import { PROJECTS_SECTION } from "@/lib/mockNews";
+import { getPostsByCategoryTreeSlug, mapWpPostToArticle } from "@/lib/wordpress";
 
 export const metadata: Metadata = { title: "Projects — Crypto Projects" };
 
-export default function ProjectsPage() {
+export default async function ProjectsPage() {
+  const projects = (await getPostsByCategoryTreeSlug("projects", 18)).map((post) =>
+    mapWpPostToArticle(post, "projects")
+  );
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <div className="mb-8">
@@ -16,11 +20,22 @@ export default function ProjectsPage() {
           In-depth coverage of the most promising blockchain projects and protocols.
         </p>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        {PROJECTS_SECTION.map((a, i) => (
-          <NewsCard key={a.id} article={a} variant="default" index={i} />
-        ))}
-      </div>
+      {projects.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {projects.map((article, index) => (
+            <NewsCard key={article.id} article={article} variant="default" index={index} />
+          ))}
+        </div>
+      ) : (
+        <div className="rounded-2xl border px-6 py-12 text-center" style={{ borderColor: "var(--border)" }}>
+          <p className="font-display font-semibold text-lg mb-2" style={{ color: "var(--text-primary)" }}>
+            Project coverage is coming soon
+          </p>
+          <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
+            This section will go live once project posts are published in WordPress.
+          </p>
+        </div>
+      )}
     </div>
   );
 }

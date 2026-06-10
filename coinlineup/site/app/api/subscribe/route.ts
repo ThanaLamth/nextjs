@@ -83,6 +83,8 @@ export async function POST(request: Request) {
   return Response.json({
     ok: true,
     welcomeEmailSent,
-    message: "You’re subscribed. Check your inbox for a welcome note.",
+    message: welcomeEmailSent
+      ? "You’re subscribed. Check your inbox for a welcome note."
+      : "You’re subscribed to CoinLineup Daily.",
   });
 }

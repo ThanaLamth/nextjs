@@ -142,6 +142,19 @@ function SponsoredCompactRow({ title, sponsor, thumbnail, href }: typeof SPONSOR
   );
 }
 
+function EmptyColumnState({ label }: { label: string }) {
+  return (
+    <div className="rounded-xl border border-dashed px-3 py-6 text-center" style={{ borderColor: "var(--border)" }}>
+      <p className="text-xs font-semibold mb-1" style={{ color: "var(--text-primary)" }}>
+        No {label.toLowerCase()} stories yet
+      </p>
+      <p className="text-[11px]" style={{ color: "var(--text-muted)" }}>
+        This column will populate from WordPress once content is published.
+      </p>
+    </div>
+  );
+}
+
 interface Props {
   newsArticles: NewsArticle[];
   marketsArticles: NewsArticle[];
@@ -155,22 +168,40 @@ export default function BottomColumns({ newsArticles, marketsArticles, projectsA
         {/* NEWS */}
         <div>
           <ColumnHeader title="News" href="/news" icon={<Newspaper size={14} />} />
-          <FeaturedCard article={newsArticles[0]} />
-          {newsArticles.slice(1, 5).map((a) => <CompactRow key={a.id} article={a} />)}
+          {newsArticles[0] ? (
+            <>
+              <FeaturedCard article={newsArticles[0]} />
+              {newsArticles.slice(1, 5).map((a) => <CompactRow key={a.id} article={a} />)}
+            </>
+          ) : (
+            <EmptyColumnState label="News" />
+          )}
         </div>
 
         {/* MARKETS */}
         <div>
           <ColumnHeader title="Markets" href="/news/markets" icon={<BarChart2 size={14} />} />
-          <FeaturedCard article={marketsArticles[0]} />
-          {marketsArticles.slice(1, 5).map((a) => <CompactRow key={a.id} article={a} />)}
+          {marketsArticles[0] ? (
+            <>
+              <FeaturedCard article={marketsArticles[0]} />
+              {marketsArticles.slice(1, 5).map((a) => <CompactRow key={a.id} article={a} />)}
+            </>
+          ) : (
+            <EmptyColumnState label="Markets" />
+          )}
         </div>
 
         {/* PROJECTS */}
         <div>
           <ColumnHeader title="Projects" href="/projects" icon={<Rocket size={14} />} />
-          <FeaturedCard article={projectsArticles[0]} />
-          {projectsArticles.slice(1, 5).map((a) => <CompactRow key={a.id} article={a} />)}
+          {projectsArticles[0] ? (
+            <>
+              <FeaturedCard article={projectsArticles[0]} />
+              {projectsArticles.slice(1, 5).map((a) => <CompactRow key={a.id} article={a} />)}
+            </>
+          ) : (
+            <EmptyColumnState label="Projects" />
+          )}
         </div>
 
         {/* SPONSORED */}
