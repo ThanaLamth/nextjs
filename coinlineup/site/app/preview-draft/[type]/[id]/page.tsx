@@ -9,6 +9,8 @@ import {
 } from "@/lib/wordpress-auth";
 import { decodeHtml, estimateReadTime, formatDate, stripHtml } from "@/lib/content";
 
+export const dynamic = "force-dynamic";
+
 interface Props {
   params: Promise<{ type: string; id: string }>;
 }
