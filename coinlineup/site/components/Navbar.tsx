@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
-import { Search, User, Menu, X, ChevronDown } from "lucide-react";
+import { Search, Menu, X, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ThemeToggle from "./ThemeToggle";
 
@@ -117,12 +117,6 @@ export default function Navbar() {
               </button>
 
               <ThemeToggle />
-
-              <Link href="/profile"
-                className="hidden sm:flex p-2 rounded-lg transition-colors hover:bg-brand-orange/10"
-                style={{ color: "var(--nav-text)" }}>
-                <User size={17} />
-              </Link>
 
               <Link href="/signup"
                 className="bg-brand-orange hover:bg-brand-orange-dark text-white text-sm font-display font-bold px-4 py-1.5 rounded-lg transition-colors">
