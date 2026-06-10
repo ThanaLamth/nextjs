@@ -44,7 +44,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function PreviewPage({ params }: Props) {
+export default async function PreviewDraftPage({ params }: Props) {
   await connection();
   const { type, id } = await params;
   const entityId = Number.parseInt(id, 10);

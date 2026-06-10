@@ -49,7 +49,7 @@ async function resolveDraftEntityPath(
     const pagePath = pathFromWpLink(page.link);
     return page.status === "publish" && pagePath !== "/"
       ? pagePath
-      : `/_preview/page/${page.id}`;
+      : `/preview-draft/page/${page.id}`;
   }
 
   const post = await getAuthenticatedPostById(postId);
@@ -58,7 +58,7 @@ async function resolveDraftEntityPath(
   const postPath = pathFromWpLink(post.link);
   return post.status === "publish" && postPath !== "/"
     ? postPath
-    : `/_preview/post/${post.id}`;
+    : `/preview-draft/post/${post.id}`;
 }
 
 export async function GET(request: Request) {
