@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import SignUpForm from "./SignUpForm";
 import Link from "next/link";
 import Image from "next/image";
-import { Zap, Newspaper, BarChart2, Bell } from "lucide-react";
+import { Clock3, Newspaper, BellRing, ShieldCheck } from "lucide-react";
+import NewsletterForm from "@/components/NewsletterForm";
 
-export const metadata: Metadata = { title: "Sign Up — CoinLineup" };
+export const metadata: Metadata = { title: "Newsletter — CoinLineup" };
 
 export default function SignUpPage() {
   return (
@@ -26,24 +26,24 @@ export default function SignUpPage() {
           {/* Middle content */}
           <div className="flex-1 flex flex-col justify-center">
             <p className="text-brand-orange font-display font-semibold text-sm uppercase tracking-widest mb-4">
-              Join CoinLineup
+              CoinLineup Daily
             </p>
             <h2 className="font-display font-bold text-4xl text-white leading-tight mb-5">
-              Your Gateway to<br />
-              <span className="gradient-text">Real-Time Market</span><br />
-              Intelligence
+              Stay ahead of<br />
+              <span className="gradient-text">the market</span><br />
+              every morning
             </h2>
             <p className="text-brand-gray-33 text-base leading-relaxed mb-10">
-              Join over 2 million investors, traders, and crypto enthusiasts who trust CoinLineup for breaking news and market analysis.
+              Get the top crypto stories, market context, and guide picks in one clean daily email. No password, no profile setup, no extra friction.
             </p>
 
             {/* Benefits */}
             <div className="space-y-4">
               {[
-                { icon: <Zap size={18} />, title: "Live Market Data", desc: "Real-time prices for 10,000+ cryptocurrencies" },
-                { icon: <Newspaper size={18} />, title: "Breaking News", desc: "Be the first to know about market-moving events" },
-                { icon: <BarChart2 size={18} />, title: "Portfolio Insights", desc: "Track your holdings with advanced analytics" },
-                { icon: <Bell size={18} />, title: "Price Alerts", desc: "Custom alerts for your favourite assets" },
+                { icon: <Newspaper size={18} />, title: "Top stories that matter", desc: "The most important crypto, markets, and regulation updates in one brief." },
+                { icon: <Clock3 size={18} />, title: "Fast morning read", desc: "A concise roundup designed to be read in a few minutes." },
+                { icon: <BellRing size={18} />, title: "Market-moving context", desc: "Not just headlines. You get why the story matters." },
+                { icon: <ShieldCheck size={18} />, title: "Easy to leave", desc: "No spam. Unsubscribe anytime from any email." },
               ].map((b) => (
                 <div key={b.title} className="flex items-start gap-3">
                   <span className="text-brand-orange flex-shrink-0 mt-0.5">{b.icon}</span>
@@ -59,9 +59,9 @@ export default function SignUpPage() {
           {/* Bottom stats */}
           <div className="flex items-center gap-8 pt-8 border-t border-brand-gray-85">
             {[
-              { value: "2M+", label: "Members" },
-              { value: "50+", label: "Countries" },
-              { value: "24/7", label: "Coverage" },
+              { value: "Daily", label: "Briefing" },
+              { value: "News", label: "& Analysis" },
+              { value: "Email", label: "Only" },
             ].map((s) => (
               <div key={s.label}>
                 <p className="font-display font-bold text-2xl gradient-text">{s.value}</p>
@@ -85,20 +85,41 @@ export default function SignUpPage() {
 
           <div className="mb-8">
             <h1 className="font-display font-bold text-3xl mb-2" style={{ color: "var(--text-primary)" }}>
-              Create your account
+              Subscribe to CoinLineup Daily
             </h1>
             <p style={{ color: "var(--text-secondary)" }} className="text-sm">
-              Already have an account?{" "}
-              <Link href="/login" className="text-brand-orange font-semibold hover:underline">
-                Sign in
-              </Link>
+              A daily crypto briefing with the biggest stories, guide picks, and market context.
             </p>
           </div>
 
-          <SignUpForm />
+          <div className="space-y-5">
+            <NewsletterForm buttonText="Subscribe" />
+
+            <div
+              className="rounded-2xl border p-4"
+              style={{ background: "var(--card-bg)", borderColor: "var(--border)" }}
+            >
+              <p className="text-sm font-semibold mb-1" style={{ color: "var(--text-primary)" }}>
+                What you get
+              </p>
+              <ul className="space-y-2 text-sm" style={{ color: "var(--text-secondary)" }}>
+                <li>Top crypto news before the market moves</li>
+                <li>Selected guides and explainers worth reading</li>
+                <li>A clean inbox-first format with no account setup</li>
+              </ul>
+            </div>
+
+            <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
+              Looking for account features like watchlists or portfolios?{" "}
+              <Link href="/" className="text-brand-orange font-semibold hover:underline">
+                Those are not live yet
+              </Link>
+              .
+            </p>
+          </div>
 
           <p className="text-xs text-center mt-6" style={{ color: "var(--text-muted)" }}>
-            By creating an account, you agree to our{" "}
+            By subscribing, you agree to our{" "}
             <Link href="/terms" className="text-brand-orange hover:underline">Terms of Service</Link>
             {" "}and{" "}
             <Link href="/privacy" className="text-brand-orange hover:underline">Privacy Policy</Link>.
