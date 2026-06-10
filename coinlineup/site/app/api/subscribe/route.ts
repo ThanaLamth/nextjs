@@ -1,11 +1,15 @@
 import {
-  createBrevoDoubleOptInContact,
-  hasBrevoDoubleOptInConfig,
   hasBrevoNewsletterConfig,
   hasBrevoWelcomeEmailConfig,
+  sendBrevoConfirmationEmail,
   sendBrevoWelcomeEmail,
   subscribeEmailToBrevo,
 } from "@/lib/brevo";
+import {
+  createNewsletterConfirmationToken,
+  hasNewsletterConfirmationConfig,
+} from "@/lib/newsletter-confirm";
+import { getSiteUrl } from "@/lib/wordpress";
 
 interface SubscribeRequestBody {
   email?: string;
@@ -36,9 +40,13 @@ export async function POST(request: Request) {
     );
   }
 
-  if (hasBrevoDoubleOptInConfig()) {
+  if (hasNewsletterConfirmationConfig() && hasBrevoWelcomeEmailConfig()) {
     try {
-      await createBrevoDoubleOptInContact(email);
+      const token = createNewsletterConfirmationToken(email);
+      const confirmUrl = new URL("/api/newsletter/confirm", getSiteUrl());
+      confirmUrl.searchParams.set("token", token);
+
+      await sendBrevoConfirmationEmail(email, confirmUrl.toString());
       return Response.json({
         ok: true,
         confirmationRequired: true,

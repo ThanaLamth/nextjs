@@ -34,6 +34,7 @@ This is the working Next.js application for the CoinLineup migration.
 - `BREVO_REPLY_TO_NAME`
 - `BREVO_DOI_TEMPLATE_ID`
 - `BREVO_DOI_REDIRECT_URL`
+- `NEWSLETTER_CONFIRM_SECRET`
 
 These are only for server-side authenticated WordPress REST calls such as preview or editorial flows.
 Do not expose them through `NEXT_PUBLIC_*` variables or client components.
@@ -43,8 +44,8 @@ Do not expose them through `NEXT_PUBLIC_*` variables or client components.
 If `BREVO_SENDER_EMAIL` is also set, the same route will send a short welcome email after a successful subscribe.
 That email send is best-effort and does not block the subscriber from being added to the list.
 
-If `BREVO_DOI_TEMPLATE_ID` and `BREVO_DOI_REDIRECT_URL` are set, `POST /api/subscribe` switches to Brevo double opt-in mode.
-In that mode, the contact is only added to the newsletter list after they confirm from the email.
+If `NEWSLETTER_CONFIRM_SECRET` is set together with `BREVO_SENDER_EMAIL`, `POST /api/subscribe` switches to app-controlled double opt-in mode.
+In that mode, the app emails a signed confirmation link and only adds the contact to Brevo after the link is opened.
 
 ## Preview Flow
 
@@ -76,6 +77,7 @@ Set these on the deployment target before enabling editorial preview:
 - `BREVO_REPLY_TO_NAME`
 - `BREVO_DOI_TEMPLATE_ID`
 - `BREVO_DOI_REDIRECT_URL`
+- `NEWSLETTER_CONFIRM_SECRET`
 
 ## Still incomplete
 
