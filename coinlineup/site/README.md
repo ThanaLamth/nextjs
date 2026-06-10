@@ -28,11 +28,18 @@ This is the working Next.js application for the CoinLineup migration.
 - `WORDPRESS_API_APP_PASSWORD`
 - `BREVO_API_KEY`
 - `BREVO_LIST_ID`
+- `BREVO_SENDER_EMAIL`
+- `BREVO_SENDER_NAME`
+- `BREVO_REPLY_TO_EMAIL`
+- `BREVO_REPLY_TO_NAME`
 
 These are only for server-side authenticated WordPress REST calls such as preview or editorial flows.
 Do not expose them through `NEXT_PUBLIC_*` variables or client components.
 
 `BREVO_API_KEY` and `BREVO_LIST_ID` are used by `POST /api/subscribe` to add newsletter subscribers into the configured Brevo list.
+
+If `BREVO_SENDER_EMAIL` is also set, the same route will send a short welcome email after a successful subscribe.
+That email send is best-effort and does not block the subscriber from being added to the list.
 
 ## Preview Flow
 
@@ -58,6 +65,10 @@ Set these on the deployment target before enabling editorial preview:
 - `WORDPRESS_REVALIDATE_SECRET`
 - `BREVO_API_KEY`
 - `BREVO_LIST_ID`
+- `BREVO_SENDER_EMAIL`
+- `BREVO_SENDER_NAME`
+- `BREVO_REPLY_TO_EMAIL`
+- `BREVO_REPLY_TO_NAME`
 
 ## Still incomplete
 

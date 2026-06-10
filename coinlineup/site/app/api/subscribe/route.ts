@@ -1,4 +1,9 @@
-import { subscribeEmailToBrevo, hasBrevoNewsletterConfig } from "@/lib/brevo";
+import {
+  hasBrevoNewsletterConfig,
+  hasBrevoWelcomeEmailConfig,
+  sendBrevoWelcomeEmail,
+  subscribeEmailToBrevo,
+} from "@/lib/brevo";
 
 interface SubscribeRequestBody {
   email?: string;
@@ -31,11 +36,23 @@ export async function POST(request: Request) {
 
   try {
     await subscribeEmailToBrevo(email);
-    return Response.json({ ok: true });
   } catch {
     return Response.json(
       { error: "Subscription failed. Please try again." },
       { status: 502 },
     );
   }
+
+  let welcomeEmailSent = false;
+
+  if (hasBrevoWelcomeEmailConfig()) {
+    try {
+      await sendBrevoWelcomeEmail(email);
+      welcomeEmailSent = true;
+    } catch (error) {
+      console.error("Welcome email send failed", error);
+    }
+  }
+
+  return Response.json({ ok: true, welcomeEmailSent });
 }
