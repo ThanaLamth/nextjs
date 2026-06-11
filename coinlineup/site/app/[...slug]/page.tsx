@@ -6,7 +6,7 @@ import { connection } from "next/server";
 import { Clock, ArrowLeft } from "lucide-react";
 import NewsCard from "@/components/NewsCard";
 import AuthorByline from "@/components/AuthorByline";
-import { getAuthorProfile } from "@/lib/authors";
+import { getPublicAuthor } from "@/lib/authors";
 import {
   getRelatedPosts,
   getSiteUrl,
@@ -234,9 +234,10 @@ async function CatchAllContent({ params }: Props) {
   const excerpt = decodeHtml(stripHtml(resolved.post.excerpt.rendered)).trim();
   const postContent = sanitizeRenderedHtml(resolved.post.content.rendered);
   const author = resolved.post._embedded?.author?.[0];
-  const authorName = decodeHtml(author?.name ?? "CoinLineup Editorial Team");
-  const authorSlug = author?.slug;
-  const authorProfile = getAuthorProfile(authorName);
+  const publicAuthor = getPublicAuthor(author?.name, author?.slug);
+  const authorName = publicAuthor.name;
+  const authorSlug = publicAuthor.slug;
+  const authorProfile = publicAuthor.profile;
   const readTime = estimateReadTime(postContent);
   const publishedDate = formatDate(resolved.post.date);
   const updatedDate = formatDate(resolved.post.modified);
@@ -249,13 +250,19 @@ async function CatchAllContent({ params }: Props) {
     dateModified: resolved.post.modified,
     description: excerpt || buildMetaDescription(resolved.post.excerpt.rendered, resolved.post.title.rendered),
     mainEntityOfPage: `${getSiteUrl()}${pathFromWpLink(resolved.post.link)}`,
-    author: {
-      "@type": "Person",
-      name: authorName,
-      url: authorSlug ? `${getSiteUrl()}/authors#${authorSlug}` : undefined,
-      jobTitle: authorProfile?.role,
-      sameAs: authorProfile?.sameAs?.length ? authorProfile.sameAs : undefined,
-    },
+    author: publicAuthor.isEditorialTeam
+      ? {
+          "@type": "Organization",
+          name: authorName,
+          url: getSiteUrl(),
+        }
+      : {
+          "@type": "Person",
+          name: authorName,
+          url: authorSlug ? `${getSiteUrl()}/authors#${authorSlug}` : undefined,
+          jobTitle: authorProfile?.role,
+          sameAs: authorProfile?.sameAs?.length ? authorProfile.sameAs : undefined,
+        },
     publisher: {
       "@type": "Organization",
       name: "CoinLineup",

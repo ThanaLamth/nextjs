@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { ArrowLeft, Clock } from "lucide-react";
 import AuthorByline from "@/components/AuthorByline";
-import { getAuthorProfile } from "@/lib/authors";
+import { getPublicAuthor } from "@/lib/authors";
 import {
   getAuthenticatedPreviewPageById,
   getAuthenticatedPreviewPostById,
@@ -101,9 +101,13 @@ export default async function PreviewDraftPage({ params }: Props) {
   }
 
   const primaryCategory = entity._embedded?.["wp:term"]?.[0]?.[0];
-  const authorName = decodeHtml(entity._embedded?.author?.[0]?.name ?? "CoinLineup Editorial Team");
-  const authorSlug = entity._embedded?.author?.[0]?.slug;
-  const authorProfile = getAuthorProfile(authorName);
+  const publicAuthor = getPublicAuthor(
+    entity._embedded?.author?.[0]?.name,
+    entity._embedded?.author?.[0]?.slug,
+  );
+  const authorName = publicAuthor.name;
+  const authorSlug = publicAuthor.slug;
+  const authorProfile = publicAuthor.profile;
   const readTime = estimateReadTime(content);
 
   return (

@@ -1,5 +1,6 @@
 import "server-only";
 import { cacheLife, cacheTag } from "next/cache";
+import { getPublicAuthor } from "@/lib/authors";
 import {
   decodeHtml,
   estimateReadTime,
@@ -153,6 +154,7 @@ function getPrimaryCategory(post: WpPost): string {
 
 export function mapWpPostToArticle(post: WpPost, section?: NewsArticle["section"]): NewsArticle {
   const category = getPrimaryCategory(post);
+  const publicAuthor = getPublicAuthor(post._embedded?.author?.[0]?.name);
 
   return {
     id: post.id,
@@ -164,7 +166,7 @@ export function mapWpPostToArticle(post: WpPost, section?: NewsArticle["section"
     thumbnail: getFeaturedImage(post) || "/logo-white.png",
     date: formatDate(post.date),
     readTime: estimateReadTime(post.content.rendered),
-    author: decodeHtml(post._embedded?.author?.[0]?.name ?? "CoinLineup Editorial Team"),
+    author: publicAuthor.name,
     section,
   };
 }

@@ -8,6 +8,13 @@ export interface AuthorProfile {
   sameAs: string[];
 }
 
+export interface PublicAuthor {
+  name: string;
+  slug?: string;
+  profile: AuthorProfile | null;
+  isEditorialTeam: boolean;
+}
+
 const AUTHOR_PROFILES: AuthorProfile[] = [
   {
     name: "Rohan Mehta",
@@ -76,10 +83,32 @@ const AUTHOR_LOOKUP = new Map(
   AUTHOR_PROFILES.map((profile) => [profile.name.toLowerCase(), profile]),
 );
 
+const HIDDEN_AUTHOR_ALIASES = new Set(["pizza"]);
+
 export function getAuthorProfile(name?: string | null): AuthorProfile | null {
   if (!name) {
     return null;
   }
 
   return AUTHOR_LOOKUP.get(decodeHtml(name).trim().toLowerCase()) ?? null;
+}
+
+export function getPublicAuthor(name?: string | null, slug?: string | null): PublicAuthor {
+  const normalizedName = decodeHtml(name ?? "").trim();
+  const normalizedSlug = (slug ?? "").trim();
+
+  if (!normalizedName || HIDDEN_AUTHOR_ALIASES.has(normalizedName.toLowerCase())) {
+    return {
+      name: "CoinLineup Editorial Team",
+      profile: null,
+      isEditorialTeam: true,
+    };
+  }
+
+  return {
+    name: normalizedName,
+    slug: normalizedSlug || undefined,
+    profile: getAuthorProfile(normalizedName),
+    isEditorialTeam: false,
+  };
 }
