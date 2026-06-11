@@ -24,8 +24,23 @@ interface Props {
   params: Promise<{ slug: string[] }>;
 }
 
-function safeExcerpt(value: string): string {
-  return decodeHtml(stripHtml(sanitizeRenderedHtml(value))).slice(0, 160);
+function safeExcerpt(value: string, title?: string): string {
+  const plain = decodeHtml(stripHtml(sanitizeRenderedHtml(value))).trim();
+
+  if (!plain) {
+    return "";
+  }
+
+  if (!title) {
+    return plain.slice(0, 160);
+  }
+
+  const normalizedTitle = decodeHtml(title).trim();
+  const withoutTitlePrefix = plain.startsWith(normalizedTitle)
+    ? plain.slice(normalizedTitle.length).trimStart()
+    : plain;
+
+  return withoutTitlePrefix.slice(0, 160);
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -37,25 +52,31 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   if (resolved.kind === "post") {
+    const postTitle = decodeHtml(resolved.post.title.rendered);
+
     return {
-      title: decodeHtml(resolved.post.title.rendered),
-      description: safeExcerpt(resolved.post.excerpt.rendered),
+      title: postTitle,
+      description: safeExcerpt(resolved.post.excerpt.rendered, postTitle),
       alternates: {
         canonical: pathFromWpLink(resolved.post.link),
       },
       openGraph: {
         type: "article",
         url: `${getSiteUrl()}${pathFromWpLink(resolved.post.link)}`,
-        title: decodeHtml(resolved.post.title.rendered),
-        description: safeExcerpt(resolved.post.excerpt.rendered),
+        title: postTitle,
+        description: safeExcerpt(resolved.post.excerpt.rendered, postTitle),
       },
     };
   }
 
   if (resolved.kind === "page") {
+    const pageTitle = decodeHtml(resolved.page.title.rendered);
+    const pageDescriptionSource =
+      resolved.page.excerpt.rendered?.trim() || resolved.page.content.rendered;
+
     return {
-      title: decodeHtml(resolved.page.title.rendered),
-      description: safeExcerpt(resolved.page.excerpt.rendered),
+      title: pageTitle,
+      description: safeExcerpt(pageDescriptionSource, pageTitle),
       alternates: {
         canonical: pathFromWpLink(resolved.page.link),
       },
