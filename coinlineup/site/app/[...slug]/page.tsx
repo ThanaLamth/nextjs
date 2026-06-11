@@ -25,6 +25,35 @@ interface Props {
   params: Promise<{ slug: string[] }>;
 }
 
+const TRUST_PAGE_DESCRIPTIONS: Record<string, string> = {
+  about:
+    "CoinLineup covers crypto news, markets, blockchain developments, and educational guides with clearer sourcing, editorial transparency, and reader-facing standards.",
+  authors:
+    "Meet the public contributors and bylines behind CoinLineup coverage, along with the standards and disclosures that support article accountability.",
+  masthead:
+    "Review CoinLineup's public editorial structure, contributor list, newsroom contacts, and the information readers can use to evaluate who is behind the publication.",
+  "editorial-policy":
+    "Read how CoinLineup approaches accuracy, sourcing, transparency, editorial independence, and the distinction between journalism, analysis, and paid promotion.",
+  "publish-editorial-standards-fact-checking-policy":
+    "See the editorial standards and fact-checking expectations CoinLineup applies to sourcing, verification, updates, and article accountability.",
+  "corrections-policy":
+    "Learn how CoinLineup handles corrections, clarifications, updates, and reader-submitted accuracy concerns across published coverage.",
+  "ownership-funding-transparency":
+    "Understand CoinLineup's approach to ownership, funding transparency, commercial relationships, sponsorship labeling, and editorial independence.",
+  contacts:
+    "Contact CoinLineup for editorial questions, corrections requests, business inquiries, privacy requests, and general feedback.",
+  "privacy-policy":
+    "Read CoinLineup's privacy policy covering data collection, newsletter subscriptions, cookies, third-party services, retention, and user choices.",
+  "terms-conditions":
+    "Review CoinLineup's terms and conditions for site access, content use, user responsibilities, disclaimers, and legal limitations.",
+  "content-disclaimer":
+    "Read CoinLineup's content disclaimer explaining that site content is for informational purposes and should not be treated as financial, legal, or tax advice.",
+  "affiliate-disclaimer":
+    "Understand how CoinLineup discloses affiliate relationships, commercial links, and the separation between editorial coverage and monetization.",
+  "rss-feed":
+    "Find CoinLineup's RSS feed information, including the main feed URL, feed-reader usage notes, and how readers can follow newly published coverage.",
+};
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const resolved = await resolveContentByPath(slug);
@@ -55,10 +84,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const pageTitle = decodeHtml(resolved.page.title.rendered);
     const pageDescriptionSource =
       resolved.page.excerpt.rendered?.trim() || resolved.page.content.rendered;
+    const pageDescription =
+      TRUST_PAGE_DESCRIPTIONS[resolved.page.slug] ??
+      buildMetaDescription(pageDescriptionSource, pageTitle);
 
     return {
       title: pageTitle,
-      description: buildMetaDescription(pageDescriptionSource, pageTitle),
+      description: pageDescription,
       alternates: {
         canonical: pathFromWpLink(resolved.page.link),
       },
