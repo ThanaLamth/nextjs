@@ -73,7 +73,9 @@ async function GuideCategoryContent({ params }: Props) {
 
       {archive.children.length > 0 ? (
         <div className="mb-8 flex flex-wrap gap-2">
-          {archive.children.map((child) => (
+          {archive.children
+            .filter((child) => (child.count ?? 0) > 0)
+            .map((child) => (
             <Link
               key={child.id}
               href={pathFromWpLink(child.link)}

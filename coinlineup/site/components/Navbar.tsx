@@ -25,10 +25,6 @@ const NAV_LINKS = [
       { label: "Crypto Basics", href: "/guides/crypto-basics" },
       { label: "Bitcoin", href: "/guides/bitcoin" },
       { label: "Blockchain", href: "/guides/blockchain" },
-      { label: "Wallets", href: "/guides/wallets" },
-      { label: "Crypto Trading", href: "/guides/crypto-trading" },
-      { label: "DeFi", href: "/guides/defi" },
-      { label: "Security", href: "/guides/security" },
     ],
   },
   { label: "Markets", href: "/markets",
@@ -42,7 +38,6 @@ const NAV_LINKS = [
     children: [
       { label: "Top Projects", href: "/projects/top-projects" },
       { label: "Reviews", href: "/projects/reviews" },
-      { label: "New Projects", href: "/projects/new-projects" },
     ],
   },
   { label: "About", href: "/about" },

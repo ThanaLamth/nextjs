@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
 export default async function GuidesPage() {
   const archive = await getCategoryTreeArchiveBySlug("guides", 12);
-  const categories = archive?.children ?? [];
+  const categories = (archive?.children ?? []).filter((category) => (category.count ?? 0) > 0);
   const articles = archive?.posts.map((post) => mapWpPostToArticle(post, "guides")) ?? [];
 
   return (
