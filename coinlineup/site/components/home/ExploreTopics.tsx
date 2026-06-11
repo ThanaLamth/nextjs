@@ -3,11 +3,11 @@ import { Bitcoin, Layers, Coins, Scale, Landmark, ArrowLeftRight, Compass } from
 import SectionHeader from "./SectionHeader";
 
 const TOPICS = [
-  { label: "Bitcoin", sub: "BTC", icon: <Bitcoin size={18} />, color: "#F7931A", bg: "rgba(247,147,26,0.12)", href: "/news/bitcoin" },
+  { label: "Bitcoin", sub: "BTC", icon: <Bitcoin size={18} />, color: "#F7931A", bg: "rgba(247,147,26,0.12)", href: "/news/bitcoin-news" },
   { label: "Ethereum", sub: "ETH", icon: <Layers size={18} />, color: "#8B5CF6", bg: "rgba(139,92,246,0.12)", href: "/news/ethereum" },
   { label: "Altcoins", sub: "", icon: <Coins size={18} />, color: "#EC4899", bg: "rgba(236,72,153,0.12)", href: "/news/altcoins" },
   { label: "Regulation", sub: "", icon: <Scale size={18} />, color: "#F59E0B", bg: "rgba(245,158,11,0.12)", href: "/news/regulation" },
-  { label: "Banking", sub: "", icon: <Landmark size={18} />, color: "#10B981", bg: "rgba(16,185,129,0.12)", href: "/news/banking" },
+  { label: "Banking", sub: "", icon: <Landmark size={18} />, color: "#10B981", bg: "rgba(16,185,129,0.12)", href: "/news/bank" },
   { label: "Exchanges", sub: "", icon: <ArrowLeftRight size={18} />, color: "#3B82F6", bg: "rgba(59,130,246,0.12)", href: "/news/exchanges" },
 ];
 

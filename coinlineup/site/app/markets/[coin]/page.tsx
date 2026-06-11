@@ -6,7 +6,9 @@ import { getTopCoins, MOCK_COINS } from "@/lib/coingecko";
 
 const COIN_META: Record<string, { name: string; symbol: string; description: string }> = {
   bitcoin: { name: "Bitcoin", symbol: "BTC", description: "Track Bitcoin price, market cap, volume, and the latest BTC news and analysis." },
+  "bitcoin-markets": { name: "Bitcoin", symbol: "BTC", description: "Track Bitcoin price, market cap, volume, and the latest BTC news and analysis." },
   ethereum: { name: "Ethereum", symbol: "ETH", description: "Track Ethereum price, market cap, volume, and the latest ETH news and analysis." },
+  "ethereum-markets": { name: "Ethereum", symbol: "ETH", description: "Track Ethereum price, market cap, volume, and the latest ETH news and analysis." },
   xrp: { name: "XRP", symbol: "XRP", description: "Track XRP price, market cap, volume, and the latest XRP news and analysis." },
 };
 

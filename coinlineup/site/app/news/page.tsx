@@ -103,7 +103,7 @@ export default async function NewsPage() {
                   { label: "Ethereum", href: "/news/ethereum" },
                   { label: "Altcoins", href: "/news/altcoins" },
                   { label: "Regulation", href: "/news/regulation" },
-                  { label: "Banking", href: "/news/banking" },
+                  { label: "Banking", href: "/news/bank" },
                   { label: "Exchanges", href: "/news/exchanges" },
                   { label: "DeFi", href: "/news/defi" },
                   { label: "Blockchain Events", href: "/news/blockchain-events" },
