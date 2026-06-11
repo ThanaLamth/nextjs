@@ -252,6 +252,13 @@ html.light .category-pill {
   color: var(--text-muted);
 }
 
+.article-body .ez-toc-title-container,
+.article-body .ez-toc-btn,
+.article-body .ez-toc-toggle,
+.article-body .ez-toc-list {
+  display: none !important;
+}
+
 @media (min-width: 768px) {
   .article-body {
     font-size: 1.125rem;

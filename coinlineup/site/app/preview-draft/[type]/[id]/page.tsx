@@ -7,14 +7,20 @@ import {
   getAuthenticatedPreviewPageById,
   getAuthenticatedPreviewPostById,
 } from "@/lib/wordpress-auth";
-import { decodeHtml, estimateReadTime, formatDate, stripHtml } from "@/lib/content";
+import {
+  decodeHtml,
+  estimateReadTime,
+  formatDate,
+  sanitizeRenderedHtml,
+  stripHtml,
+} from "@/lib/content";
 
 interface Props {
   params: Promise<{ type: string; id: string }>;
 }
 
 function safeExcerpt(value: string): string {
-  return decodeHtml(stripHtml(value)).slice(0, 160);
+  return decodeHtml(stripHtml(sanitizeRenderedHtml(value))).slice(0, 160);
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -64,6 +70,9 @@ export default async function PreviewDraftPage({ params }: Props) {
 
   const title = decodeHtml(entity.title.rendered);
   const excerpt = decodeHtml(stripHtml(entity.excerpt.rendered || entity.content.rendered)).trim();
+  const content = sanitizeRenderedHtml(entity.content.rendered, {
+    removeLeadingHeading: type === "page",
+  });
 
   if (type === "page") {
     return (
@@ -83,7 +92,7 @@ export default async function PreviewDraftPage({ params }: Props) {
         </h1>
         <div
           className="article-body max-w-3xl"
-          dangerouslySetInnerHTML={{ __html: entity.content.rendered }}
+          dangerouslySetInnerHTML={{ __html: content }}
         />
       </div>
     );
@@ -91,7 +100,7 @@ export default async function PreviewDraftPage({ params }: Props) {
 
   const primaryCategory = entity._embedded?.["wp:term"]?.[0]?.[0];
   const authorName = decodeHtml(entity._embedded?.author?.[0]?.name ?? "CoinLineup Editorial Team");
-  const readTime = estimateReadTime(entity.content.rendered);
+  const readTime = estimateReadTime(content);
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -126,7 +135,7 @@ export default async function PreviewDraftPage({ params }: Props) {
         <div className="max-w-3xl">
           <div
             className="article-body"
-            dangerouslySetInnerHTML={{ __html: entity.content.rendered }}
+            dangerouslySetInnerHTML={{ __html: content }}
           />
         </div>
       </article>

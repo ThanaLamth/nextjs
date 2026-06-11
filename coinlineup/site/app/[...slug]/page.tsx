@@ -12,14 +12,20 @@ import {
   pathFromWpLink,
   resolveContentByPath,
 } from "@/lib/wordpress";
-import { decodeHtml, estimateReadTime, formatDate, stripHtml } from "@/lib/content";
+import {
+  decodeHtml,
+  estimateReadTime,
+  formatDate,
+  sanitizeRenderedHtml,
+  stripHtml,
+} from "@/lib/content";
 
 interface Props {
   params: Promise<{ slug: string[] }>;
 }
 
 function safeExcerpt(value: string): string {
-  return decodeHtml(value).slice(0, 160);
+  return decodeHtml(stripHtml(sanitizeRenderedHtml(value))).slice(0, 160);
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -83,6 +89,10 @@ async function CatchAllContent({ params }: Props) {
   }
 
   if (resolved.kind === "page") {
+    const pageContent = sanitizeRenderedHtml(resolved.page.content.rendered, {
+      removeLeadingHeading: true,
+    });
+
     return (
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <Link
@@ -97,7 +107,7 @@ async function CatchAllContent({ params }: Props) {
         </h1>
         <div
           className="article-body"
-          dangerouslySetInnerHTML={{ __html: resolved.page.content.rendered }}
+          dangerouslySetInnerHTML={{ __html: pageContent }}
         />
       </div>
     );
@@ -135,10 +145,11 @@ async function CatchAllContent({ params }: Props) {
   const relatedArticles = related.map((post) => mapWpPostToArticle(post));
   const primaryCategory = resolved.post._embedded?.["wp:term"]?.[0]?.[0];
   const excerpt = decodeHtml(stripHtml(resolved.post.excerpt.rendered)).trim();
+  const postContent = sanitizeRenderedHtml(resolved.post.content.rendered);
   const author = resolved.post._embedded?.author?.[0];
   const authorName = decodeHtml(author?.name ?? "CoinLineup Editorial Team");
   const authorSlug = author?.slug;
-  const readTime = estimateReadTime(resolved.post.content.rendered);
+  const readTime = estimateReadTime(postContent);
   const publishedDate = formatDate(resolved.post.date);
   const updatedDate = formatDate(resolved.post.modified);
   const showUpdatedDate = resolved.post.modified !== resolved.post.date;
@@ -193,7 +204,7 @@ async function CatchAllContent({ params }: Props) {
         <div className="max-w-3xl">
           <div
             className="article-body"
-            dangerouslySetInnerHTML={{ __html: resolved.post.content.rendered }}
+            dangerouslySetInnerHTML={{ __html: postContent }}
           />
         </div>
       </article>

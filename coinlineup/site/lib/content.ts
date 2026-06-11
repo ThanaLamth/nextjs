@@ -36,6 +36,35 @@ export function stripHtml(value: string): string {
   return value.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
 }
 
+interface SanitizeRenderedHtmlOptions {
+  removeLeadingHeading?: boolean;
+}
+
+export function sanitizeRenderedHtml(
+  value: string,
+  options: SanitizeRenderedHtmlOptions = {},
+): string {
+  let sanitized = value;
+
+  // Remove plugin-generated table-of-contents blocks that clutter trust pages.
+  sanitized = sanitized.replace(
+    /<div[^>]*id=(["'])ez-toc-container\1[^>]*>[\s\S]*?<\/nav>\s*<\/div>/gi,
+    "",
+  );
+
+  // Remove inline marker spans injected around headings by the TOC plugin.
+  sanitized = sanitized.replace(/<span[^>]*class=(["'])ez-toc-section(?:-end)?\1[^>]*>[\s\S]*?<\/span>/gi, "");
+
+  if (options.removeLeadingHeading) {
+    sanitized = sanitized.replace(/^\s*<h1\b[^>]*>[\s\S]*?<\/h1>\s*/i, "");
+  }
+
+  sanitized = sanitized.replace(/<p>\s*(?:&nbsp;|\u00a0|\s)*<\/p>/gi, "");
+  sanitized = sanitized.replace(/\n{3,}/g, "\n\n");
+
+  return sanitized.trim();
+}
+
 export function decodeHtml(value: string): string {
   return value
     .replace(/&#8217;|&#039;|&#x27;/g, "'")
