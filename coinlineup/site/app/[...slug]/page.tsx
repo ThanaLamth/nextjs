@@ -54,6 +54,54 @@ const TRUST_PAGE_DESCRIPTIONS: Record<string, string> = {
     "Find CoinLineup's RSS feed information, including the main feed URL, feed-reader usage notes, and how readers can follow newly published coverage.",
 };
 
+const TRUST_PAGE_CONTENT_OVERRIDES: Record<string, string> = {
+  about: `
+    <h1>About CoinLineup</h1>
+    <p>CoinLineup is a digital publication covering cryptocurrency news, markets, blockchain developments, and educational guides. Our goal is to help readers understand fast-moving digital asset stories with clearer reporting, plain-language context, and visible editorial standards.</p>
+    <p>We publish a mix of breaking news, explainers, market coverage, project reviews, and educational content for readers who want useful information rather than hype, imitation, or disguised promotion.</p>
+    <h2>What CoinLineup is trying to do</h2>
+    <p>Crypto publishing often moves faster than verification. CoinLineup's public trust pages exist so readers can see how the site presents its authorship, sourcing standards, corrections path, and commercial disclosures. We want readers to be able to evaluate not just what we publish, but how we publish it.</p>
+    <p>This approach aligns with the broader expectation that news publishers should make it easy for readers to find information about the publication, the people behind it, and the standards applied to its work.</p>
+    <h2>What we cover</h2>
+    <ul>
+      <li>Crypto and blockchain news</li>
+      <li>Market developments and token ecosystem updates</li>
+      <li>Beginner and advanced guides</li>
+      <li>Project reviews and research-driven explainers</li>
+      <li>Regulation, exchanges, DeFi, NFTs, and infrastructure stories</li>
+    </ul>
+    <h2>Who the site is for</h2>
+    <p>CoinLineup serves a mixed audience that may include first-time crypto readers, active traders, researchers, and Web3 operators. Because that audience has different experience levels, we try to distinguish basic explainers from more technical analysis and avoid presenting speculation as settled fact.</p>
+    <h2>How we work</h2>
+    <p>CoinLineup aims to make each article accountable and easy to evaluate. We show bylines, visible publication information, and editorial policy pages so readers can understand who wrote the piece, how we verify information, and how to report an issue.</p>
+    <ul>
+      <li><a href="/editorial-policy/">Editorial Policy</a></li>
+      <li><a href="/publish-editorial-standards-fact-checking-policy/">Editorial Standards &amp; Fact-Checking</a></li>
+      <li><a href="/corrections-policy/">Corrections Policy</a></li>
+      <li><a href="/ownership-funding-transparency/">Ownership &amp; Funding Transparency</a></li>
+      <li><a href="/authors/">Authors</a></li>
+      <li><a href="/masthead/">Masthead</a></li>
+      <li><a href="/contacts/">Contact</a></li>
+    </ul>
+    <h2>Signals readers should expect on CoinLineup pages</h2>
+    <ul>
+      <li>A visible byline or accountable editorial label</li>
+      <li>A publication date, and an updated date when a page is materially revised</li>
+      <li>Links to policy, disclosure, or contact pages when they help explain how the content was produced</li>
+      <li>Clear labels when a page contains sponsored, promotional, or affiliate-supported elements</li>
+    </ul>
+    <h2>Editorial independence</h2>
+    <p>Editorial decisions are made independently from advertisers, sponsors, and affiliate relationships. CoinLineup does not sell favorable coverage, positive reviews, or guaranteed editorial placement.</p>
+    <p>When content includes sponsorship, commercial placement, or affiliate relationships, we aim to label that relationship clearly so readers can distinguish news and analysis from paid promotion.</p>
+    <h2>What CoinLineup is not</h2>
+    <p>CoinLineup is a publisher, not an exchange, token issuer, broker, investment adviser, or law firm. Coverage may discuss companies, products, tokens, protocols, and market events, but publication does not equal endorsement.</p>
+    <h2>How this page should be used</h2>
+    <p>This page is intended to give readers a plain-language starting point. More specific process information appears on the Editorial Policy, Fact-Checking, Corrections, Ownership, Authors, and Masthead pages linked above.</p>
+    <h2>Reader note</h2>
+    <p>CoinLineup is a publisher, not an investment adviser. Nothing on this website should be treated as financial, legal, or tax advice. Readers should verify important claims and perform their own research before making decisions involving digital assets.</p>
+  `,
+};
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const resolved = await resolveContentByPath(slug);
@@ -124,9 +172,11 @@ async function CatchAllContent({ params }: Props) {
   }
 
   if (resolved.kind === "page") {
-    const pageContent = sanitizeRenderedHtml(resolved.page.content.rendered, {
-      removeLeadingHeading: true,
-    });
+    const pageContent =
+      TRUST_PAGE_CONTENT_OVERRIDES[resolved.page.slug] ??
+      sanitizeRenderedHtml(resolved.page.content.rendered, {
+        removeLeadingHeading: true,
+      });
 
     return (
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
