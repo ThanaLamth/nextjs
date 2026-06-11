@@ -92,8 +92,6 @@ const pages = [
       <p>His public profile materials also point to a technical education background and prior work connected to blockchain writing and GameFi analysis, which aligns with CoinLineup's use of his byline for gaming-adjacent and altcoin ecosystem coverage.</p>
       <p><strong>Focus areas:</strong> Altcoin ecosystems, GameFi, NFTs, exchange coverage, and digital ownership trends.</p>
       <p><strong>Public profiles:</strong> <a href="https://x.com/YukiMatsud82024" rel="nofollow noopener noreferrer" target="_blank">X</a> · <a href="https://www.youtube.com/@YukiOnWeb3" rel="nofollow noopener noreferrer" target="_blank">YouTube</a></p>
-      <h2 id="thorne-callahan">Thorne Callahan</h2>
-      <p>Thorne Callahan writes about crypto mining, blockchain infrastructure, DeFi protocols, and practical how-to coverage for readers navigating the technical side of digital assets.</p>
       <h2>Disclosure expectations</h2>
       <p>Where CoinLineup considers a contributor's holdings, affiliations, or commercial relationships material to a topic, those interests should be disclosed in a way that helps readers assess potential conflicts. Not every article requires a disclosure note, but material conflicts should not remain hidden.</p>
       <h2>How author information is maintained</h2>
@@ -121,7 +119,6 @@ const pages = [
         <li>Rohan Mehta, Crypto Markets Reporter</li>
         <li>Jensen Ackles (Acklesverse), DeFi and Tokenomics Analyst</li>
         <li>Yuki Matsuda, Altcoins and Web3 Gaming Reporter</li>
-        <li>Thorne Callahan</li>
       </ul>
       <h2>How to use this page</h2>
       <p>If you are checking whether a CoinLineup page comes from a visible editorial operation, this page should be read together with <a href="/authors/">Authors</a>, <a href="/editorial-policy/">Editorial Policy</a>, and <a href="/corrections-policy/">Corrections Policy</a>.</p>

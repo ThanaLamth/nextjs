@@ -83,7 +83,7 @@ const AUTHOR_LOOKUP = new Map(
   AUTHOR_PROFILES.map((profile) => [profile.name.toLowerCase(), profile]),
 );
 
-const HIDDEN_AUTHOR_ALIASES = new Set(["pizza"]);
+const HIDDEN_AUTHOR_ALIASES = new Set(["pizza", "thorne callahan"]);
 
 export function getAuthorProfile(name?: string | null): AuthorProfile | null {
   if (!name) {
