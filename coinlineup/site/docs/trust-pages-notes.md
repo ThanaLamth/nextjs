@@ -16,6 +16,10 @@ This file captures the rationale behind the CoinLineup trust page set and the fr
 - RSS discovery and crawler references:
   - https://developers.google.com/search/blog/2009/10/using-rssatom-feeds-to-discover-new-content
   - https://developers.google.com/crawling/docs/crawlers-fetchers/feedfetcher
+- Search Central guidance on helpful, reliable, people-first content:
+  - https://developers.google.com/search/docs/fundamentals/creating-helpful-content
+- Search Essentials baseline:
+  - https://developers.google.com/search/docs/essentials
 
 ## CoinDesk reference pattern
 
@@ -51,3 +55,27 @@ The CoinLineup implementation avoids copying CoinDesk wording and instead adapts
 - Article templates should show visible author attribution and publication information.
 - Footer links should expose the trust page cluster directly.
 - Unsupported social-proof claims and placeholder social links should be removed.
+
+## Current content strategy
+
+The trust pages were expanded beyond "thin policy stubs" so each page answers a concrete trust question:
+
+- `about`: what CoinLineup is, who it serves, what signals readers should expect on articles, and where to find deeper process pages
+- `authors`: who writes the content, what topics they cover, and how contributor accountability and disclosures are maintained
+- `masthead`: who is publicly responsible for the publication and where editorial or operational questions should be directed
+- `editorial-policy`: sourcing hierarchy, attribution, editorial independence, updates after publication, and separation from commercial influence
+- `publish-editorial-standards-fact-checking-policy`: practical verification workflow, visible article signals, and how uncertain information is handled
+- `corrections-policy`: correction types, intake expectations, and how significant factual issues are reviewed
+- `ownership-funding-transparency`: revenue sources, disclosure rules, and separation between monetization and editorial judgment
+- `contacts`: clear routes for corrections, privacy, legal, editorial, and commercial requests
+- `rss-feed`: explicit feed location and purpose for readers and compatible discovery systems
+
+## Remaining gaps that need real business data
+
+These pages can be structurally strong without inventing facts, but some sections should eventually be upgraded with first-party information from the site owner:
+
+- formal operating entity name, if one should be public
+- jurisdiction or company registration details, if appropriate
+- named editor roles beyond contributor bylines
+- physical mailing address or legal notice address, if the business wants to publish one
+- specific newsletter or analytics vendors, once those choices are stable
