@@ -8,6 +8,7 @@ import {
   getAuthenticatedPreviewPostById,
 } from "@/lib/wordpress-auth";
 import {
+  buildMetaDescription,
   decodeHtml,
   estimateReadTime,
   formatDate,
@@ -17,10 +18,6 @@ import {
 
 interface Props {
   params: Promise<{ type: string; id: string }>;
-}
-
-function safeExcerpt(value: string): string {
-  return decodeHtml(stripHtml(sanitizeRenderedHtml(value))).slice(0, 160);
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -42,7 +39,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return {
     title: `${decodeHtml(entity.title.rendered)} (Preview)`,
-    description: safeExcerpt(entity.excerpt.rendered || entity.content.rendered),
+    description: buildMetaDescription(
+      entity.excerpt.rendered || entity.content.rendered,
+      entity.title.rendered,
+    ),
     robots: {
       index: false,
       follow: false,

@@ -36,6 +36,10 @@ export function stripHtml(value: string): string {
   return value.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
 }
 
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 interface SanitizeRenderedHtmlOptions {
   removeLeadingHeading?: boolean;
 }
@@ -77,6 +81,31 @@ export function decodeHtml(value: string): string {
     .replace(/&nbsp;/g, " ")
     .replace(/&#8217/g, "'")
     .trim();
+}
+
+export function buildMetaDescription(value: string, title?: string, maxLength = 160): string {
+  let plain = decodeHtml(stripHtml(sanitizeRenderedHtml(value, {
+    removeLeadingHeading: true,
+  }))).trim();
+
+  if (!plain) {
+    return "";
+  }
+
+  if (title) {
+    const normalizedTitle = decodeHtml(title).trim();
+
+    if (normalizedTitle) {
+      const titlePrefixPattern = new RegExp(`^(?:${escapeRegExp(normalizedTitle)}[\\s:|\\-]+)+`, "i");
+      plain = plain.replace(titlePrefixPattern, "").trim();
+    }
+  }
+
+  if (plain.length <= maxLength) {
+    return plain;
+  }
+
+  return plain.slice(0, maxLength).trimEnd();
 }
 
 export function estimateReadTime(html: string): string {

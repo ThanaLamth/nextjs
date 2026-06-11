@@ -13,6 +13,7 @@ import {
   resolveContentByPath,
 } from "@/lib/wordpress";
 import {
+  buildMetaDescription,
   decodeHtml,
   estimateReadTime,
   formatDate,
@@ -22,25 +23,6 @@ import {
 
 interface Props {
   params: Promise<{ slug: string[] }>;
-}
-
-function safeExcerpt(value: string, title?: string): string {
-  const plain = decodeHtml(stripHtml(sanitizeRenderedHtml(value))).trim();
-
-  if (!plain) {
-    return "";
-  }
-
-  if (!title) {
-    return plain.slice(0, 160);
-  }
-
-  const normalizedTitle = decodeHtml(title).trim();
-  const withoutTitlePrefix = plain.startsWith(normalizedTitle)
-    ? plain.slice(normalizedTitle.length).trimStart()
-    : plain;
-
-  return withoutTitlePrefix.slice(0, 160);
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -56,7 +38,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
     return {
       title: postTitle,
-      description: safeExcerpt(resolved.post.excerpt.rendered, postTitle),
+      description: buildMetaDescription(resolved.post.excerpt.rendered, postTitle),
       alternates: {
         canonical: pathFromWpLink(resolved.post.link),
       },
@@ -64,7 +46,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         type: "article",
         url: `${getSiteUrl()}${pathFromWpLink(resolved.post.link)}`,
         title: postTitle,
-        description: safeExcerpt(resolved.post.excerpt.rendered, postTitle),
+        description: buildMetaDescription(resolved.post.excerpt.rendered, postTitle),
       },
     };
   }
@@ -76,7 +58,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
     return {
       title: pageTitle,
-      description: safeExcerpt(pageDescriptionSource, pageTitle),
+      description: buildMetaDescription(pageDescriptionSource, pageTitle),
       alternates: {
         canonical: pathFromWpLink(resolved.page.link),
       },
