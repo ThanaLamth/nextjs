@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Search, Menu, X, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ThemeToggle from "./ThemeToggle";
@@ -48,10 +49,28 @@ const NAV_LINKS = [
 ];
 
 export default function Navbar() {
+  const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [dropdown, setDropdown] = useState<string | null>(null);
+
+  function submitSearch() {
+    const query = searchQuery.trim();
+
+    if (!searchOpen) {
+      setSearchOpen(true);
+      return;
+    }
+
+    if (!query) {
+      setSearchOpen(false);
+      return;
+    }
+
+    router.push(`/search?q=${encodeURIComponent(query)}`);
+    setSearchOpen(false);
+  }
 
   return (
     <header className="relative w-full">
@@ -102,15 +121,22 @@ export default function Navbar() {
                 {searchOpen && (
                   <motion.div initial={{ width: 0, opacity: 0 }} animate={{ width: 200, opacity: 1 }}
                     exit={{ width: 0, opacity: 0 }} transition={{ duration: 0.18 }} className="overflow-hidden">
-                    <input autoFocus type="text" value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Search news, coins..."
-                      className="w-full rounded-lg px-3 py-1.5 text-sm nav-input focus:outline-none focus:ring-1 focus:ring-brand-orange border" />
+                    <form
+                      onSubmit={(event) => {
+                        event.preventDefault();
+                        submitSearch();
+                      }}
+                    >
+                      <input autoFocus type="text" value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Search stories..."
+                        className="w-full rounded-lg px-3 py-1.5 text-sm nav-input focus:outline-none focus:ring-1 focus:ring-brand-orange border" />
+                    </form>
                   </motion.div>
                 )}
               </AnimatePresence>
 
-              <button onClick={() => setSearchOpen(!searchOpen)}
+              <button onClick={submitSearch}
                 className="p-2 rounded-lg transition-colors hover:bg-brand-orange/10"
                 style={{ color: "var(--nav-text)" }}>
                 {searchOpen ? <X size={17} /> : <Search size={17} />}
@@ -168,6 +194,24 @@ export default function Navbar() {
                     )}
                   </div>
                 ))}
+                <form
+                  className="pt-2"
+                  onSubmit={(event) => {
+                    event.preventDefault();
+                    const query = searchQuery.trim();
+                    if (!query) return;
+                    router.push(`/search?q=${encodeURIComponent(query)}`);
+                    setMobileOpen(false);
+                  }}
+                >
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search stories..."
+                    className="w-full rounded-lg px-3 py-2 text-sm nav-input focus:outline-none focus:ring-1 focus:ring-brand-orange border"
+                  />
+                </form>
                 <div className="pt-2 border-t" style={{ borderColor: "var(--nav-dropdown-border)" }}>
                   <Link href="/signup" onClick={() => setMobileOpen(false)}
                     className="block text-center bg-brand-orange text-white font-semibold py-2.5 rounded-lg text-sm">

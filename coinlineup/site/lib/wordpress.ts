@@ -411,3 +411,40 @@ export async function getHomePageData() {
     ),
   };
 }
+
+export async function searchWordPressContent(query: string, limit = 12): Promise<NewsArticle[]> {
+  const search = query.trim();
+  if (!search) {
+    return [];
+  }
+
+  const [posts, pages] = await Promise.all([
+    fetchWordPressJson<WpPost[]>("posts", {
+      search,
+      per_page: limit,
+      _embed: 1,
+    }),
+    fetchWordPressJson<WpPage[]>("pages", {
+      search,
+      per_page: Math.min(limit, 6),
+      _embed: 1,
+    }),
+  ]);
+
+  const postResults = posts.map((post) => mapWpPostToArticle(post, "news"));
+  const pageResults = pages.map((page) => ({
+    id: page.id,
+    slug: page.slug,
+    href: pathFromWpLink(page.link),
+    title: decodeHtml(page.title.rendered),
+    excerpt: decodeHtml(stripHtml(page.excerpt.rendered || page.content.rendered)).slice(0, 180),
+    category: "Page",
+    thumbnail: getFeaturedImage(page) || "/logo-white.png",
+    date: formatDate(page.date),
+    readTime: estimateReadTime(page.content.rendered),
+    author: "CoinLineup",
+    section: undefined,
+  }));
+
+  return [...postResults, ...pageResults].slice(0, limit);
+}
