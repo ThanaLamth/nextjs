@@ -135,8 +135,13 @@ async function CatchAllContent({ params }: Props) {
   const relatedArticles = related.map((post) => mapWpPostToArticle(post));
   const primaryCategory = resolved.post._embedded?.["wp:term"]?.[0]?.[0];
   const excerpt = decodeHtml(stripHtml(resolved.post.excerpt.rendered)).trim();
-  const authorName = decodeHtml(resolved.post._embedded?.author?.[0]?.name ?? "CoinLineup Editorial Team");
+  const author = resolved.post._embedded?.author?.[0];
+  const authorName = decodeHtml(author?.name ?? "CoinLineup Editorial Team");
+  const authorSlug = author?.slug;
   const readTime = estimateReadTime(resolved.post.content.rendered);
+  const publishedDate = formatDate(resolved.post.date);
+  const updatedDate = formatDate(resolved.post.modified);
+  const showUpdatedDate = resolved.post.modified !== resolved.post.date;
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -167,9 +172,21 @@ async function CatchAllContent({ params }: Props) {
           </p>
         ) : null}
         <div className="flex flex-wrap items-center gap-3 text-sm mb-8" style={{ color: "var(--text-secondary)" }}>
-          <span className="font-medium" style={{ color: "var(--text-primary)" }}>By {authorName}</span>
+          {authorSlug ? (
+            <Link href={`/authors#${authorSlug}`} className="font-medium hover:text-brand-orange transition-colors" style={{ color: "var(--text-primary)" }}>
+              By {authorName}
+            </Link>
+          ) : (
+            <span className="font-medium" style={{ color: "var(--text-primary)" }}>By {authorName}</span>
+          )}
           <span className="text-[10px]">•</span>
-          <span>Updated {formatDate(resolved.post.modified)}</span>
+          <span>Published {publishedDate}</span>
+          {showUpdatedDate ? (
+            <>
+              <span className="text-[10px]">•</span>
+              <span>Updated {updatedDate}</span>
+            </>
+          ) : null}
           <span className="text-[10px]">•</span>
           <span className="inline-flex items-center gap-1"><Clock size={14} />{readTime}</span>
         </div>

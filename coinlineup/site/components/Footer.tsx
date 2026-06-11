@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Twitter, Github, Youtube, Send, Mail, Star } from "lucide-react";
+import { Twitter, Mail, Rss, ShieldCheck, BadgeInfo, FileText } from "lucide-react";
 import NewsletterForm from "@/components/NewsletterForm";
 
 const FOOTER_LINKS: Record<string, { label: string; href: string; external?: boolean }[]> = {
@@ -10,16 +10,21 @@ const FOOTER_LINKS: Record<string, { label: string; href: string; external?: boo
     { label: "Markets", href: "/markets" },
     { label: "Projects", href: "/projects" },
   ],
-  Resources: [
-    { label: "About Us", href: "/about" },
+  "Trust & Company": [
+    { label: "About", href: "/about" },
+    { label: "Authors", href: "/authors" },
+    { label: "Editorial Policy", href: "/editorial-policy" },
+    { label: "Corrections Policy", href: "/corrections-policy" },
+    { label: "Ownership & Funding", href: "/ownership-funding-transparency" },
+    { label: "Masthead", href: "/masthead" },
     { label: "Contact", href: "/contacts" },
-    { label: "Privacy Policy", href: "/privacy-policy" },
-    { label: "Terms of Use", href: "/terms-conditions" },
   ],
-  Community: [
-    { label: "Newsletter", href: "/signup" },
-    { label: "Twitter (X)", href: "https://twitter.com/coinlineup", external: true },
-    { label: "Discord", href: "https://discord.gg/coinlineup", external: true },
+  "Legal & Access": [
+    { label: "Privacy Policy", href: "/privacy-policy" },
+    { label: "Terms of Service", href: "/terms-conditions" },
+    { label: "Content Disclaimer", href: "/content-disclaimer" },
+    { label: "Affiliate Disclaimer", href: "/affiliate-disclaimer" },
+    { label: "RSS", href: "/rss-feed" },
   ],
 };
 
@@ -140,19 +145,27 @@ export default function Footer() {
             <PhoneMockup />
           </div>
 
-          {/* Col 3: Social proof / Feedback */}
+          {/* Col 3: Trust signals */}
           <div className="flex flex-col items-center text-center">
-            <p className="font-display font-bold text-4xl mb-1" style={{ color: "var(--footer-text)" }}>
-              Join 50,000+
+            <p className="font-display font-bold text-3xl mb-2 leading-tight" style={{ color: "var(--footer-text)" }}>
+              Clear sourcing.<br />Visible standards.
             </p>
-            <p className="text-base mb-5" style={{ color: "var(--footer-text-muted)" }}>crypto enthusiasts</p>
-            <div className="flex items-center gap-1.5 mb-3">
-              {[1, 2, 3, 4, 5].map((s) => (
-                <Star key={s} size={22} className="fill-brand-gold text-brand-gold" />
+            <p className="text-sm mb-5 max-w-xs" style={{ color: "var(--footer-text-muted)" }}>
+              CoinLineup publishes trust pages, attribution standards, and clear reader disclosures to keep coverage accountable.
+            </p>
+            <div className="space-y-3 text-left w-full max-w-xs">
+              {[
+                { icon: <ShieldCheck size={16} />, label: "Editorial policies published" },
+                { icon: <BadgeInfo size={16} />, label: "Sponsored content must be labeled" },
+                { icon: <FileText size={16} />, label: "Corrections path available to readers" },
+              ].map((item) => (
+                <div key={item.label} className="flex items-center gap-3 rounded-xl px-3 py-2.5"
+                  style={{ border: "1px solid var(--footer-border)", background: "rgba(255,255,255,0.03)", color: "var(--footer-text-secondary)" }}>
+                  <span className="text-brand-orange">{item.icon}</span>
+                  <span className="text-sm">{item.label}</span>
+                </div>
               ))}
             </div>
-            <p className="text-lg font-bold" style={{ color: "var(--footer-text)" }}>4.8 / 5</p>
-            <p className="text-xs mt-1" style={{ color: "var(--footer-text-muted)" }}>from 2,300+ reviews</p>
           </div>
 
         </div>
@@ -173,16 +186,15 @@ export default function Footer() {
               <Image src="/logo-white.png" alt="CoinLineup" width={150} height={28} className="h-7 w-auto mb-4" />
             </Link>
             <p className="text-sm leading-relaxed mb-5" style={{ color: "var(--footer-text-muted)" }}>
-              Your go-to source for crypto news, guides, and market insights.
+              Crypto news, markets, and guides with clearer attribution, editorial standards, and reader-facing disclosures.
             </p>
             <div className="flex items-center gap-2.5">
               {[
                 { icon: <Twitter size={14} />, href: "https://twitter.com/coinlineup" },
-                { icon: <Github size={14} />, href: "#" },
-                { icon: <Youtube size={14} />, href: "#" },
-                { icon: <Send size={14} />, href: "#" },
+                { icon: <Mail size={14} />, href: "mailto:contact@coinlineup.com" },
+                { icon: <Rss size={14} />, href: "/rss-feed" },
               ].map((s, i) => (
-                <a key={i} href={s.href} target="_blank" rel="noopener noreferrer"
+                <a key={i} href={s.href} target={s.href.startsWith("http") ? "_blank" : undefined} rel={s.href.startsWith("http") ? "noopener noreferrer" : undefined}
                   className="p-2 rounded-lg transition-colors hover:bg-brand-orange hover:text-white"
                   style={{ background: "rgba(255,255,255,0.05)", border: "1px solid var(--footer-border)", color: "var(--footer-text-muted)" }}>
                   {s.icon}
@@ -233,7 +245,7 @@ export default function Footer() {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-xs"
             style={{ color: "var(--footer-text-muted)" }}>
             <p>© 2026 CoinLineup. All rights reserved.</p>
-            <p>Made with ♥ for the crypto community</p>
+            <p>Content is for informational purposes only and is not investment advice.</p>
           </div>
         </div>
       </div>

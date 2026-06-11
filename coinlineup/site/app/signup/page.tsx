@@ -120,9 +120,9 @@ export default function SignUpPage() {
 
           <p className="text-xs text-center mt-6" style={{ color: "var(--text-muted)" }}>
             By subscribing, you agree to our{" "}
-            <Link href="/terms" className="text-brand-orange hover:underline">Terms of Service</Link>
+            <Link href="/terms-conditions" className="text-brand-orange hover:underline">Terms of Service</Link>
             {" "}and{" "}
-            <Link href="/privacy" className="text-brand-orange hover:underline">Privacy Policy</Link>.
+            <Link href="/privacy-policy" className="text-brand-orange hover:underline">Privacy Policy</Link>.
           </p>
         </div>
       </div>
