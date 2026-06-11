@@ -75,11 +75,14 @@ const pages = [
         <li>If a piece is substantially updated after publication, the article page should show visible date information so readers can understand when the work was last revised.</li>
       </ul>
       <h2 id="rohan-mehta">Rohan Mehta</h2>
-      <p>Rohan Mehta covers crypto markets and blockchain technology with a focus on making technical developments understandable to retail readers. His public author bio states that he entered crypto in 2017 and has worked across crypto journalism, fintech content, and editorial strategy.</p>
+      <p>Rohan Mehta is a crypto markets and blockchain reporter based in Bengaluru, India. He says he entered the crypto space in 2017 and focuses on making technical developments, token ecosystems, and market narratives easier for everyday readers to understand without flattening the underlying complexity.</p>
+      <p>His public profile materials describe a finance background, experience in fintech and crypto content roles, and a reporting style centered on research depth, plain-language explanation, and retail-reader accessibility.</p>
       <h2 id="jensen-ackles">Acklesverse</h2>
-      <p>Acklesverse covers blockchain adoption, decentralized finance, and digital asset market trends. Public disclosures on author materials indicate a Bitcoin holding above CoinLineup's stated disclosure threshold.</p>
+      <p>Jensen Ackles, who publishes under the byline Acklesverse, covers tokenomics, decentralized finance, DAO governance, and broader digital asset market structure. His public profile materials describe a background that moved from business and market analysis into crypto-native reporting and research.</p>
+      <p>CoinLineup uses the Acklesverse byline for coverage aimed at helping readers make sense of complex Web3 topics such as governance proposals, DeFi mechanics, and the economic design behind token-based systems. Public profile materials place him in Toronto, Canada.</p>
       <h2 id="yuki-matsuda">Yuki Matsuda</h2>
-      <p>Yuki Matsuda focuses on altcoins, exchange ecosystems, and how blockchain technology intersects with digital ownership. Public disclosures on author materials indicate an ETH holding above CoinLineup's stated disclosure threshold.</p>
+      <p>Yuki Matsuda covers altcoins, blockchain gaming, exchange ecosystems, and how Web3 changes digital ownership. Public profile materials describe him as Tokyo-based and focused on the intersection of crypto, gaming, NFTs, and user-facing blockchain adoption.</p>
+      <p>His public profile materials also point to a technical education background and prior work connected to blockchain writing and GameFi analysis, which aligns with CoinLineup's use of his byline for gaming-adjacent and altcoin ecosystem coverage.</p>
       <h2 id="thorne-callahan">Thorne Callahan</h2>
       <p>Thorne Callahan writes about crypto mining, blockchain infrastructure, DeFi protocols, and practical how-to coverage for readers navigating the technical side of digital assets.</p>
       <h2 id="pizza">Pizza</h2>
@@ -108,9 +111,9 @@ const pages = [
       <p>Published content should be traceable either to a named contributor or to an accountable editorial function. CoinLineup's editorial desk is responsible for coordinating review standards, update practices, and public-facing trust information.</p>
       <h2>Public contributors</h2>
       <ul>
-        <li>Rohan Mehta</li>
-        <li>Acklesverse</li>
-        <li>Yuki Matsuda</li>
+        <li>Rohan Mehta, crypto markets and blockchain reporting</li>
+        <li>Jensen Ackles (Acklesverse), tokenomics, DeFi, and DAO coverage</li>
+        <li>Yuki Matsuda, altcoins, gaming, and digital ownership coverage</li>
         <li>Thorne Callahan</li>
         <li>Pizza</li>
       </ul>
