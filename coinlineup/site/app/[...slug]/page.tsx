@@ -5,6 +5,8 @@ import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { Clock, ArrowLeft } from "lucide-react";
 import NewsCard from "@/components/NewsCard";
+import AuthorByline from "@/components/AuthorByline";
+import { getAuthorProfile } from "@/lib/authors";
 import {
   getRelatedPosts,
   getSiteUrl,
@@ -234,10 +236,32 @@ async function CatchAllContent({ params }: Props) {
   const author = resolved.post._embedded?.author?.[0];
   const authorName = decodeHtml(author?.name ?? "CoinLineup Editorial Team");
   const authorSlug = author?.slug;
+  const authorProfile = getAuthorProfile(authorName);
   const readTime = estimateReadTime(postContent);
   const publishedDate = formatDate(resolved.post.date);
   const updatedDate = formatDate(resolved.post.modified);
   const showUpdatedDate = resolved.post.modified !== resolved.post.date;
+  const articleJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    headline: decodeHtml(resolved.post.title.rendered),
+    datePublished: resolved.post.date,
+    dateModified: resolved.post.modified,
+    description: excerpt || buildMetaDescription(resolved.post.excerpt.rendered, resolved.post.title.rendered),
+    mainEntityOfPage: `${getSiteUrl()}${pathFromWpLink(resolved.post.link)}`,
+    author: {
+      "@type": "Person",
+      name: authorName,
+      url: authorSlug ? `${getSiteUrl()}/authors#${authorSlug}` : undefined,
+      jobTitle: authorProfile?.role,
+      sameAs: authorProfile?.sameAs?.length ? authorProfile.sameAs : undefined,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "CoinLineup",
+      url: getSiteUrl(),
+    },
+  };
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -256,6 +280,10 @@ async function CatchAllContent({ params }: Props) {
       </div>
 
       <article>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+        />
         <div className="mb-4">
           {primaryCategory ? <span className="category-pill">{primaryCategory.name}</span> : null}
         </div>
@@ -268,14 +296,11 @@ async function CatchAllContent({ params }: Props) {
           </p>
         ) : null}
         <div className="flex flex-wrap items-center gap-3 text-sm mb-8" style={{ color: "var(--text-secondary)" }}>
-          {authorSlug ? (
-            <Link href={`/authors#${authorSlug}`} className="font-medium hover:text-brand-orange transition-colors" style={{ color: "var(--text-primary)" }}>
-              By {authorName}
-            </Link>
-          ) : (
-            <span className="font-medium" style={{ color: "var(--text-primary)" }}>By {authorName}</span>
-          )}
-          <span className="text-[10px]">•</span>
+          <AuthorByline
+            authorName={authorName}
+            authorSlug={authorSlug}
+            authorProfile={authorProfile}
+          />
           <span>Published {publishedDate}</span>
           {showUpdatedDate ? (
             <>

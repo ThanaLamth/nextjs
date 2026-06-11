@@ -3,6 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { ArrowLeft, Clock } from "lucide-react";
+import AuthorByline from "@/components/AuthorByline";
+import { getAuthorProfile } from "@/lib/authors";
 import {
   getAuthenticatedPreviewPageById,
   getAuthenticatedPreviewPostById,
@@ -100,6 +102,8 @@ export default async function PreviewDraftPage({ params }: Props) {
 
   const primaryCategory = entity._embedded?.["wp:term"]?.[0]?.[0];
   const authorName = decodeHtml(entity._embedded?.author?.[0]?.name ?? "CoinLineup Editorial Team");
+  const authorSlug = entity._embedded?.author?.[0]?.slug;
+  const authorProfile = getAuthorProfile(authorName);
   const readTime = estimateReadTime(content);
 
   return (
@@ -126,8 +130,11 @@ export default async function PreviewDraftPage({ params }: Props) {
           </p>
         ) : null}
         <div className="flex flex-wrap items-center gap-3 text-sm mb-8" style={{ color: "var(--text-secondary)" }}>
-          <span className="font-medium" style={{ color: "var(--text-primary)" }}>By {authorName}</span>
-          <span className="text-[10px]">•</span>
+          <AuthorByline
+            authorName={authorName}
+            authorSlug={authorSlug}
+            authorProfile={authorProfile}
+          />
           <span>Updated {formatDate(entity.modified)}</span>
           <span className="text-[10px]">•</span>
           <span className="inline-flex items-center gap-1"><Clock size={14} />{readTime}</span>
