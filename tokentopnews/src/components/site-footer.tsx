@@ -1,11 +1,5 @@
 import Link from "next/link";
 
-import type { WpPage } from "@/lib/wp";
-
-type SiteFooterProps = {
-  pages: WpPage[];
-};
-
 const FOOTER_GROUPS = [
   {
     title: "Company",
@@ -43,9 +37,7 @@ const STATS = [
   { n: "99.9%", l: "Uptime SLA" },
 ];
 
-export function SiteFooter({ pages }: SiteFooterProps) {
-  void pages;
-
+export function SiteFooter() {
   return (
     <footer
       className="site-footer"

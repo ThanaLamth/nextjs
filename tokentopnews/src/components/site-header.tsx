@@ -6,13 +6,11 @@ import {
   toInternalPath,
   type SiteSettings,
   type WpCategory,
-  type WpPage,
 } from "@/lib/wp";
 
 type SiteHeaderProps = {
   site: SiteSettings;
   categories: WpCategory[];
-  trustPages: WpPage[];
 };
 
 const NAV_LABEL_OVERRIDES: Record<string, string> = {
@@ -70,7 +68,7 @@ function toNavItems(categories: WpCategory[]): NavItemData[] {
     });
 }
 
-export function SiteHeader({ site, categories, trustPages }: SiteHeaderProps) {
+export function SiteHeader({ site, categories }: SiteHeaderProps) {
   const utilityLinks = STATIC_UTILITY_LINKS.map((link) => ({
     label: link.label,
     href: toInternalPath(link.href),

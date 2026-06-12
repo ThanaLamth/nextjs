@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 
 import "./globals.css";
 
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { absoluteUrl, getAllCategories, getSiteSettings, getTrustPages } from "@/lib/wp";
+import { absoluteUrl, getAllCategories, getSiteSettings } from "@/lib/wp";
 
 export const metadata: Metadata = {
   metadataBase: new URL(absoluteUrl()),
@@ -29,21 +28,18 @@ try {
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const [site, categories, trustPages] = await Promise.all([
+  const [site, categories] = await Promise.all([
     getSiteSettings(),
     getAllCategories(),
-    getTrustPages(),
   ]);
 
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
-        <Suspense fallback={<div style={{ minHeight: 148 }} />}>
-          <SiteHeader site={site} categories={categories} trustPages={trustPages} />
-        </Suspense>
+        <SiteHeader site={site} categories={categories} />
         {children}
-        <SiteFooter pages={trustPages} />
+        <SiteFooter />
       </body>
     </html>
   );

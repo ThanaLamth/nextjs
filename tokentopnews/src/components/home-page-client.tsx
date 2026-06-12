@@ -373,15 +373,9 @@ export function HomePageClient({
                   )}
                 </div>
               ))}
-              <a
-                href="https://www.coingecko.com/"
-                target="_blank"
-                rel="noreferrer"
-                className="view-all"
-                style={{ marginTop: "var(--s4)", display: "flex" }}
-              >
+              <Link href="/markets" className="view-all" style={{ marginTop: "var(--s4)", display: "flex" }}>
                 All markets →
-              </a>
+              </Link>
             </div>
 
             <div className="market-col--chart" style={{ gridColumn: "span 7", borderLeft: "0.5px solid var(--border-subtle)", paddingLeft: "var(--s6)" }}>

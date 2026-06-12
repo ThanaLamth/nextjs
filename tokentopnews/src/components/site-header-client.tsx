@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { fetchMarketData, type CoinPrice } from "@/lib/market-data";
 import type { NavItemData } from "@/lib/site-ui";
@@ -92,11 +91,11 @@ export function SiteHeaderClient({
   navItems,
   utilityLinks,
 }: SiteHeaderClientProps) {
-  const pathname = usePathname();
   const [theme, setTheme] = useState<Theme>("dark");
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [ticker, setTicker] = useState<CoinPrice[]>([]);
+  const [currentPath, setCurrentPath] = useState("");
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -104,6 +103,7 @@ export function SiteHeaderClient({
     const nextTheme = stored === "light" ? "light" : "dark";
     setTheme(nextTheme);
     applyTheme(nextTheme);
+    setCurrentPath(window.location.pathname);
   }, []);
 
   useEffect(() => {
@@ -131,20 +131,19 @@ export function SiteHeaderClient({
     };
   }, []);
 
-  const isActive = useMemo(
-    () => (href: string, sub?: NavItemData["sub"]) => {
-      if (!pathname) {
-        return false;
-      }
+  const isActive = (href: string, sub?: NavItemData["sub"]) => {
+    if (!currentPath) {
+      return false;
+    }
 
-      if (pathname === href || pathname.startsWith(href)) {
-        return true;
-      }
+    if (currentPath === href || currentPath.startsWith(href)) {
+      return true;
+    }
 
-      return Boolean(sub?.some((item) => pathname === item.href || pathname.startsWith(item.href)));
-    },
-    [pathname],
-  );
+    return Boolean(
+      sub?.some((item) => currentPath === item.href || currentPath.startsWith(item.href)),
+    );
+  };
 
   const openDrop = (label: string) => {
     if (timerRef.current) {
@@ -454,7 +453,8 @@ export function SiteHeaderClient({
                     }}
                   >
                     {item.sub?.map((sub) => {
-                      const subActive = pathname === sub.href || pathname.startsWith(`${sub.href}/`);
+                      const subActive =
+                        currentPath === sub.href || currentPath.startsWith(`${sub.href}/`);
                       return (
                         <Link
                           key={sub.href}
