@@ -34,6 +34,13 @@ const NAV_LINKS = [
       { label: "XRP", href: "/markets/xrp" },
     ],
   },
+  { label: "Tools", href: "/tools",
+    children: [
+      { label: "Tax Calculator", href: "/tools/crypto-tax-calculator" },
+      { label: "US Crypto Tax", href: "/tools/crypto-tax-calculator/us" },
+      { label: "UK Crypto Tax", href: "/tools/crypto-tax-calculator/uk" },
+    ],
+  },
   { label: "About", href: "/about" },
 ];
 

@@ -139,6 +139,56 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "hourly",
       priority: 0.9,
     },
+    {
+      url: `${siteUrl}/tools`,
+      changeFrequency: "weekly",
+      priority: 0.7,
+    },
+    {
+      url: `${siteUrl}/tools/crypto-tax-calculator`,
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
+    {
+      url: `${siteUrl}/tools/crypto-tax-calculator/us`,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
+      url: `${siteUrl}/tools/crypto-tax-calculator/us/methodology`,
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
+    {
+      url: `${siteUrl}/tools/crypto-tax-calculator/uk`,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
+      url: `${siteUrl}/tools/crypto-tax-calculator/uk/methodology`,
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
+    {
+      url: `${siteUrl}/tools/crypto-tax-calculator/canada`,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
+      url: `${siteUrl}/tools/crypto-tax-calculator/canada/methodology`,
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
+    {
+      url: `${siteUrl}/tools/crypto-tax-calculator/australia`,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
+      url: `${siteUrl}/tools/crypto-tax-calculator/australia/methodology`,
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
   ];
 
   if (aboutPage) {
