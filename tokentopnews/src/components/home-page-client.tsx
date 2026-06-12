@@ -161,7 +161,7 @@ export function HomePageClient({
                   </Link>
                 ))}
               </div>
-              <Link href="/cryptocurrency-news/" className="view-all" style={{ marginTop: "var(--s4)", display: "flex" }}>
+              <Link href="/trending" className="view-all" style={{ marginTop: "var(--s4)", display: "flex" }}>
                 View all latest news →
               </Link>
             </div>
@@ -307,7 +307,7 @@ export function HomePageClient({
                   </Link>
                 ))}
               </div>
-              <Link href="/cryptocurrency-news/" className="view-all" style={{ marginTop: "var(--s4)", display: "flex" }}>
+              <Link href="/trending" className="view-all" style={{ marginTop: "var(--s4)", display: "flex" }}>
                 View all most read →
               </Link>
             </div>

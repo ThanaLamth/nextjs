@@ -48,7 +48,7 @@ export const CATEGORY_META: Record<string, CategoryMeta> = {
     accent: "#9B3DFF",
     text: "#C47AFF",
     label: "News",
-    icon: "N",
+    icon: "📰",
     badgeClass: "badge-news",
   },
   insights: {
@@ -56,7 +56,7 @@ export const CATEGORY_META: Record<string, CategoryMeta> = {
     accent: "#00C8FF",
     text: "#0090B0",
     label: "Insights",
-    icon: "I",
+    icon: "💡",
     badgeClass: "badge-insights",
   },
   trends: {
@@ -64,7 +64,7 @@ export const CATEGORY_META: Record<string, CategoryMeta> = {
     accent: "#FFA800",
     text: "#C07800",
     label: "Trends",
-    icon: "T",
+    icon: "📈",
     badgeClass: "badge-trends",
   },
   narratives: {
@@ -72,7 +72,7 @@ export const CATEGORY_META: Record<string, CategoryMeta> = {
     accent: "#00D4A0",
     text: "#00A07A",
     label: "Narratives",
-    icon: "N",
+    icon: "📖",
     badgeClass: "badge-narratives",
   },
   macro: {
@@ -80,7 +80,7 @@ export const CATEGORY_META: Record<string, CategoryMeta> = {
     accent: "#FF5080",
     text: "#D94060",
     label: "Macro",
-    icon: "M",
+    icon: "🌐",
     badgeClass: "badge-macro",
   },
   sponsored: {
@@ -88,7 +88,7 @@ export const CATEGORY_META: Record<string, CategoryMeta> = {
     accent: "#9B3DFF",
     text: "#7B2DD0",
     label: "Sponsored Articles",
-    icon: "S",
+    icon: "⭐",
     badgeClass: "badge-sponsored",
   },
   press: {
@@ -96,7 +96,7 @@ export const CATEGORY_META: Record<string, CategoryMeta> = {
     accent: "#3B8BFF",
     text: "#1B6BE0",
     label: "Press Release",
-    icon: "P",
+    icon: "📰",
     badgeClass: "badge-press",
   },
   "weekly-recap": {
@@ -104,7 +104,7 @@ export const CATEGORY_META: Record<string, CategoryMeta> = {
     accent: "#00C8FF",
     text: "#0090B0",
     label: "Weekly Recap",
-    icon: "W",
+    icon: "📅",
     badgeClass: "badge-news",
   },
 };

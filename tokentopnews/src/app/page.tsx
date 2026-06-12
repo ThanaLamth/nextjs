@@ -15,8 +15,9 @@ import {
   getLatestPosts,
   getPostCategories,
   getPostsByCategoryId,
-  getSiteSettings,
-  toInternalPath,
+  toLocalArticlePath,
+  toLocalCategoryPath,
+  toLocalCategorySlug,
   type WpCategory,
   type WpPost,
 } from "@/lib/wp";
@@ -25,7 +26,7 @@ function toDisplayPost(post: WpPost, sourceName: string): DisplayPost {
   const image = getFeaturedImage(post);
   const categories = getPostCategories(post);
   const primaryCategory = categories[0];
-  const categorySlug = primaryCategory?.slug ?? "cryptocurrency-news";
+  const categorySlug = toLocalCategorySlug(primaryCategory?.slug ?? "cryptocurrency-news");
   const categoryLabel = primaryCategory
     ? decodeEntities(primaryCategory.name)
     : "News";
@@ -34,7 +35,7 @@ function toDisplayPost(post: WpPost, sourceName: string): DisplayPost {
 
   return {
     id: post.id,
-    href: toInternalPath(post.link),
+    href: toLocalArticlePath(post.slug),
     title: decodeEntities(post.title.rendered),
     excerpt: textFromHtml(post.excerpt.rendered || post.content?.rendered || ""),
     categorySlug,
@@ -52,6 +53,7 @@ function toDisplayPost(post: WpPost, sourceName: string): DisplayPost {
 
 async function getSectionData(
   category: WpCategory | undefined,
+  categoryMap: Map<number, WpCategory>,
   sourceName: string,
 ): Promise<CategorySectionData | null> {
   if (!category) {
@@ -61,26 +63,26 @@ async function getSectionData(
   const posts = await getPostsByCategoryId(category.id, 5);
 
   return {
-    key: getUiCategoryKey(category.slug),
+    key: getUiCategoryKey(toLocalCategorySlug(category.slug)),
     label: decodeEntities(category.name),
-    href: toInternalPath(category.link ?? `/${category.slug}`),
+    href: toLocalCategoryPath(category, categoryMap),
     posts: posts.map((post) => toDisplayPost(post, sourceName)),
   };
 }
 
 export default async function HomePage() {
-  const [site, latestPosts, categories] = await Promise.all([
-    getSiteSettings(),
+  const [latestPosts, categories] = await Promise.all([
     getLatestPosts(24),
     getAllCategories(),
   ]);
   const categoryBySlug = new Map(categories.map((category) => [category.slug, category]));
-  const sourceName = decodeEntities(site.name) === "TokenTopNews" ? "TTN" : decodeEntities(site.name);
+  const categoryMap = new Map(categories.map((category) => [category.id, category]));
+  const sourceName = "TTN";
 
   const [categorySections, sponsoredPosts, pressPosts] = await Promise.all([
     Promise.all(
       ["insights", "trends", "narratives", "macro"].map((slug) =>
-        getSectionData(categoryBySlug.get(slug), sourceName),
+        getSectionData(categoryBySlug.get(slug), categoryMap, sourceName),
       ),
     ).then((sections) =>
       sections.filter((section): section is CategorySectionData => Boolean(section)),

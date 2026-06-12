@@ -136,6 +136,16 @@ export const TRUST_PAGE_SLUGS = [
   "privacy-policy",
 ] as const;
 
+const LOCAL_TO_WP_CATEGORY_SLUG: Record<string, string> = {
+  sponsored: "sponsored-articles",
+  press: "press-release",
+};
+
+const WP_TO_LOCAL_CATEGORY_SLUG: Record<string, string> = {
+  "sponsored-articles": "sponsored",
+  "press-release": "press",
+};
+
 function buildApiUrl(path: string): string {
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
   return `${WORDPRESS_API_BASE}${normalizedPath}`;
@@ -374,19 +384,83 @@ function buildCategoryPath(
   return segments.join("/");
 }
 
+function toWpCategorySlug(slug: string): string {
+  return LOCAL_TO_WP_CATEGORY_SLUG[slug] ?? slug;
+}
+
+export function toLocalCategorySlug(slug: string): string {
+  return WP_TO_LOCAL_CATEGORY_SLUG[slug] ?? slug;
+}
+
+export function toLocalArticlePath(slug: string): string {
+  return `/article/${slug}/`;
+}
+
+export function toLocalCategoryPath(
+  category: WpCategory,
+  categoryMap: Map<number, WpCategory>,
+): string {
+  const segments = [toLocalCategorySlug(category.slug)];
+  let parentId = category.parent;
+
+  while (parentId) {
+    const parent = categoryMap.get(parentId);
+
+    if (!parent) {
+      break;
+    }
+
+    segments.unshift(toLocalCategorySlug(parent.slug));
+    parentId = parent.parent;
+  }
+
+  return `/category/${segments.join("/")}/`;
+}
+
+export async function toLocalEntityPath(entity: ResolvedEntity): Promise<string> {
+  if (entity.kind === "post") {
+    return toLocalArticlePath(entity.post.slug);
+  }
+
+  if (entity.kind === "page") {
+    return toInternalPath(entity.page.link);
+  }
+
+  const categories = await getAllCategories();
+  const categoryMap = new Map(categories.map((category) => [category.id, category]));
+  return toLocalCategoryPath(entity.category, categoryMap);
+}
+
 export async function resolveEntityByPath(
   slugParts: string[],
 ): Promise<ResolvedEntity | null> {
-  const normalizedPath = slugParts.filter(Boolean).join("/");
-  const leafSlug = slugParts.at(-1);
+  const filteredParts = slugParts.filter(Boolean);
+  const isArticleRoute = filteredParts[0] === "article";
+  const isCategoryRoute = filteredParts[0] === "category";
+  const categoryPathParts = isCategoryRoute
+    ? filteredParts.slice(1).map(toWpCategorySlug)
+    : filteredParts;
+  const normalizedPath = categoryPathParts.join("/");
+  const leafSlug = categoryPathParts.at(-1);
 
   if (!leafSlug) {
     return null;
   }
 
-  const page = await getPageBySlug(leafSlug);
-  if (page && normalizePathFromLink(page.link) === normalizedPath) {
-    return { kind: "page", page };
+  if (isArticleRoute) {
+    if (filteredParts.length !== 2) {
+      return null;
+    }
+
+    const post = await getPostBySlug(leafSlug);
+    return post ? { kind: "post", post } : null;
+  }
+
+  if (!isCategoryRoute) {
+    const page = await getPageBySlug(leafSlug);
+    if (page && normalizePathFromLink(page.link) === normalizedPath) {
+      return { kind: "page", page };
+    }
   }
 
   const categories = await getAllCategories();
@@ -400,7 +474,7 @@ export async function resolveEntityByPath(
     return { kind: "category", category, posts };
   }
 
-  if (slugParts.length === 1) {
+  if (!isCategoryRoute && filteredParts.length === 1) {
     const post = await getPostBySlug(leafSlug);
     if (post && normalizePathFromLink(post.link) === normalizedPath) {
       return { kind: "post", post };

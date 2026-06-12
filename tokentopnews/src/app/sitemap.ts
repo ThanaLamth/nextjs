@@ -1,6 +1,13 @@
 import type { MetadataRoute } from "next";
 
-import { absoluteUrl, SITE_URL, toInternalPath } from "@/lib/wp";
+import {
+  absoluteUrl,
+  SITE_URL,
+  toInternalPath,
+  toLocalArticlePath,
+  toLocalCategoryPath,
+  type WpCategory,
+} from "@/lib/wp";
 
 export const revalidate = 3600;
 
@@ -16,7 +23,9 @@ type SitemapPage = {
 };
 
 type SitemapCategory = {
+  id: number;
   link?: string;
+  parent: number;
   slug: string;
 };
 
@@ -41,9 +50,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       "/wp/v2/pages?per_page=100&_fields=link,modified",
     ),
     fetchSitemapJson<SitemapCategory[]>(
-      "/wp/v2/categories?per_page=100&_fields=slug,link",
+      "/wp/v2/categories?per_page=100&_fields=id,parent,slug,link",
     ),
   ]);
+  const categoryMap = new Map(categories.map((category) => [category.id, category as WpCategory]));
 
   const items: MetadataRoute.Sitemap = [
     {
@@ -51,7 +61,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
     },
     ...posts.map((post) => ({
-      url: new URL(toInternalPath(new URL(post.link).pathname), SITE_URL).toString(),
+      url: new URL(toLocalArticlePath(post.slug), SITE_URL).toString(),
       lastModified: new Date(post.modified),
     })),
     ...pages.map((page) => ({
@@ -62,7 +72,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .filter((category) => category.link)
       .map((category) => ({
         url: new URL(
-          toInternalPath(new URL(category.link as string).pathname),
+          toLocalCategoryPath(category as WpCategory, categoryMap),
           SITE_URL,
         ).toString(),
         lastModified: new Date(),

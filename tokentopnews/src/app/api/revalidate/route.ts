@@ -1,4 +1,4 @@
-import { toInternalPath } from "@/lib/wp";
+import { resolveEntityByPath, toInternalPath, toLocalArticlePath, toLocalEntityPath } from "@/lib/wp";
 import { revalidatePath, revalidateTag } from "next/cache";
 
 export async function POST(request: Request) {
@@ -21,7 +21,7 @@ export async function POST(request: Request) {
 
   if (payload.postSlug) {
     revalidateTag(`post:${payload.postSlug}`, "max");
-    revalidatePath(toInternalPath(`/${payload.postSlug}`));
+    revalidatePath(toLocalArticlePath(payload.postSlug));
   }
 
   if (payload.categoryId) {
@@ -29,7 +29,13 @@ export async function POST(request: Request) {
   }
 
   if (payload.path) {
-    revalidatePath(toInternalPath(payload.path));
+    const slugParts = payload.path
+      .replace(/^https?:\/\/[^/]+/i, "")
+      .replace(/^\/+|\/+$/g, "")
+      .split("/")
+      .filter(Boolean);
+    const entity = slugParts.length ? await resolveEntityByPath(slugParts) : null;
+    revalidatePath(entity ? await toLocalEntityPath(entity) : toInternalPath(payload.path));
   }
 
   for (const tag of payload.tags ?? []) {

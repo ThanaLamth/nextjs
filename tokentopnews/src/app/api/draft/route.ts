@@ -1,7 +1,7 @@
 import { draftMode } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { resolveEntityByPath, toInternalPath } from "@/lib/wp";
+import { resolveEntityByPath, toLocalEntityPath } from "@/lib/wp";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -22,5 +22,5 @@ export async function GET(request: Request) {
   const draft = await draftMode();
   draft.enable();
 
-  redirect(toInternalPath(`/${slugParts.join("/")}`));
+  redirect(await toLocalEntityPath(entity));
 }

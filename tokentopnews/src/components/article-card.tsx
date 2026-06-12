@@ -6,7 +6,7 @@ import {
   getFeaturedImage,
   getPostCategories,
   stripHtml,
-  toInternalPath,
+  toLocalArticlePath,
   type WpPost,
 } from "@/lib/wp";
 
@@ -23,7 +23,7 @@ export function ArticleCard({
   const author = getAuthor(post);
   const categories = getPostCategories(post);
   const primaryCategory = categories[0];
-  const href = toInternalPath(post.link);
+  const href = toLocalArticlePath(post.slug);
   const excerpt = stripHtml(post.excerpt.rendered);
 
   return (
