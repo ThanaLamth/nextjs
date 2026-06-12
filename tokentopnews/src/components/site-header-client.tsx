@@ -203,7 +203,14 @@ export function SiteHeaderClient({
                     >
                       {coin.sym}
                     </span>
-                    <span style={{ fontSize: 11, fontFamily: "monospace", color: "var(--text-1)" }}>
+                    <span
+                      style={{
+                        fontSize: 11,
+                        fontFamily: "monospace",
+                        color: "var(--text-1)",
+                        fontWeight: 500,
+                      }}
+                    >
                       {coin.price}
                     </span>
                     <span
@@ -223,11 +230,7 @@ export function SiteHeaderClient({
               </div>
             ))}
           </div>
-          <Link
-            className="hide-mobile"
-            href="/markets"
-            style={{ fontSize: 11, color: "var(--text-3)", whiteSpace: "nowrap", flexShrink: 0 }}
-          >
+          <Link href="/markets" style={{ fontSize: 11, color: "var(--text-3)", whiteSpace: "nowrap", flexShrink: 0 }}>
             View all markets →
           </Link>
         </div>
@@ -273,7 +276,6 @@ export function SiteHeaderClient({
                 {siteName}
               </div>
               <div
-                className="hide-mobile"
                 style={{
                   fontSize: 9,
                   color: "var(--text-3)",
@@ -285,7 +287,7 @@ export function SiteHeaderClient({
               </div>
             </div>
           </Link>
-          <div className="hide-mobile" style={{ flex: 1, maxWidth: 380, position: "relative" }}>
+          <div style={{ flex: 1, maxWidth: 380, position: "relative" }}>
             <input
               type="text"
               placeholder="Search"
@@ -319,7 +321,7 @@ export function SiteHeaderClient({
               <path d="m21 21-4.35-4.35" />
             </svg>
           </div>
-          <div className="hide-mobile" style={{ marginLeft: "auto", display: "flex", gap: 8, flexShrink: 0 }}>
+          <div style={{ marginLeft: "auto", display: "flex", gap: 8, flexShrink: 0 }}>
             <Link href="/newsletter" className="btn btn-outline btn-sm">
               Newsletter
             </Link>
@@ -331,7 +333,6 @@ export function SiteHeaderClient({
       </div>
 
       <div
-        className="hide-mobile"
         style={{
           background: "var(--canvas)",
           borderBottom: "0.5px solid var(--border-subtle)",
@@ -403,7 +404,7 @@ export function SiteHeaderClient({
                       borderRadius: "var(--r-lg)",
                       boxShadow: "0 8px 32px rgba(0,0,0,0.18)",
                       padding: "6px 0",
-                      minWidth: 220,
+                      minWidth: 200,
                       zIndex: 300,
                     }}
                   >
@@ -421,6 +422,18 @@ export function SiteHeaderClient({
                             fontWeight: 500,
                             color: subActive ? "var(--text-brand)" : "var(--text-2)",
                             background: subActive ? "var(--brand-subtle)" : "transparent",
+                          }}
+                          onMouseEnter={(event) => {
+                            event.currentTarget.style.background = "var(--raised)";
+                            event.currentTarget.style.color = "var(--text-1)";
+                          }}
+                          onMouseLeave={(event) => {
+                            event.currentTarget.style.background = subActive
+                              ? "var(--brand-subtle)"
+                              : "transparent";
+                            event.currentTarget.style.color = subActive
+                              ? "var(--text-brand)"
+                              : "var(--text-2)";
                           }}
                         >
                           {sub.label}

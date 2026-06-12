@@ -344,7 +344,6 @@ async function CatchAllPageContent({ params }: CatchAllPageProps) {
                     fontSize: 12,
                     color: "rgba(255,255,255,0.8)",
                     textShadow: "0 1px 4px rgba(0,0,0,0.7)",
-                    flexWrap: "wrap",
                   }}
                 >
                   <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
@@ -375,7 +374,7 @@ async function CatchAllPageContent({ params }: CatchAllPageProps) {
                   <span style={{ opacity: 0.5 }}>|</span>
                   <span>{formatDisplayDate(post.date)}</span>
                   <span style={{ opacity: 0.5 }}>|</span>
-                  <span>{readLabel}</span>
+                  <span>⏰ {readLabel}</span>
                 </div>
               </div>
             </div>
@@ -393,7 +392,6 @@ async function CatchAllPageContent({ params }: CatchAllPageProps) {
                   borderTop: "0.5px solid var(--border-subtle)",
                   borderBottom: "0.5px solid var(--border-subtle)",
                   marginBottom: "var(--s8)",
-                  flexWrap: "wrap",
                 }}
               >
                 <span style={{ fontSize: 11, color: "var(--text-3)", marginRight: 4 }}>
@@ -841,10 +839,7 @@ async function CatchAllPageContent({ params }: CatchAllPageProps) {
                 </p>
               </div>
               <div style={{ display: "flex", gap: "var(--s6)" }}>
-                {[
-                  { n: `${entity.category.count}+`, l: "Articles" },
-                  { n: `${Math.max(1, Math.round(entity.category.count * 50))}`, l: "Readers" },
-                ].map((stat) => (
+                {[{ n: "240+", l: "Articles" }, { n: "12K", l: "Readers" }].map((stat) => (
                   <div key={stat.l} style={{ textAlign: "center" }}>
                     <div style={{ fontSize: 22, fontWeight: 800, fontFamily: "var(--font-display)" }}>
                       <span className={`grad-${parentKey}`}>{stat.n}</span>
@@ -978,7 +973,7 @@ async function CatchAllPageContent({ params }: CatchAllPageProps) {
                           {stripHtml(featuredPost.excerpt.rendered)}
                         </p>
                       </div>
-                      <div style={{ display: "flex", gap: 12, fontSize: 11, color: "var(--text-3)", marginTop: "var(--s4)", flexWrap: "wrap" }}>
+                      <div style={{ display: "flex", gap: 12, fontSize: 11, color: "var(--text-3)", marginTop: "var(--s4)" }}>
                         <span>{getAuthor(featuredPost)?.name ?? "Editorial Team"}</span>
                         <span>·</span>
                         <span>{formatDisplayDate(featuredPost.date)}</span>
@@ -1218,10 +1213,7 @@ async function CatchAllPageContent({ params }: CatchAllPageProps) {
               </div>
             </div>
             <div style={{ display: "flex", gap: "var(--s8)" }}>
-              {[
-                { n: String(entity.category.count), l: "Articles" },
-                { n: `${Math.max(1, Math.round(entity.category.count * 3.2))}K`, l: "Readers" },
-              ].map((stat) => (
+              {[{ n: "1,240", l: "Articles" }, { n: "48K", l: "Readers" }].map((stat) => (
                 <div key={stat.l} style={{ textAlign: "center" }}>
                   <div style={{ fontSize: 24, fontWeight: 800, fontFamily: "var(--font-display)" }}>
                     <span className={`grad-${categoryKey}`}>{stat.n}</span>
