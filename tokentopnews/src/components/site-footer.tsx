@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { decodeEntities, toInternalPath, type WpPage } from "@/lib/wp";
+import type { WpPage } from "@/lib/wp";
 
 type SiteFooterProps = {
   pages: WpPage[];
@@ -9,15 +9,30 @@ type SiteFooterProps = {
 const FOOTER_GROUPS = [
   {
     title: "Company",
-    slugs: ["about-us", "publishing-principles"],
+    links: [
+      { label: "About Us", href: "/about" },
+      { label: "Our Team", href: "/team" },
+      { label: "Careers", href: "/careers" },
+      { label: "Press", href: "/press" },
+    ],
   },
   {
-    title: "Standards",
-    slugs: ["ownership-funding", "feedback-corrections", "ethics-policy"],
+    title: "Resources",
+    links: [
+      { label: "Help Center", href: "/help" },
+      { label: "Blog", href: "/trending" },
+      { label: "Community Forum", href: "/forum" },
+      { label: "API Documentation", href: "/api-docs" },
+    ],
   },
   {
-    title: "Policies",
-    slugs: ["diversity-policy", "diversity-staffing-report", "privacy-policy"],
+    title: "Legal",
+    links: [
+      { label: "Terms of Service", href: "/terms" },
+      { label: "Privacy Policy", href: "/privacy" },
+      { label: "Cookie Policy", href: "/cookies" },
+      { label: "Disclaimer", href: "/disclaimer" },
+    ],
   },
 ];
 
@@ -29,16 +44,7 @@ const STATS = [
 ];
 
 export function SiteFooter({ pages }: SiteFooterProps) {
-  const pageMap = new Map(pages.map((page) => [page.slug, page]));
-  const footerGroups = FOOTER_GROUPS.map((group) => ({
-    title: group.title,
-    pages: group.slugs
-      .map((slug) => pageMap.get(slug))
-      .filter((page): page is WpPage => Boolean(page)),
-  }));
-  const bottomPages = ["privacy-policy", "publishing-principles", "about-us"]
-    .map((slug) => pageMap.get(slug))
-    .filter((page): page is WpPage => Boolean(page));
+  void pages;
 
   return (
     <footer
@@ -148,7 +154,7 @@ export function SiteFooter({ pages }: SiteFooterProps) {
               alignItems: "start",
             }}
           >
-            {footerGroups.map((group) => (
+            {FOOTER_GROUPS.map((group) => (
               <div key={group.title}>
                 <div
                   style={{
@@ -164,13 +170,13 @@ export function SiteFooter({ pages }: SiteFooterProps) {
                   {group.title}
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                  {group.pages.map((page) => (
+                  {group.links.map((link) => (
                     <Link
-                      key={page.id}
-                      href={toInternalPath(page.link)}
+                      key={link.href}
+                      href={link.href}
                       style={{ fontSize: 12, color: "var(--text-3)" }}
                     >
-                      {decodeEntities(page.title.rendered)}
+                      {link.label}
                     </Link>
                   ))}
                 </div>
@@ -273,11 +279,15 @@ export function SiteFooter({ pages }: SiteFooterProps) {
             &copy; 2026 TokenTopNews. All rights reserved.
           </p>
           <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
-            {bottomPages.map((page) => (
-              <Link key={page.id} href={toInternalPath(page.link)} style={{ fontSize: 11, color: "var(--text-3)" }}>
-                {decodeEntities(page.title.rendered)}
-              </Link>
-            ))}
+            <Link href="/privacy" style={{ fontSize: 11, color: "var(--text-3)" }}>
+              Privacy
+            </Link>
+            <Link href="/terms" style={{ fontSize: 11, color: "var(--text-3)" }}>
+              Terms
+            </Link>
+            <Link href="/cookies" style={{ fontSize: 11, color: "var(--text-3)" }}>
+              Cookies
+            </Link>
           </div>
         </div>
       </div>

@@ -252,15 +252,13 @@ export function SiteHeaderClient({
               </div>
             ))}
           </div>
-          <a
+          <Link
             className="hide-mobile"
-            href="https://www.coingecko.com/"
-            target="_blank"
-            rel="noreferrer"
+            href="/markets"
             style={{ fontSize: 11, color: "var(--text-3)", whiteSpace: "nowrap", flexShrink: 0 }}
           >
             View all markets →
-          </a>
+          </Link>
         </div>
       </div>
 
@@ -351,12 +349,12 @@ export function SiteHeaderClient({
             </svg>
           </div>
           <div className="hide-mobile" style={{ marginLeft: "auto", display: "flex", gap: 8, flexShrink: 0 }}>
-            <button className="btn btn-outline btn-sm" type="button">
+            <Link href="/newsletter" className="btn btn-outline btn-sm">
               Newsletter
-            </button>
-            <button className="btn btn-primary btn-sm" type="button">
+            </Link>
+            <Link href="/subscribe" className="btn btn-primary btn-sm">
               Subscribe
-            </button>
+            </Link>
           </div>
           <button
             className="show-mobile"
@@ -500,8 +498,8 @@ export function SiteHeaderClient({
             >
               {theme === "dark" ? <SunIcon /> : <MoonIcon />}
             </button>
-            <button
-              type="button"
+            <Link
+              href="/profile"
               aria-label="Profile"
               style={{
                 display: "flex",
@@ -521,7 +519,7 @@ export function SiteHeaderClient({
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <path d="m6 9 6 6 6-6" />
               </svg>
-            </button>
+            </Link>
           </div>
         </div>
       </div>

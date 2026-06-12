@@ -30,10 +30,6 @@ function imageBackground(image?: string) {
     : "var(--surface)";
 }
 
-function timeAgo(article: DisplayPost) {
-  return formatTimeAgo(article.publishedAt);
-}
-
 export function HomePageClient({
   hero,
   latest,
@@ -47,6 +43,11 @@ export function HomePageClient({
   const [period, setPeriod] = useState(0);
   const [chartPts, setChartPts] = useState<{ line: string; area: string }>({ line: "", area: "" });
   const [btc, setBtc] = useState<CoinPrice | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -100,6 +101,8 @@ export function HomePageClient({
 
   const featuredLead = featured[0];
   const featuredRest = featured.slice(1, 3);
+  const displayTimeAgo = (article: DisplayPost) =>
+    mounted ? formatTimeAgo(article.publishedAt) : article.dateLabel;
 
   return (
     <main>
@@ -124,7 +127,7 @@ export function HomePageClient({
                     >
                       <div style={{ flex: 1 }}>
                         <div className="t-meta" style={{ marginBottom: 3 }}>
-                          {timeAgo(article)}
+                          {displayTimeAgo(article)}
                         </div>
                         <div className="t-h4 clamp3" style={{ fontSize: 12, color: "var(--text-2)", lineHeight: 1.45 }}>
                           {article.title}
@@ -197,7 +200,7 @@ export function HomePageClient({
                           letterSpacing: "0.06em",
                         }}
                       >
-                        {timeAgo(hero)}
+                        {displayTimeAgo(hero)}
                       </span>
                     </div>
                     <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "var(--s10) var(--s8) var(--s8)" }}>
@@ -503,7 +506,7 @@ export function HomePageClient({
                         {featuredLead.title}
                       </div>
                       <div className="t-meta" style={{ color: "rgba(255,255,255,0.55)", fontSize: 10 }}>
-                        {timeAgo(featuredLead)}
+                        {displayTimeAgo(featuredLead)}
                       </div>
                     </div>
                   </div>
@@ -591,7 +594,7 @@ export function HomePageClient({
                             {featuredArticle.title}
                           </div>
                           <div className="t-meta" style={{ color: "rgba(255,255,255,0.6)" }}>
-                            {timeAgo(featuredArticle)}
+                            {displayTimeAgo(featuredArticle)}
                           </div>
                         </div>
                       </div>
@@ -621,7 +624,7 @@ export function HomePageClient({
                           <div className="clamp2" style={{ fontSize: 11, fontWeight: 600, color: "var(--text-2)", lineHeight: 1.4 }}>
                             {article.title}
                           </div>
-                          <div style={{ fontSize: 9, color: "var(--text-3)", marginTop: 2 }}>{timeAgo(article)}</div>
+                          <div style={{ fontSize: 9, color: "var(--text-3)", marginTop: 2 }}>{displayTimeAgo(article)}</div>
                         </div>
                       </div>
                     </Link>

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { connection } from "next/server";
+import { Suspense } from "react";
 
 import { MarketSidebarWidget } from "@/components/market-sidebar-widget";
 import { RichText } from "@/components/rich-text";
@@ -65,7 +67,16 @@ export async function generateMetadata({
   };
 }
 
-export default async function CatchAllPage({ params }: CatchAllPageProps) {
+export default function CatchAllPage(props: CatchAllPageProps) {
+  return (
+    <Suspense fallback={<main />} >
+      <CatchAllPageContent {...props} />
+    </Suspense>
+  );
+}
+
+async function CatchAllPageContent({ params }: CatchAllPageProps) {
+  await connection();
   const { slug } = await params;
   const entity = await resolveEntityByPath(slug);
 
@@ -304,6 +315,192 @@ export default async function CatchAllPage({ params }: CatchAllPageProps) {
   ).filter((category): category is NonNullable<(typeof categories)[number]> => Boolean(category));
   const featuredPost = entity.posts[0];
   const restPosts = entity.posts.slice(1, 10);
+  const parentCategory = entity.category.parent
+    ? categories.find((category) => category.id === entity.category.parent)
+    : null;
+  const siblingCategories = parentCategory
+    ? categories.filter((category) => category.parent === parentCategory.id)
+    : [];
+
+  if (parentCategory) {
+    const parentMeta = getCategoryMeta(parentCategory.slug);
+    const parentKey = getUiCategoryKey(parentCategory.slug);
+
+    return (
+      <main>
+        <section style={{ background: "var(--surface)", borderBottom: "0.5px solid var(--border-subtle)", padding: "var(--s10) 0", position: "relative", overflow: "hidden", marginBottom: "var(--s8)" }}>
+          <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 4, background: parentMeta.grad }} />
+          <div style={{ position: "absolute", top: -80, left: "50%", transform: "translateX(-50%)", width: 600, height: 300, borderRadius: "50%", background: `radial-gradient(ellipse,${parentMeta.accent}15 0%,transparent 70%)`, pointerEvents: "none" }} />
+          <div className="container" style={{ position: "relative" }}>
+            <div style={{ display: "flex", gap: 6, marginBottom: "var(--s4)", fontSize: 11, color: "var(--text-3)", alignItems: "center" }}>
+              <Link href="/">Home</Link>
+              <span>/</span>
+              <Link href={toInternalPath(parentCategory.link ?? `/${parentCategory.slug}`)} style={{ color: parentMeta.text, fontWeight: 600 }}>
+                {decodeEntities(parentCategory.name)}
+              </Link>
+              <span>/</span>
+              <span style={{ color: "var(--text-2)" }}>{decodeEntities(entity.category.name)}</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: "var(--s6)" }}>
+              <div style={{ maxWidth: 600 }}>
+                <div style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: "var(--s4)" }}>
+                  <div style={{ padding: "4px 12px", background: `${parentMeta.accent}20`, border: `0.5px solid ${parentMeta.accent}40`, borderRadius: "var(--r-pill)", fontSize: 11, fontWeight: 700, fontFamily: "var(--font-display)", color: parentMeta.text }}>
+                    {decodeEntities(parentCategory.name).toUpperCase()}
+                  </div>
+                </div>
+                <h1 style={{ fontFamily: "var(--font-display)", fontSize: 32, fontWeight: 800, marginBottom: 12, lineHeight: 1.15 }}>
+                  <span className={`grad-${parentKey}`}>{decodeEntities(entity.category.name)}</span>
+                </h1>
+                <p style={{ fontSize: 14, color: "var(--text-3)", lineHeight: 1.65, maxWidth: 520 }}>
+                  Latest {decodeEntities(entity.category.name)} coverage and archive updates.
+                </p>
+              </div>
+              <div style={{ display: "flex", gap: "var(--s6)" }}>
+                {[{ n: `${entity.category.count}+`, l: "Articles" }, { n: `${Math.max(1, Math.round(entity.category.count * 50))}`, l: "Readers" }].map((stat) => (
+                  <div key={stat.l} style={{ textAlign: "center" }}>
+                    <div style={{ fontSize: 22, fontWeight: 800, fontFamily: "var(--font-display)" }}>
+                      <span className={`grad-${parentKey}`}>{stat.n}</span>
+                    </div>
+                    <div style={{ fontSize: 10, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.08em" }}>{stat.l}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {siblingCategories.length > 0 ? (
+              <div style={{ display: "flex", gap: 6, marginTop: "var(--s6)", flexWrap: "wrap" }}>
+                {siblingCategories.map((sibling) => {
+                  const isActive = sibling.id === entity.category.id;
+                  return (
+                    <Link
+                      key={sibling.id}
+                      href={toInternalPath(sibling.link ?? `/${sibling.slug}`)}
+                      style={{
+                        padding: "5px 14px",
+                        background: isActive ? parentMeta.grad : "var(--raised)",
+                        border: `0.5px solid ${isActive ? "transparent" : "var(--border)"}`,
+                        borderRadius: "var(--r-pill)",
+                        fontSize: 11,
+                        fontWeight: 600,
+                        color: isActive ? "#fff" : "var(--text-2)",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {decodeEntities(sibling.name)}
+                    </Link>
+                  );
+                })}
+              </div>
+            ) : null}
+          </div>
+        </section>
+
+        <div className="container">
+          <div style={{ display: "flex", gap: 8, marginBottom: "var(--s8)", paddingBottom: "var(--s6)", borderBottom: "0.5px solid var(--border-subtle)", flexWrap: "wrap", alignItems: "center" }}>
+            <span style={{ fontSize: 11, color: "var(--text-3)", marginRight: 4 }}>Sort by:</span>
+            {["Latest", "Most Read", "Featured", "This Week"].map((filter, index) => (
+              <button key={filter} type="button" style={{ padding: "5px 14px", background: index === 0 ? parentMeta.grad : "var(--surface)", border: `0.5px solid ${index === 0 ? "transparent" : "var(--border)"}`, borderRadius: "var(--r-pill)", fontSize: 11, fontWeight: 600, color: index === 0 ? "#fff" : "var(--text-3)" }}>
+                {filter}
+              </button>
+            ))}
+          </div>
+
+          <div className="grid-12">
+            <div className="category-main-col" style={{ gridColumn: "span 9" }}>
+              {featuredPost ? (
+                <Link href={toInternalPath(featuredPost.link)} style={{ display: "block", marginBottom: "var(--s8)" }}>
+                  <div className="archive-feature-card" style={{ background: "var(--surface)", border: "0.5px solid var(--border)", borderRadius: "var(--r-xl)", overflow: "hidden", display: "grid", gridTemplateColumns: "1fr 1fr" }}>
+                    <div style={{ minHeight: 240, background: getFeaturedImage(featuredPost) ? `linear-gradient(to bottom,rgba(13,11,20,0.15),rgba(13,11,20,0.8)),url(${getFeaturedImage(featuredPost)?.source_url}) center/cover` : "var(--raised)", position: "relative" }}>
+                      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 4, background: parentMeta.grad }} />
+                      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "var(--s4)" }}>
+                        <div className="t-h4 clamp2" style={{ color: "#fff", fontSize: 14 }}>{decodeEntities(featuredPost.title.rendered)}</div>
+                      </div>
+                    </div>
+                    <div style={{ padding: "var(--s6)", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                      <div>
+                        <span style={{ fontSize: 10, fontWeight: 700, fontFamily: "var(--font-display)", color: parentMeta.text, textTransform: "uppercase", letterSpacing: "0.1em", display: "block", marginBottom: 8 }}>
+                          {decodeEntities(entity.category.name)} · Featured
+                        </span>
+                        <h2 className="t-h2 clamp3" style={{ marginBottom: 12 }}>{decodeEntities(featuredPost.title.rendered)}</h2>
+                        <p className="t-body clamp2" style={{ color: "var(--text-2)" }}>{stripHtml(featuredPost.excerpt.rendered)}</p>
+                      </div>
+                      <div style={{ display: "flex", gap: 12, fontSize: 11, color: "var(--text-3)", marginTop: "var(--s4)", flexWrap: "wrap" }}>
+                        <span>{getAuthor(featuredPost)?.name ?? "Editorial Team"}</span>
+                        <span>·</span>
+                        <span>{formatDisplayDate(featuredPost.date)}</span>
+                        <span>·</span>
+                        <span>{estimateReadTime(stripHtml(featuredPost.excerpt.rendered))}</span>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              ) : null}
+
+              <div className="grid-12" style={{ marginBottom: "var(--s8)" }}>
+                {restPosts.map((post) => (
+                  <Link key={post.id} href={toInternalPath(post.link)} className="related-card" style={{ gridColumn: "span 4", display: "block" }}>
+                    <div style={{ background: "var(--surface)", border: "0.5px solid var(--border)", borderRadius: "var(--r-lg)", overflow: "hidden", height: "100%" }}>
+                      <div style={{ height: 150, background: getFeaturedImage(post) ? `url(${getFeaturedImage(post)?.source_url}) center/cover` : "var(--raised)", position: "relative" }}>
+                        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: parentMeta.grad }} />
+                      </div>
+                      <div style={{ padding: "var(--s4)" }}>
+                        <div style={{ fontSize: 9, fontWeight: 700, fontFamily: "var(--font-display)", color: parentMeta.text, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 6 }}>
+                          {decodeEntities(entity.category.name)}
+                        </div>
+                        <div className="t-h4 clamp2" style={{ fontSize: 13, marginBottom: 8 }}>{decodeEntities(post.title.rendered)}</div>
+                        <div style={{ fontSize: 10, color: "var(--text-3)" }}>
+                          {formatDisplayDate(post.date)} · {estimateReadTime(stripHtml(post.excerpt.rendered))}
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+              <div style={{ textAlign: "center", paddingTop: "var(--s8)", borderTop: "0.5px solid var(--border-subtle)" }}>
+                <button type="button" className="btn btn-ghost" style={{ minWidth: 200, justifyContent: "center" }}>
+                  Load more
+                </button>
+              </div>
+            </div>
+
+            <aside className="category-sidebar-col" style={{ gridColumn: "span 3" }}>
+              <div style={{ position: "sticky", top: 120, display: "flex", flexDirection: "column", gap: "var(--s6)" }}>
+                <div style={{ background: "var(--surface)", border: "0.5px solid var(--border)", borderRadius: "var(--r-lg)", padding: "var(--s5)" }}>
+                  <div className="t-tag" style={{ color: "var(--text-3)", marginBottom: "var(--s4)" }}>
+                    IN THIS CATEGORY
+                  </div>
+                  {siblingCategories.map((sibling) => {
+                    const isActive = sibling.id === entity.category.id;
+                    return (
+                      <Link key={sibling.id} href={toInternalPath(sibling.link ?? `/${sibling.slug}`)} style={{ display: "flex", alignItems: "center", gap: 8, padding: 8, borderRadius: "var(--r-md)", background: isActive ? `${parentMeta.accent}15` : "transparent", border: `0.5px solid ${isActive ? parentMeta.accent : "transparent"}`, marginBottom: 2 }}>
+                        <div style={{ width: 6, height: 6, borderRadius: "50%", background: isActive ? parentMeta.accent : "var(--border)", flexShrink: 0 }} />
+                        <span style={{ fontSize: 12, fontWeight: isActive ? 700 : 500, color: isActive ? "var(--text-1)" : "var(--text-2)" }}>
+                          {decodeEntities(sibling.name)}
+                        </span>
+                      </Link>
+                    );
+                  })}
+                </div>
+                <div style={{ background: parentMeta.grad, borderRadius: "var(--r-lg)", padding: "var(--s5)", position: "relative", overflow: "hidden" }}>
+                  <div style={{ position: "absolute", bottom: -20, right: -20, width: 80, height: 80, borderRadius: "50%", background: "rgba(255,255,255,0.08)" }} />
+                  <h3 style={{ fontFamily: "var(--font-display)", fontSize: 14, fontWeight: 700, color: "#fff", marginBottom: 6 }}>
+                    {decodeEntities(entity.category.name)} updates
+                  </h3>
+                  <p style={{ fontSize: 11, color: "rgba(255,255,255,0.8)", marginBottom: "var(--s3)", lineHeight: 1.5 }}>
+                    Get the latest {decodeEntities(entity.category.name)} analysis delivered weekly.
+                  </p>
+                  <input type="email" placeholder="your@email.com" className="newsletter-input" style={{ width: "100%", background: "rgba(0,0,0,0.18)", border: "1px solid rgba(255,255,255,0.25)", borderRadius: "var(--r-md)", padding: "7px 10px", fontSize: 12, marginBottom: 8, outline: "none" }} />
+                  <button type="button" className="btn btn-white" style={{ width: "100%", justifyContent: "center", fontSize: 11 }}>
+                    Subscribe →
+                  </button>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main>

@@ -26,6 +26,13 @@ const NAV_LABEL_OVERRIDES: Record<string, string> = {
   "press-release": "PRESS RELEASE",
 };
 
+const STATIC_UTILITY_LINKS = [
+  { label: "Newsletter", href: "/newsletter" },
+  { label: "Subscribe", href: "/subscribe" },
+  { label: "Markets", href: "/markets" },
+  { label: "Trending", href: "/trending" },
+] as const;
+
 function toCategoryPath(category: WpCategory): string {
   return toInternalPath(category.link ?? `/${category.slug}`);
 }
@@ -64,9 +71,9 @@ function toNavItems(categories: WpCategory[]): NavItemData[] {
 }
 
 export function SiteHeader({ site, categories, trustPages }: SiteHeaderProps) {
-  const utilityLinks = trustPages.slice(0, 4).map((page) => ({
-    label: decodeEntities(page.title.rendered),
-    href: toInternalPath(page.link),
+  const utilityLinks = STATIC_UTILITY_LINKS.map((link) => ({
+    label: link.label,
+    href: toInternalPath(link.href),
   }));
 
   return (
