@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { ArticleCard } from "@/components/article-card";
@@ -8,6 +9,7 @@ import {
   decodeEntities,
   getAuthor,
   getFeaturedImage,
+  getPostsByCategoryId,
   getPostCategories,
   resolveEntityByPath,
   stripHtml,
@@ -34,7 +36,7 @@ export async function generateMetadata({
     const yoast = entity.post.yoast_head_json;
 
     return {
-        title: decodeEntities(yoast?.title || entity.post.title.rendered),
+      title: decodeEntities(yoast?.title || entity.post.title.rendered),
       description: yoast?.description || stripHtml(entity.post.excerpt.rendered),
       alternates: {
         canonical: yoast?.canonical || absoluteUrl(`/${slug.join("/")}/`),
@@ -85,29 +87,59 @@ export default async function CatchAllPage({ params }: CatchAllPageProps) {
     const featuredImage = getFeaturedImage(post);
     const author = getAuthor(post);
     const categories = getPostCategories(post);
+    const relatedPosts = categories[0]
+      ? (await getPostsByCategoryId(categories[0].id, 4)).filter(
+          (relatedPost) => relatedPost.id !== post.id,
+        )
+      : [];
 
     return (
-      <main className="shell page">
-        <article className="article-layout">
-          <div className="article-layout__main">
-            <p className="eyebrow">Article</p>
-            <h1>{decodeEntities(post.title.rendered)}</h1>
-            <p className="lede">{stripHtml(post.excerpt.rendered)}</p>
-            <div className="article-meta">
-              <span>{new Date(post.date).toLocaleString("en-US")}</span>
-              {author ? <span>{author.name}</span> : null}
-              {categories[0] ? <span>{categories[0].name}</span> : null}
+      <main className="page-shell">
+        <section className="article-hero-band">
+          <div className="shell article-hero">
+            <div className="article-hero__content">
+              <p className="eyebrow">Article</p>
+              <h1>{decodeEntities(post.title.rendered)}</h1>
+              <p className="lede">{stripHtml(post.excerpt.rendered)}</p>
+              <div className="article-meta">
+                <span>{new Date(post.date).toLocaleString("en-US")}</span>
+                {author ? <span>{author.name}</span> : null}
+                {categories[0] ? (
+                  <Link href={toInternalPath(`/${categories[0].slug}`)}>
+                    {decodeEntities(categories[0].name)}
+                  </Link>
+                ) : null}
+              </div>
             </div>
             {featuredImage ? (
               <img
                 src={featuredImage.source_url}
                 alt={decodeEntities(featuredImage.alt_text || post.title.rendered)}
-                className="hero-image"
+                className="article-hero__image"
               />
             ) : null}
-            <RichText html={post.content?.rendered || ""} />
           </div>
-        </article>
+        </section>
+        <section className="shell article-stage">
+          <article className="article-layout">
+            <div className="article-layout__main">
+              <RichText html={post.content?.rendered || ""} />
+            </div>
+          </article>
+          {relatedPosts.length > 0 ? (
+            <aside className="article-sidebar">
+              <div className="panel-heading">
+                <p className="eyebrow">Related</p>
+                <h2>More from this desk</h2>
+              </div>
+              <div className="stack">
+                {relatedPosts.map((relatedPost) => (
+                  <ArticleCard key={relatedPost.id} post={relatedPost} />
+                ))}
+              </div>
+            </aside>
+          ) : null}
+        </section>
       </main>
     );
   }
@@ -116,29 +148,36 @@ export default async function CatchAllPage({ params }: CatchAllPageProps) {
     const page = entity.page;
 
     return (
-      <main className="shell page">
-        <section className="page-copy">
-          <p className="eyebrow">Page</p>
-          <h1>{decodeEntities(page.title.rendered)}</h1>
-          <RichText html={page.content?.rendered || ""} />
+      <main className="page-shell">
+        <section className="shell editorial-page">
+          <div className="page-copy">
+            <p className="eyebrow">Page</p>
+            <h1>{decodeEntities(page.title.rendered)}</h1>
+            <RichText html={page.content?.rendered || ""} />
+          </div>
         </section>
       </main>
     );
   }
 
   return (
-    <main className="shell page">
-      <section className="page-copy">
-        <p className="eyebrow">Archive</p>
-        <h1>{decodeEntities(entity.category.name)}</h1>
-        <p className="lede">
-          Live archive rendered from the WordPress category tree.
-        </p>
+    <main className="page-shell">
+      <section className="shell archive-hero">
+        <div className="page-copy">
+          <p className="eyebrow">Archive</p>
+          <h1>{decodeEntities(entity.category.name)}</h1>
+          <p className="lede">
+            Live archive rendered from the WordPress category tree and styled from
+            the migrated editorial frontend.
+          </p>
+        </div>
       </section>
-      <section className="archive-grid">
-        {entity.posts.map((post) => (
-          <ArticleCard key={post.id} post={post} />
-        ))}
+      <section className="shell archive-preview">
+        <div className="archive-grid">
+          {entity.posts.map((post) => (
+            <ArticleCard key={post.id} post={post} />
+          ))}
+        </div>
       </section>
     </main>
   );

@@ -4,6 +4,7 @@ import {
   decodeEntities,
   getAuthor,
   getFeaturedImage,
+  getPostCategories,
   stripHtml,
   toInternalPath,
   type WpPost,
@@ -20,11 +21,16 @@ export function ArticleCard({
 }: ArticleCardProps) {
   const featuredImage = getFeaturedImage(post);
   const author = getAuthor(post);
+  const categories = getPostCategories(post);
+  const primaryCategory = categories[0];
   const href = toInternalPath(post.link);
   const excerpt = stripHtml(post.excerpt.rendered);
 
   return (
-    <article className={`article-card article-card--${variant}`}>
+    <article
+      className={`article-card article-card--${variant}`}
+      data-category={primaryCategory?.slug ?? "default"}
+    >
       {featuredImage ? (
         <Link href={href} className="article-card__image-link">
           <img
@@ -35,6 +41,9 @@ export function ArticleCard({
         </Link>
       ) : null}
       <div className="article-card__body">
+        {primaryCategory ? (
+          <p className="article-card__tag">{decodeEntities(primaryCategory.name)}</p>
+        ) : null}
         <p className="article-card__meta">
           <span>{new Date(post.date).toLocaleDateString("en-US")}</span>
           {author ? <span>{author.name}</span> : null}

@@ -14,10 +14,10 @@ import {
 export const metadata: Metadata = {
   metadataBase: new URL(absoluteUrl()),
   title: {
-    default: "TokenTopNews Headless",
+    default: "TokenTopNews",
     template: "%s",
   },
-  description: "Next.js headless frontend for TokenTopNews.",
+  description: "Crypto news, insight and market context from TokenTopNews.",
 };
 
 export default async function RootLayout({

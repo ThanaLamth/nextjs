@@ -257,7 +257,7 @@ async function getCachedLatestPosts(limit: number): Promise<WpPost[]> {
   cacheTag("home");
 
   return fetchWordPress<WpPost[]>(
-    `/wp/v2/posts?per_page=${limit}&_embed&_fields=id,slug,link,date,modified,title,excerpt,categories,author,featured_media,yoast_head_json,_embedded`,
+    `/wp/v2/posts?per_page=${limit}&_embed`,
   );
 }
 
@@ -279,7 +279,7 @@ async function getCachedPostsByCategoryId(
   cacheTag(`category:${categoryId}`);
 
   return fetchWordPress<WpPost[]>(
-    `/wp/v2/posts?per_page=${limit}&categories=${categoryId}&_embed&_fields=id,slug,link,date,modified,title,excerpt,categories,author,featured_media,yoast_head_json,_embedded`,
+    `/wp/v2/posts?per_page=${limit}&categories=${categoryId}&_embed`,
   );
 }
 
@@ -295,9 +295,7 @@ async function getCachedPostBySlug(slug: string): Promise<WpPost | null> {
   cacheTag(`post:${slug}`);
 
   const posts = await fetchWordPress<WpPost[]>(
-    `/wp/v2/posts?slug=${encodeURIComponent(
-      slug,
-    )}&_embed&_fields=id,slug,link,date,modified,title,excerpt,content,categories,author,featured_media,yoast_head_json,_embedded`,
+    `/wp/v2/posts?slug=${encodeURIComponent(slug)}&_embed`,
   );
 
   return posts[0] ?? null;

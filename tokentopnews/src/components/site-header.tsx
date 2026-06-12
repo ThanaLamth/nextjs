@@ -10,29 +10,62 @@ type SiteHeaderProps = {
 
 export function SiteHeader({ site, categories, trustPages }: SiteHeaderProps) {
   const utilityPages = trustPages.slice(0, 2);
+  const ctaPages = trustPages.slice(2, 4);
 
   return (
     <header className="site-header">
-      <div className="top-strip">
-        <div className="shell top-strip__inner">
-          <span className="eyebrow">Live Editorial Wire</span>
-          <span className="top-strip__copy">{decodeEntities(site.description)}</span>
+      <div className="live-bar">
+        <div className="shell live-bar__inner">
+          <span className="live-pill">Live</span>
+          <div className="live-ticker" aria-label="Coverage lanes">
+            {categories.slice(0, 4).map((category) => (
+              <Link
+                key={category.id}
+                href={toInternalPath(`/${category.slug}`)}
+                className="live-ticker__item"
+              >
+                {decodeEntities(category.name)}
+              </Link>
+            ))}
+          </div>
+          <span className="live-copy">{decodeEntities(site.description)}</span>
         </div>
       </div>
       <div className="shell masthead">
-        <div>
-          <Link href="/" className="brand">
-            {site.name}
-          </Link>
-          <p className="brand-tagline">WordPress CMS, Next.js editorial frontend.</p>
+        <Link href="/" className="brand-lockup" aria-label={site.name}>
+          <span className="brand-mark">T</span>
+          <div>
+            <span className="brand">{site.name}</span>
+            <p className="brand-tagline">Crypto news, insight &amp; market context.</p>
+          </div>
+        </Link>
+        <div className="masthead__signal">
+          <p className="masthead__signal-label">Headless Frontend</p>
+          <p className="masthead__signal-copy">
+            WordPress remains the CMS while Next.js handles the editorial
+            presentation layer.
+          </p>
         </div>
-        <nav className="utility-nav" aria-label="Utility">
-          {utilityPages.map((page) => (
-            <Link key={page.id} href={toInternalPath(page.link)}>
-              {decodeEntities(page.title.rendered)}
-            </Link>
-          ))}
-        </nav>
+        <div className="masthead__actions">
+          <nav className="utility-nav" aria-label="Utility">
+            {utilityPages.map((page) => (
+              <Link key={page.id} href={toInternalPath(page.link)}>
+                {decodeEntities(page.title.rendered)}
+              </Link>
+            ))}
+          </nav>
+          <div className="header-cta">
+            {ctaPages.map((page, index) => (
+              <Link
+                key={page.id}
+                href={toInternalPath(page.link)}
+                className={`btn ${index === 0 ? "btn-outline" : "btn-primary"} btn-sm`}
+              >
+                {decodeEntities(page.title.rendered)}
+              </Link>
+            ))}
+          </div>
+        </div>
       </div>
       <div className="shell primary-nav-wrap">
         <nav className="primary-nav" aria-label="Primary">
