@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Subscribe | TokenTopNews",
+  title: "Subscribe",
   description: "Get premium access to crypto news, analysis and market data.",
 };
 

@@ -258,6 +258,10 @@ textarea {
   background: var(--grad-trends);
 }
 
+.cmc-market-row:hover {
+  background: var(--raised);
+}
+
 .grad-narratives {
   background: var(--grad-narratives);
 }

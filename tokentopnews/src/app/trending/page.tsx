@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Trending | TokenTopNews",
+  title: "Trending",
   description: "Most-read stories and topics in the last 24 hours.",
 };
 

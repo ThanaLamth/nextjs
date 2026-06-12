@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Markets | TokenTopNews",
+  title: "Markets",
   description: "Live crypto market prices, market caps and 24h changes.",
 };
 
