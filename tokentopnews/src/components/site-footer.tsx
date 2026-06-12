@@ -6,89 +6,279 @@ type SiteFooterProps = {
   pages: WpPage[];
 };
 
+const FOOTER_GROUPS = [
+  {
+    title: "Company",
+    slugs: ["about-us", "publishing-principles"],
+  },
+  {
+    title: "Standards",
+    slugs: ["ownership-funding", "feedback-corrections", "ethics-policy"],
+  },
+  {
+    title: "Policies",
+    slugs: ["diversity-policy", "diversity-staffing-report", "privacy-policy"],
+  },
+];
+
+const STATS = [
+  { n: "50K+", l: "Daily Readers" },
+  { n: "120+", l: "Countries" },
+  { n: "4.9★", l: "App Rating" },
+  { n: "99.9%", l: "Uptime SLA" },
+];
+
 export function SiteFooter({ pages }: SiteFooterProps) {
   const pageMap = new Map(pages.map((page) => [page.slug, page]));
-  const footerGroups = [
-    {
-      title: "Company",
-      slugs: ["about-us", "publishing-principles"],
-    },
-    {
-      title: "Standards",
-      slugs: ["ownership-funding", "feedback-corrections", "ethics-policy"],
-    },
-    {
-      title: "Policies",
-      slugs: ["diversity-policy", "diversity-staffing-report", "privacy-policy"],
-    },
-  ].map((group) => ({
+  const footerGroups = FOOTER_GROUPS.map((group) => ({
     title: group.title,
     pages: group.slugs
       .map((slug) => pageMap.get(slug))
       .filter((page): page is WpPage => Boolean(page)),
   }));
-
-  const metrics = [
-    { value: "WordPress", label: "CMS source" },
-    { value: "Next.js 16", label: "Frontend runtime" },
-    { value: "REST API", label: "Content transport" },
-    { value: "Railway", label: "Deployment target" },
-  ];
+  const bottomPages = ["privacy-policy", "publishing-principles", "about-us"]
+    .map((slug) => pageMap.get(slug))
+    .filter((page): page is WpPage => Boolean(page));
 
   return (
-    <footer className="site-footer">
-      <div className="shell site-footer__grid">
-        <div className="site-footer__brand">
-          <div className="brand-lockup brand-lockup--footer">
-            <span className="brand-mark">T</span>
-            <div>
-              <span className="brand">TokenTopNews</span>
-              <p className="brand-tagline">Crypto news, insight &amp; market context.</p>
-            </div>
-          </div>
-          <p className="footer-copy">
-            Tokentopnews.com remains the editorial system of record. This frontend
-            renders WordPress content through a staged Next.js migration.
-          </p>
-          <p className="footer-note">
-            Editorial, policy, and transparency pages remain available from the same
-            source content during the cutover period.
-          </p>
-        </div>
-        <div className="footer-columns">
-          {footerGroups.map((group) => (
-            <div key={group.title} className="footer-column">
-              <p className="footer-column__title">{group.title}</p>
-              <div className="footer-links">
-                {group.pages.map((page) => (
-                  <Link key={page.id} href={toInternalPath(page.link)}>
-                    {decodeEntities(page.title.rendered)}
-                  </Link>
-                ))}
+    <footer
+      className="site-footer"
+      style={{
+        background: "var(--surface)",
+        borderTop: "0.5px solid var(--border-subtle)",
+        marginTop: "var(--s16)",
+        paddingTop: "var(--s16)",
+        paddingBottom: "var(--s8)",
+      }}
+    >
+      <div className="container">
+        <div
+          className="site-footer-grid"
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: 48,
+            marginBottom: "var(--s16)",
+            alignItems: "start",
+          }}
+        >
+          <div>
+            <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: "var(--s4)" }}>
+              <div
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: 7,
+                  background: "var(--grad-brand)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontFamily: "var(--font-display)",
+                  fontWeight: 800,
+                  fontSize: 14,
+                  color: "#fff",
+                }}
+              >
+                T
               </div>
-            </div>
-          ))}
-          <div className="footer-card">
-            <p className="footer-column__title">Platform Stack</p>
-            <div className="footer-metrics">
-              {metrics.map((metric) => (
-                <div key={metric.label}>
-                  <p className="footer-metrics__value">{metric.value}</p>
-                  <p className="footer-metrics__label">{metric.label}</p>
+              <div>
+                <div style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 14 }}>
+                  TokenTopNews
                 </div>
+                <div
+                  style={{
+                    fontSize: 8,
+                    color: "var(--text-3)",
+                    letterSpacing: "0.1em",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  CRYPTO NEWS, INSIGHT &amp; MARKET CONTEXT
+                </div>
+              </div>
+            </Link>
+            <p
+              style={{
+                fontSize: 11,
+                color: "var(--text-3)",
+                lineHeight: 1.6,
+                marginBottom: "var(--s6)",
+              }}
+            >
+              Disclaimer: Any financial and market information given on Tokentopnews.com
+              is written for informational purposes only. Conduct your own research by
+              contacting financial experts before making any investment decisions.
+            </p>
+            <div style={{ display: "flex", gap: 8 }}>
+              {[
+                { l: "F", c: "#1877F2" },
+                { l: "X", c: "#1DA1F2" },
+                { l: "T", c: "#229ED9" },
+                { l: "Y", c: "#FF0000" },
+                { l: "L", c: "#0A66C2" },
+              ].map((social) => (
+                <a
+                  key={social.l}
+                  href="#"
+                  style={{
+                    width: 28,
+                    height: 28,
+                    borderRadius: 5,
+                    background: social.c,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 10,
+                    fontWeight: 700,
+                    color: "#fff",
+                  }}
+                >
+                  {social.l}
+                </a>
               ))}
             </div>
           </div>
+
+          <div
+            className="footer-link-grid"
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+              gap: 24,
+              alignItems: "start",
+            }}
+          >
+            {footerGroups.map((group) => (
+              <div key={group.title}>
+                <div
+                  style={{
+                    fontFamily: "var(--font-display)",
+                    fontSize: 12,
+                    fontWeight: 700,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.06em",
+                    marginBottom: "var(--s4)",
+                    color: "var(--text-1)",
+                  }}
+                >
+                  {group.title}
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {group.pages.map((page) => (
+                    <Link
+                      key={page.id}
+                      href={toInternalPath(page.link)}
+                      style={{ fontSize: 12, color: "var(--text-3)" }}
+                    >
+                      {decodeEntities(page.title.rendered)}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            ))}
+
+            <div
+              style={{
+                background: "linear-gradient(var(--surface), var(--surface)) padding-box, var(--grad-brand) border-box",
+                border: "1.5px solid transparent",
+                borderRadius: "var(--r-xl)",
+                padding: "var(--s5)",
+              }}
+            >
+              <div
+                style={{
+                  fontFamily: "var(--font-display)",
+                  fontSize: 11,
+                  fontWeight: 700,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.08em",
+                  marginBottom: "var(--s4)",
+                  color: "var(--text-3)",
+                }}
+              >
+                TRUSTED BY READERS WORLDWIDE
+              </div>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: "var(--s4)",
+                  marginBottom: "var(--s4)",
+                }}
+              >
+                {STATS.map((stat) => (
+                  <div key={stat.l}>
+                    <div
+                      style={{
+                        fontFamily: "var(--font-display)",
+                        fontSize: 22,
+                        fontWeight: 800,
+                        lineHeight: 1,
+                      }}
+                    >
+                      <span className="grad-brand">{stat.n}</span>
+                    </div>
+                    <div style={{ fontSize: 10, color: "var(--text-3)", marginTop: 3 }}>
+                      {stat.l}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div
+                style={{
+                  borderTop: "0.5px solid var(--border-subtle)",
+                  paddingTop: "var(--s3)",
+                  marginTop: "var(--s2)",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 4 }}>
+                  <div
+                    style={{
+                      width: 14,
+                      height: 14,
+                      borderRadius: 3,
+                      background: "var(--grad-brand)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3">
+                      <path d="M20 6 9 17l-5-5" />
+                    </svg>
+                  </div>
+                  <span style={{ fontSize: 10, fontWeight: 700, color: "var(--text-2)" }}>
+                    SOC2 Certified
+                  </span>
+                </div>
+                <div style={{ fontSize: 10, color: "var(--text-3)", fontStyle: "italic" }}>
+                  Built for the crypto community
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-      <div className="shell site-footer__bottom">
-        <p>&copy; 2026 TokenTopNews. All rights reserved.</p>
-        <div className="site-footer__bottom-links">
-          {pages.slice(-3).map((page) => (
-            <Link key={page.id} href={toInternalPath(page.link)}>
-              {decodeEntities(page.title.rendered)}
-            </Link>
-          ))}
+
+        <div className="divider" style={{ marginBottom: "var(--s6)" }} />
+        <div
+          className="footer-bottom"
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: 20,
+          }}
+        >
+          <p style={{ fontSize: 11, color: "var(--text-3)" }}>
+            &copy; 2026 TokenTopNews. All rights reserved.
+          </p>
+          <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
+            {bottomPages.map((page) => (
+              <Link key={page.id} href={toInternalPath(page.link)} style={{ fontSize: 11, color: "var(--text-3)" }}>
+                {decodeEntities(page.title.rendered)}
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
     </footer>

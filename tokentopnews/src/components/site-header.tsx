@@ -1,6 +1,13 @@
-import Link from "next/link";
-
-import { decodeEntities, toInternalPath, type WpCategory, type WpPage, type SiteSettings } from "@/lib/wp";
+import { SiteHeaderClient } from "@/components/site-header-client";
+import type { NavItemData } from "@/lib/site-ui";
+import {
+  decodeEntities,
+  PRIMARY_CATEGORY_SLUGS,
+  toInternalPath,
+  type SiteSettings,
+  type WpCategory,
+  type WpPage,
+} from "@/lib/wp";
 
 type SiteHeaderProps = {
   site: SiteSettings;
@@ -8,78 +15,66 @@ type SiteHeaderProps = {
   trustPages: WpPage[];
 };
 
+const NAV_LABEL_OVERRIDES: Record<string, string> = {
+  "cryptocurrency-news": "NEWS",
+  insights: "INSIGHTS",
+  trends: "TRENDS",
+  narratives: "NARRATIVES",
+  macro: "MACRO",
+  "weekly-recap": "WEEKLY RECAP",
+  "sponsored-articles": "SPONSORED",
+  "press-release": "PRESS RELEASE",
+};
+
+function toCategoryPath(category: WpCategory): string {
+  return toInternalPath(category.link ?? `/${category.slug}`);
+}
+
+function toNavItems(categories: WpCategory[]): NavItemData[] {
+  const categoriesById = new Map(categories.map((category) => [category.id, category]));
+
+  return PRIMARY_CATEGORY_SLUGS.map((slug) =>
+    categories.find((category) => category.slug === slug),
+  )
+    .filter((category): category is WpCategory => Boolean(category))
+    .map((category) => {
+      const sub = categories
+        .filter((entry) => entry.parent === category.id)
+        .sort((left, right) => left.name.localeCompare(right.name))
+        .map((entry) => {
+          const parent = categoriesById.get(entry.parent);
+          const href = parent
+            ? toInternalPath(`${toCategoryPath(parent)}${entry.slug}`)
+            : toCategoryPath(entry);
+
+          return {
+            label: decodeEntities(entry.name),
+            href,
+          };
+        });
+
+      return {
+        label:
+          NAV_LABEL_OVERRIDES[category.slug] ??
+          decodeEntities(category.name).toUpperCase(),
+        href: toCategoryPath(category),
+        sub: sub.length ? sub : undefined,
+      };
+    });
+}
+
 export function SiteHeader({ site, categories, trustPages }: SiteHeaderProps) {
-  const utilityPages = trustPages.slice(0, 2);
-  const ctaPages = trustPages.slice(2, 4);
+  const utilityLinks = trustPages.slice(0, 4).map((page) => ({
+    label: decodeEntities(page.title.rendered),
+    href: toInternalPath(page.link),
+  }));
 
   return (
-    <header className="site-header">
-      <div className="live-bar">
-        <div className="shell live-bar__inner">
-          <span className="live-pill">Live</span>
-          <div className="live-ticker" aria-label="Coverage lanes">
-            {categories.slice(0, 4).map((category) => (
-              <Link
-                key={category.id}
-                href={toInternalPath(`/${category.slug}`)}
-                className="live-ticker__item"
-              >
-                {decodeEntities(category.name)}
-              </Link>
-            ))}
-          </div>
-          <span className="live-copy">{decodeEntities(site.description)}</span>
-        </div>
-      </div>
-      <div className="shell masthead">
-        <Link href="/" className="brand-lockup" aria-label={site.name}>
-          <span className="brand-mark">T</span>
-          <div>
-            <span className="brand">{site.name}</span>
-            <p className="brand-tagline">Crypto news, insight &amp; market context.</p>
-          </div>
-        </Link>
-        <div className="masthead__signal">
-          <p className="masthead__signal-label">Headless Frontend</p>
-          <p className="masthead__signal-copy">
-            WordPress remains the CMS while Next.js handles the editorial
-            presentation layer.
-          </p>
-        </div>
-        <div className="masthead__actions">
-          <nav className="utility-nav" aria-label="Utility">
-            {utilityPages.map((page) => (
-              <Link key={page.id} href={toInternalPath(page.link)}>
-                {decodeEntities(page.title.rendered)}
-              </Link>
-            ))}
-          </nav>
-          <div className="header-cta">
-            {ctaPages.map((page, index) => (
-              <Link
-                key={page.id}
-                href={toInternalPath(page.link)}
-                className={`btn ${index === 0 ? "btn-outline" : "btn-primary"} btn-sm`}
-              >
-                {decodeEntities(page.title.rendered)}
-              </Link>
-            ))}
-          </div>
-        </div>
-      </div>
-      <div className="shell primary-nav-wrap">
-        <nav className="primary-nav" aria-label="Primary">
-          {categories.map((category) => (
-            <Link
-              key={category.id}
-              href={toInternalPath(`/${category.slug}`)}
-              className="primary-nav__item"
-            >
-              {decodeEntities(category.name)}
-            </Link>
-          ))}
-        </nav>
-      </div>
-    </header>
+    <SiteHeaderClient
+      siteName={decodeEntities(site.name)}
+      description={decodeEntities(site.description)}
+      navItems={toNavItems(categories)}
+      utilityLinks={utilityLinks}
+    />
   );
 }
