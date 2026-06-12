@@ -8,7 +8,6 @@ const FOOTER_LINKS: Record<string, { label: string; href: string; external?: boo
     { label: "News", href: "/news" },
     { label: "Guides", href: "/guides" },
     { label: "Markets", href: "/markets" },
-    { label: "Projects", href: "/projects" },
   ],
   "Trust & Company": [
     { label: "About", href: "/about" },

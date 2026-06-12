@@ -1,5 +1,4 @@
 import NewsletterForm from "@/components/NewsletterForm";
-import { Star } from "lucide-react";
 
 export default function NewsletterBand() {
   return (
@@ -20,7 +19,7 @@ export default function NewsletterBand() {
             Stay Ahead of the Market
           </h2>
           <p className="text-sm mb-6" style={{ color: "var(--text-secondary)" }}>
-            Get daily crypto insights before the market moves. Join 50,000+ subscribers.
+            Get daily crypto insights before the market moves, with a cleaner editorial focus on signal over noise.
           </p>
           <div className="w-full md:w-96">
             <NewsletterForm buttonText="Subscribe Free" />
@@ -30,22 +29,19 @@ export default function NewsletterBand() {
           </p>
         </div>
 
-        {/* Right: social proof */}
+        {/* Right: reader value */}
         <div
           className="flex flex-col items-center justify-center px-8 py-10 border-t md:border-t-0 md:border-l"
           style={{ borderColor: "var(--border)" }}
         >
           <p className="font-display font-bold text-2xl mb-1" style={{ color: "var(--text-primary)" }}>
-            Join 50,000+
+            Built for readers
           </p>
-          <p className="text-sm mb-4" style={{ color: "var(--text-secondary)" }}>crypto enthusiasts</p>
-          <div className="flex items-center gap-0.5 mb-2">
-            {[1, 2, 3, 4, 5].map((s) => (
-              <Star key={s} size={18} className="fill-brand-gold text-brand-gold" />
-            ))}
-          </div>
-          <p className="text-xs font-semibold" style={{ color: "var(--text-secondary)" }}>
-            4.8/5 from 2,300+ reviews
+          <p className="text-sm mb-4 text-center" style={{ color: "var(--text-secondary)" }}>
+            A simpler briefing format for top stories, explainers, and market context.
+          </p>
+          <p className="text-xs font-semibold text-center" style={{ color: "var(--text-secondary)" }}>
+            No account setup required
           </p>
         </div>
       </div>

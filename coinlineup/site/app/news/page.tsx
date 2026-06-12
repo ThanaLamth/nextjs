@@ -99,11 +99,11 @@ export default async function NewsPage() {
             </h3>
             <div className="flex flex-wrap gap-2">
                 {[
-                  { label: "Bitcoin", href: "/news/bitcoin-news" },
+                  { label: "Bitcoin", href: "/news/bitcoin" },
                   { label: "Ethereum", href: "/news/ethereum" },
                   { label: "Altcoins", href: "/news/altcoins" },
                   { label: "Regulation", href: "/news/regulation" },
-                  { label: "Banking", href: "/news/bank" },
+                  { label: "Banking", href: "/news/banking" },
                   { label: "Exchanges", href: "/news/exchanges" },
                   { label: "DeFi", href: "/news/defi" },
                   { label: "Blockchain Events", href: "/news/blockchain-events" },

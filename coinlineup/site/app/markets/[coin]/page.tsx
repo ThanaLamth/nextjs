@@ -93,7 +93,7 @@ async function CoinContent({ params }: Props) {
 
       <div className="flex items-center justify-between">
         <p className="text-sm" style={{ color: "var(--text-muted)" }}>
-          Full {name} market page coming soon with charts, historical data, and on-chain analytics.
+          This page focuses on the latest live pricing snapshot while broader market coverage continues across CoinLineup.
         </p>
         <Link href="/markets" className="text-brand-orange text-sm font-semibold flex items-center gap-1 hover:gap-2 transition-all">
           View all markets <ArrowRight size={14} />

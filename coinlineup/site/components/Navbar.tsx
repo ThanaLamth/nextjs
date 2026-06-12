@@ -11,11 +11,11 @@ import ThemeToggle from "./ThemeToggle";
 const NAV_LINKS = [
   { label: "News", href: "/news",
     children: [
-      { label: "Bitcoin", href: "/news/bitcoin-news" },
+      { label: "Bitcoin", href: "/news/bitcoin" },
       { label: "Ethereum", href: "/news/ethereum" },
       { label: "Altcoins", href: "/news/altcoins" },
       { label: "Regulation", href: "/news/regulation" },
-      { label: "Banking", href: "/news/bank" },
+      { label: "Banking", href: "/news/banking" },
       { label: "Exchanges", href: "/news/exchanges" },
       { label: "Blockchain Events", href: "/news/blockchain-events" },
     ],
@@ -32,12 +32,6 @@ const NAV_LINKS = [
       { label: "Bitcoin", href: "/markets/bitcoin-markets" },
       { label: "Ethereum", href: "/markets/ethereum-markets" },
       { label: "XRP", href: "/markets/xrp" },
-    ],
-  },
-  { label: "Projects", href: "/projects",
-    children: [
-      { label: "Top Projects", href: "/projects/top-projects" },
-      { label: "Reviews", href: "/projects/reviews" },
     ],
   },
   { label: "About", href: "/about" },

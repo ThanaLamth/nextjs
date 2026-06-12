@@ -5,11 +5,11 @@ import { usePathname } from "next/navigation";
 
 const CATEGORIES = [
   { label: "All", href: "/news" },
-  { label: "Bitcoin", href: "/news/bitcoin-news" },
+  { label: "Bitcoin", href: "/news/bitcoin" },
   { label: "Ethereum", href: "/news/ethereum" },
   { label: "Altcoins", href: "/news/altcoins" },
   { label: "Regulation", href: "/news/regulation" },
-  { label: "Banking", href: "/news/bank" },
+  { label: "Banking", href: "/news/banking" },
   { label: "Exchanges", href: "/news/exchanges" },
   { label: "Blockchain Events", href: "/news/blockchain-events" },
 ];

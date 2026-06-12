@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, BookOpen, ChevronRight, Shield, Check, Rocket, TrendingUp, Zap, Timer } from "lucide-react";
+import { ArrowRight, BookOpen, ChevronRight, Shield, Check, Rocket, TrendingUp, Zap } from "lucide-react";
 
 const LEARNING_PATHS = [
   { icon: <Rocket size={16} />, title: "Start Here: Crypto Basics", lessons: 5, href: "/guides" },
@@ -15,11 +15,11 @@ const QUICK_ANSWERS = [
   { q: "What is Web3?", href: "/guides" },
 ];
 
-const TRUST_POINTS = [
-  "Tested by our team",
-  "Fact-checked",
-  "Regularly updated",
-  "Trusted by 50K+ readers",
+const EDITORIAL_POINTS = [
+  "Named bylines on published guides",
+  "Corrections path available to readers",
+  "Policy pages linked sitewide",
+  "Guide coverage updated as topics evolve",
 ];
 
 export default function GuidesHub() {
@@ -59,27 +59,25 @@ export default function GuidesHub() {
             className="inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded mb-3"
             style={{ background: "rgba(247,147,26,0.15)", color: "#F7931A" }}
           >
-            Featured Guide
+            Start Here
           </span>
           <h3 className="font-display font-bold text-base leading-snug mb-2" style={{ color: "var(--text-primary)" }}>
-            What is Bitcoin? A Beginner&apos;s Guide to BTC
+            Explore CoinLineup&apos;s crypto guide library
           </h3>
           <p className="text-xs leading-relaxed mb-4" style={{ color: "var(--text-secondary)" }}>
-            Everything you need to know about Bitcoin, how it works, and why it matters.
+            Browse beginner explainers, market primers, and topic-based learning paths built from the live guides archive.
           </p>
           <div className="flex items-center gap-2 mb-3">
             <span className="w-5 h-5 rounded-full bg-brand-orange flex items-center justify-center text-white text-[9px] font-bold">CL</span>
-            <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>CoinLineup Research Team</span>
+            <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>CoinLineup Guides Desk</span>
           </div>
           <div className="flex items-center gap-2 text-[10px] mb-4" style={{ color: "var(--text-muted)" }}>
-            <span className="flex items-center gap-1"><Timer size={10} /> 12 min read</span>
-            <span>·</span>
             <span>Beginner</span>
             <span>·</span>
-            <span>Updated May 19</span>
+            <span>Editorially maintained</span>
           </div>
           <Link href="/guides" className="inline-flex items-center gap-1 text-brand-orange text-xs font-semibold hover:gap-2 transition-all">
-            Read Guide <ArrowRight size={12} />
+            Browse Guides <ArrowRight size={12} />
           </Link>
         </div>
 
@@ -131,15 +129,15 @@ export default function GuidesHub() {
           </div>
         </div>
 
-        {/* Trusted & Reviewed */}
+        {/* Editorial standards */}
         <div className="p-5 flex flex-col justify-between">
           <div>
             <p className="font-display font-bold text-xs uppercase tracking-widest mb-1" style={{ color: "var(--text-primary)" }}>
-              Trusted & Reviewed
+              Editorial Standards
             </p>
-            <p className="text-[10px] mb-4" style={{ color: "var(--text-muted)" }}>Our editorial standards</p>
+            <p className="text-[10px] mb-4" style={{ color: "var(--text-muted)" }}>How readers can evaluate guide coverage</p>
             <ul className="space-y-2.5">
-              {TRUST_POINTS.map((pt) => (
+              {EDITORIAL_POINTS.map((pt) => (
                 <li key={pt} className="flex items-center gap-2 text-xs" style={{ color: "var(--text-secondary)" }}>
                   <span className="w-4 h-4 rounded-full bg-brand-green/15 flex items-center justify-center flex-shrink-0">
                     <Check size={9} className="text-brand-green" />

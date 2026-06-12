@@ -110,11 +110,7 @@ export default function SignUpPage() {
             </div>
 
             <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
-              Looking for account features like watchlists or portfolios?{" "}
-              <Link href="/" className="text-brand-orange font-semibold hover:underline">
-                Those are not live yet
-              </Link>
-              .
+              CoinLineup is currently focused on editorial coverage, guides, and newsletter updates for readers who want a simpler product experience.
             </p>
           </div>
 

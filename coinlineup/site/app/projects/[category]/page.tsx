@@ -48,10 +48,10 @@ async function ProjectCategoryContent({ params }: Props) {
 
       <div className="flex flex-col items-center justify-center py-24 text-center">
         <p className="font-display font-semibold text-lg mb-2" style={{ color: "var(--text-secondary)" }}>
-          Coverage coming soon
+          No coverage published yet
         </p>
         <p className="text-sm mb-6" style={{ color: "var(--text-muted)" }}>
-          {label} archives will go live after dedicated WordPress categories are set up.
+          {label} archives will appear here automatically once related WordPress content is available.
         </p>
         <Link href="/projects" className="text-brand-orange text-sm font-semibold flex items-center gap-1 hover:gap-2 transition-all">
           Browse all projects <ArrowRight size={14} />

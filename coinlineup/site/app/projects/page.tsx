@@ -29,10 +29,10 @@ export default async function ProjectsPage() {
       ) : (
         <div className="rounded-2xl border px-6 py-12 text-center" style={{ borderColor: "var(--border)" }}>
           <p className="font-display font-semibold text-lg mb-2" style={{ color: "var(--text-primary)" }}>
-            Project coverage is coming soon
+            No project coverage published yet
           </p>
           <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
-            This section will go live once project posts are published in WordPress.
+            This section will populate automatically when project coverage is published in WordPress.
           </p>
         </div>
       )}
