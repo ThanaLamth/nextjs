@@ -4,7 +4,7 @@ import "./globals.css";
 
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { absoluteUrl, getAllCategories, getSiteSettings } from "@/lib/wp";
+import { absoluteUrl } from "@/lib/wp";
 
 export const metadata: Metadata = {
   metadataBase: new URL(absoluteUrl()),
@@ -25,19 +25,14 @@ try {
 } catch {}
 `;
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const [site, categories] = await Promise.all([
-    getSiteSettings(),
-    getAllCategories(),
-  ]);
-
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
-        <SiteHeader site={site} categories={categories} />
+        <SiteHeader />
         {children}
         <SiteFooter />
       </body>
