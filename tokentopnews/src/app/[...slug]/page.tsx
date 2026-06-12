@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { connection } from "next/server";
-import { Suspense } from "react";
+import { cache, Suspense } from "react";
 
 import { RichText } from "@/components/rich-text";
 import {
@@ -134,11 +133,13 @@ function getSubsectionMeta(parentSlug: string, slug: string, fallbackLabel: stri
   );
 }
 
+const getResolvedRouteEntity = cache(async (slug: string[]) => resolveEntityByPath(slug));
+
 export async function generateMetadata({
   params,
 }: CatchAllPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const entity = await resolveEntityByPath(slug);
+  const entity = await getResolvedRouteEntity(slug);
 
   if (!entity) {
     return {
@@ -221,9 +222,8 @@ export default function CatchAllPage(props: CatchAllPageProps) {
 }
 
 async function CatchAllPageContent({ params }: CatchAllPageProps) {
-  await connection();
   const { slug } = await params;
-  const entity = await resolveEntityByPath(slug);
+  const entity = await getResolvedRouteEntity(slug);
 
   if (!entity) {
     notFound();

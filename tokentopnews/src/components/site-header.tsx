@@ -56,20 +56,6 @@ const NAV_ITEMS: NavItemData[] = [
   },
 ];
 
-const UTILITY_LINKS = [
-  { label: "Newsletter", href: "/newsletter" },
-  { label: "Subscribe", href: "/subscribe" },
-  { label: "Markets", href: "/markets" },
-  { label: "Trending", href: "/trending" },
-];
-
 export function SiteHeader() {
-  return (
-    <SiteHeaderClient
-      siteName="TokenTopNews"
-      description="CRYPTO NEWS, INSIGHT & MARKET CONTEXT"
-      navItems={NAV_ITEMS}
-      utilityLinks={UTILITY_LINKS}
-    />
-  );
+  return <SiteHeaderClient siteName="TokenTopNews" navItems={NAV_ITEMS} />;
 }

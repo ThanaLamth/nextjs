@@ -268,7 +268,7 @@ export function SiteFooter() {
           }}
         >
           <p style={{ fontSize: 11, color: "var(--text-3)" }}>
-            &copy; 2026 TokenTopNews. All rights reserved.
+            &copy; 2024 TokenTopNews. All rights reserved.
           </p>
           <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
             <Link href="/privacy" style={{ fontSize: 11, color: "var(--text-3)" }}>

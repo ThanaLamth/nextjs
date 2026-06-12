@@ -6,16 +6,9 @@ import { useEffect, useRef, useState } from "react";
 import { fetchMarketData, type CoinPrice } from "@/lib/market-data";
 import type { NavItemData } from "@/lib/site-ui";
 
-type UtilityLink = {
-  label: string;
-  href: string;
-};
-
 type SiteHeaderClientProps = {
   siteName: string;
-  description: string;
   navItems: NavItemData[];
-  utilityLinks: UtilityLink[];
 };
 
 type Theme = "dark" | "light";
@@ -62,24 +55,6 @@ function MoonIcon() {
   );
 }
 
-function MenuIcon() {
-  return (
-    <svg
-      width="22"
-      height="22"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-    >
-      <line x1="3" y1="6" x2="21" y2="6" />
-      <line x1="3" y1="12" x2="21" y2="12" />
-      <line x1="3" y1="18" x2="21" y2="18" />
-    </svg>
-  );
-}
-
 function applyTheme(theme: Theme) {
   document.documentElement.setAttribute("data-theme", theme);
   window.localStorage.setItem("theme", theme);
@@ -87,13 +62,10 @@ function applyTheme(theme: Theme) {
 
 export function SiteHeaderClient({
   siteName,
-  description,
   navItems,
-  utilityLinks,
 }: SiteHeaderClientProps) {
   const [theme, setTheme] = useState<Theme>("dark");
   const [openMenu, setOpenMenu] = useState<string | null>(null);
-  const [mobileOpen, setMobileOpen] = useState(false);
   const [ticker, setTicker] = useState<CoinPrice[]>([]);
   const [currentPath, setCurrentPath] = useState("");
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -355,23 +327,6 @@ export function SiteHeaderClient({
               Subscribe
             </Link>
           </div>
-          <button
-            className="show-mobile"
-            type="button"
-            aria-label="Open menu"
-            style={{
-              marginLeft: "auto",
-              background: "none",
-              border: "none",
-              color: "var(--text-1)",
-              cursor: "pointer",
-              padding: 4,
-              flexShrink: 0,
-            }}
-            onClick={() => setMobileOpen((open) => !open)}
-          >
-            <MenuIcon />
-          </button>
         </div>
       </div>
 
@@ -523,54 +478,6 @@ export function SiteHeaderClient({
           </div>
         </div>
       </div>
-
-      {mobileOpen ? (
-        <div className="mobile-panel">
-          <div className="container" style={{ paddingTop: 12, paddingBottom: 16 }}>
-            <p style={{ fontSize: 11, color: "var(--text-3)", marginBottom: 12 }}>{description}</p>
-            <div style={{ display: "grid", gap: 10 }}>
-              {utilityLinks.map((link) => (
-                <Link key={link.href} href={link.href} style={{ fontSize: 13, fontWeight: 600 }}>
-                  {link.label}
-                </Link>
-              ))}
-            </div>
-            <div style={{ display: "grid", gap: 8, marginTop: 16 }}>
-              {navItems.map((item) => (
-                <div key={item.label} style={{ borderTop: "0.5px solid var(--border-subtle)", paddingTop: 8 }}>
-                  <Link
-                    href={item.href}
-                    style={{
-                      display: "block",
-                      fontFamily: "var(--font-display)",
-                      fontSize: 12,
-                      fontWeight: 700,
-                      letterSpacing: "0.06em",
-                    }}
-                    onClick={() => setMobileOpen(false)}
-                  >
-                    {item.label}
-                  </Link>
-                  {item.sub?.length ? (
-                    <div style={{ display: "grid", gap: 6, marginTop: 8, paddingLeft: 12 }}>
-                      {item.sub.map((sub) => (
-                        <Link
-                          key={sub.href}
-                          href={sub.href}
-                          style={{ fontSize: 12, color: "var(--text-2)" }}
-                          onClick={() => setMobileOpen(false)}
-                        >
-                          {sub.label}
-                        </Link>
-                      ))}
-                    </div>
-                  ) : null}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      ) : null}
     </header>
   );
 }
