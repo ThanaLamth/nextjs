@@ -580,6 +580,10 @@ textarea {
   .footer-link-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   }
+
+  .footer-trust-card {
+    grid-column: 1 / -1;
+  }
 }
 
 @media (max-width: 768px) {
@@ -628,11 +632,21 @@ textarea {
     align-items: flex-start !important;
   }
 
+  .footer-trust-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
   .article-hero-title {
     font-size: 28px !important;
   }
 
   .t-hero {
     font-size: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer-trust-stats {
+    grid-template-columns: 1fr !important;
   }
 }

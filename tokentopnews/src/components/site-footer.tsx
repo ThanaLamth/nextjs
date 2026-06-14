@@ -141,7 +141,7 @@ export function SiteFooter() {
             className="footer-link-grid"
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+              gridTemplateColumns: "repeat(3, minmax(0, 1fr)) minmax(280px, 1.2fr)",
               gap: 24,
               alignItems: "start",
             }}
@@ -176,6 +176,7 @@ export function SiteFooter() {
             ))}
 
             <div
+              className="footer-trust-card"
               style={{
                 background: "linear-gradient(var(--surface), var(--surface)) padding-box, var(--grad-brand) border-box",
                 border: "1.5px solid transparent",
@@ -197,6 +198,7 @@ export function SiteFooter() {
                 TRUSTED BY READERS WORLDWIDE
               </div>
               <div
+                className="footer-trust-stats"
                 style={{
                   display: "grid",
                   gridTemplateColumns: "1fr 1fr",
