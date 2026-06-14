@@ -9,6 +9,21 @@ interface Props {
   params: Promise<{ country: string }>;
 }
 
+function getCountryFlag(slug: string): string {
+  switch (slug) {
+    case "us":
+      return "🇺🇸";
+    case "uk":
+      return "🇬🇧";
+    case "canada":
+      return "🇨🇦";
+    case "australia":
+      return "🇦🇺";
+    default:
+      return "🌍";
+  }
+}
+
 export async function generateStaticParams() {
   return getTaxCountries().map((country) => ({ country: country.slug }));
 }
@@ -42,6 +57,8 @@ export default async function CountryTaxMethodologyPage({ params }: Props) {
 
   if (!rule) notFound();
 
+  const countryFlag = getCountryFlag(rule.slug);
+
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
       <Link
@@ -52,7 +69,7 @@ export default async function CountryTaxMethodologyPage({ params }: Props) {
       </Link>
 
       <div className="article-body">
-        <h1>{rule.name} crypto tax calculator methodology</h1>
+        <h1><span aria-hidden="true">{countryFlag}</span> {rule.name} crypto tax calculator methodology</h1>
         <p>
           This page explains the scope, formula, and deliberate simplifications behind CoinLineup&apos;s v1
           {` ${rule.name} `}crypto tax calculator. It is designed to help readers evaluate the estimate, not to replace filing software or professional advice.

@@ -10,6 +10,21 @@ interface Props {
   params: Promise<{ country: string }>;
 }
 
+function getCountryFlag(slug: string): string {
+  switch (slug) {
+    case "us":
+      return "🇺🇸";
+    case "uk":
+      return "🇬🇧";
+    case "canada":
+      return "🇨🇦";
+    case "australia":
+      return "🇦🇺";
+    default:
+      return "🌍";
+  }
+}
+
 function getUsageGuide(rule: NonNullable<ReturnType<typeof getTaxCountry>>) {
   switch (rule.slug) {
     case "us":
@@ -103,15 +118,21 @@ export default async function CountryTaxCalculatorPage({ params }: Props) {
 
   if (!rule) notFound();
 
+  const countryFlag = getCountryFlag(rule.slug);
   const usageGuide = getUsageGuide(rule);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
       <div className="mb-8 max-w-4xl">
-        <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-brand-orange">
-          Tax Calculator v1
-        </p>
+        <div className="mb-3 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm font-semibold"
+          style={{ borderColor: "var(--border)", background: "var(--surface)", color: "var(--text-secondary)" }}
+        >
+          <span aria-hidden="true">{countryFlag}</span>
+          <span>{rule.code}</span>
+          <span className="text-brand-orange">Tax Calculator v1</span>
+        </div>
         <h1 className="font-display text-4xl font-bold" style={{ color: "var(--text-primary)" }}>
+          <span aria-hidden="true" className="mr-3">{countryFlag}</span>
           {rule.pageTitle}
         </h1>
         <p className="mt-3 text-sm leading-7" style={{ color: "var(--text-secondary)" }}>
