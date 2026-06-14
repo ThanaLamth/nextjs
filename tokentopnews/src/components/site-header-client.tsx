@@ -244,41 +244,23 @@ export function SiteHeaderClient({
           padding: "24px 0",
         }}
       >
-        <div className="container" style={{ display: "flex", alignItems: "center", gap: 24 }}>
-          <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
-            <div
-              style={{
-                width: 36,
-                height: 36,
-                borderRadius: 8,
-                background: "var(--grad-brand)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontFamily: "var(--font-display)",
-                fontWeight: 800,
-                fontSize: 16,
-                color: "#fff",
-              }}
-            >
-              T
-            </div>
-            <div>
-              <div
-                style={{
-                  fontFamily: "var(--font-display)",
-                  fontWeight: 700,
-                  fontSize: 16,
-                  color: "var(--text-1)",
-                  lineHeight: 1.2,
-                }}
-              >
-                {siteName}
-              </div>
-              <div
-                style={{
-                  fontSize: 9,
-                  color: "var(--text-3)",
+	        <div className="container" style={{ display: "flex", alignItems: "center", gap: 24 }}>
+	          <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+	            <div>
+	              <img
+	                src="https://tokentopnews.com/wp-content/uploads/2025/04/TokenTopNews_2.png"
+	                alt={siteName}
+	                style={{
+	                  display: "block",
+	                  width: "auto",
+	                  height: 32,
+	                  maxWidth: 208,
+	                }}
+	              />
+	              <div
+	                style={{
+	                  fontSize: 9,
+	                  color: "var(--text-3)",
                   letterSpacing: "0.1em",
                   textTransform: "uppercase",
                 }}

@@ -60,32 +60,23 @@ export function SiteFooter() {
             alignItems: "start",
           }}
         >
-          <div>
-            <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: "var(--s4)" }}>
-              <div
-                style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: 7,
-                  background: "var(--grad-brand)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontFamily: "var(--font-display)",
-                  fontWeight: 800,
-                  fontSize: 14,
-                  color: "#fff",
-                }}
-              >
-                T
-              </div>
-              <div>
-                <div style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 14 }}>
-                  TokenTopNews
-                </div>
-                <div
-                  style={{
-                    fontSize: 8,
+	          <div>
+	            <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: "var(--s4)" }}>
+	              <div>
+	                <img
+	                  src="https://tokentopnews.com/wp-content/uploads/2025/04/TokenTopNews_2.png"
+	                  alt="TokenTopNews"
+	                  style={{
+	                    display: "block",
+	                    width: "auto",
+	                    height: 28,
+	                    maxWidth: 180,
+	                    marginBottom: 4,
+	                  }}
+	                />
+	                <div
+	                  style={{
+	                    fontSize: 8,
                     color: "var(--text-3)",
                     letterSpacing: "0.1em",
                     textTransform: "uppercase",
