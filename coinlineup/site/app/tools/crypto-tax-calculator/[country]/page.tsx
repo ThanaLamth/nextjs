@@ -59,7 +59,26 @@ export default async function CountryTaxCalculatorPage({ params }: Props) {
 
       <CountryTaxCalculator rule={rule} />
 
-      <div className="mt-8 grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(320px,0.95fr)]">
+      <div className="mt-8 grid grid-cols-1 gap-5 xl:grid-cols-3">
+        <div
+          className="rounded-2xl border p-5 md:p-6"
+          style={{ background: "var(--card-bg)", borderColor: "var(--border)" }}
+        >
+          <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-brand-orange">
+            How to use this calculator
+          </p>
+          <ol className="space-y-2 text-sm" style={{ color: "var(--text-secondary)" }}>
+            <li>1. Enter how many coins you sold and your buy and sell price per coin.</li>
+            <li>2. Choose the simple preset mode if you want a fast estimate, or switch to custom if you already know your own rate.</li>
+            <li>3. Add buy and sell dates if you want the tool to estimate short-term versus long-term treatment.</li>
+            <li>4. Open advanced options only if you need fees, manual adjustments, or a separate long-term rate.</li>
+            <li>5. Review the estimate summary, then compare it against the official sources before relying on it.</li>
+          </ol>
+          <p className="mt-4 text-sm" style={{ color: "var(--text-secondary)" }}>
+            Best for a quick single-sale estimate, not a full-year tax return.
+          </p>
+        </div>
+
         <div
           className="rounded-2xl border p-5 md:p-6"
           style={{ background: "var(--card-bg)", borderColor: "var(--border)" }}
