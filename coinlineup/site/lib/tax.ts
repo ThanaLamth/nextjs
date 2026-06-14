@@ -71,9 +71,9 @@ export const TAX_COUNTRY_RULES: Record<SupportedTaxCountry, TaxCountryRule> = {
     currency: "USD",
     pageTitle: "United States Crypto Tax Calculator",
     summary:
-      "Estimate a simple crypto capital gain or loss for a single disposal in the United States. This v1 model distinguishes between short-term and long-term holding periods and lets the reader enter their own estimated rates.",
+      "Estimate a simple crypto capital gain or loss for a single disposal in the United States. This v1 model distinguishes between short-term and long-term holding periods and supports an IRS-based preset flow for filing status and taxable income band.",
     shortDescription:
-      "Simple U.S. crypto tax estimate using cost basis, proceeds, holding period, and user-entered short-term or long-term rates.",
+      "Simple U.S. crypto tax estimate using cost basis, proceeds, holding period, and either IRS-based preset bands or user-entered short-term and long-term rates.",
     taxTreatment: "The IRS treats digital assets as property. Investment gains or losses are generally capital in nature when you dispose of crypto held as a capital asset.",
     holdingRule: "A disposal held for one year or less is treated as short-term. A disposal held for more than one year is treated as long-term.",
     costBasisMethod: "This v1 tool uses the reader's single-lot cost basis from the entered buy price and fees. It does not attempt lot selection or broker-specific identification rules.",
@@ -86,6 +86,7 @@ export const TAX_COUNTRY_RULES: Record<SupportedTaxCountry, TaxCountryRule> = {
     manualExemptionLabel: "Manual adjustment or exclusion (optional)",
     keyAssumptions: [
       "Built for a single disposal rather than a full tax-year ledger.",
+      "The preset flow is a simplified estimator built from IRS federal bracket pages and long-term capital gains guidance, not a full return calculation.",
       "Does not model wash sales, staking income, mining income, airdrops, or DeFi-specific treatment.",
       "Does not model specific lot identification or broker reporting differences.",
     ],
@@ -96,8 +97,11 @@ export const TAX_COUNTRY_RULES: Record<SupportedTaxCountry, TaxCountryRule> = {
       "Fair market value or proceeds at disposal time",
     ],
     officialSources: [
-      { label: "IRS: Digital assets", url: "https://www.eitc.irs.gov/filing/digital-assets" },
-      { label: "IRS: Publication 550 draft reference", url: "https://www.irs.gov/pub/irs-dft/p550--dft.pdf" },
+      { label: "IRS: Digital assets", url: "https://www.irs.gov/businesses/small-businesses-self-employed/digital-assets" },
+      { label: "IRS: Federal income tax rates and brackets", url: "https://www.irs.gov/filing/federal-income-tax-rates-and-brackets" },
+      { label: "IRS Topic no. 409, Capital gains and losses", url: "https://www.irs.gov/taxtopics/tc409" },
+      { label: "IRS Publication 544, Sales and Other Dispositions of Assets", url: "https://www.irs.gov/publications/p544" },
+      { label: "IRS Publication 550, Investment Income and Expenses", url: "https://www.irs.gov/publications/p550" },
     ],
     lastReviewed: "June 12, 2026",
   },

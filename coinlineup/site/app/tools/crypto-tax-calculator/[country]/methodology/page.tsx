@@ -91,6 +91,26 @@ export default async function CountryTaxMethodologyPage({ params }: Props) {
           uses reader-entered rates rather than hardcoding personal tax brackets.
         </p>
 
+        {rule.slug === "us" ? (
+          <>
+            <h2>How the U.S. preset flow works</h2>
+            <p>
+              The U.S. calculator also includes a beginner preset mode. In that mode, CoinLineup maps the selected
+              filing status and taxable income band to a simplified federal short-term estimate and a simplified
+              federal long-term capital gains estimate.
+            </p>
+            <ul>
+              <li>Short-term estimates follow the selected IRS ordinary-income bracket band for the chosen filing status.</li>
+              <li>Long-term estimates follow IRS capital gains guidance for 0%, 15%, and 20% federal long-term rate bands.</li>
+              <li>The state layer in this v1 tool is only an extra rough overlay. It is not a full state-return engine.</li>
+            </ul>
+            <p>
+              This is still a simplified model. It does not calculate full taxable income, netting rules, surtaxes,
+              NIIT, deductions, or every state-specific exception before choosing a bracket.
+            </p>
+          </>
+        ) : null}
+
         <h2>When the estimate is likely too simple</h2>
         <ul>
           <li>Multi-lot disposals where basis tracking changes across time</li>
@@ -104,6 +124,15 @@ export default async function CountryTaxMethodologyPage({ params }: Props) {
           CoinLineup links to official tax-agency guidance where possible. Readers should confirm that the official
           page, rate, allowance, or manual still applies to their facts and to the relevant tax year.
         </p>
+        <ul>
+          {rule.officialSources.map((source) => (
+            <li key={source.url}>
+              <a href={source.url} target="_blank" rel="noopener noreferrer">
+                {source.label}
+              </a>
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );

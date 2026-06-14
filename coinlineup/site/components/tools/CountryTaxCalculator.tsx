@@ -870,6 +870,34 @@ export default function CountryTaxCalculator({ rule }: Props) {
         >
           Informational only. This tool is not tax, legal, or investment advice. Real filing outcomes can differ because of lot-matching rules, income treatment, exemptions, residence changes, and other facts not modeled here.
         </div>
+
+        <div
+          className="mt-4 rounded-xl border px-4 py-3"
+          style={{ borderColor: "var(--border)", background: "var(--surface)" }}
+        >
+          <p className="text-xs font-semibold uppercase tracking-widest text-brand-orange">
+            Official sources used
+          </p>
+          <p className="mt-2 text-sm" style={{ color: "var(--text-secondary)" }}>
+            Last reviewed on {rule.lastReviewed}. {rule.slug === "us"
+              ? "The U.S. preset flow uses IRS filing-status brackets and long-term capital gains guidance as a simplified estimate."
+              : "Country rule notes on this page are mapped to the official tax-agency sources below."}
+          </p>
+          <ul className="mt-3 space-y-2 text-sm">
+            {rule.officialSources.map((source) => (
+              <li key={source.url}>
+                <a
+                  href={source.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-brand-orange hover:underline"
+                >
+                  {source.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
 
       <div className="space-y-5">
