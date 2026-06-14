@@ -42,6 +42,7 @@ export interface TaxEstimateInput {
   estimateRate: number;
   longTermRate?: number;
   manualExemption?: number;
+  stateRate?: number;
 }
 
 export interface TaxEstimateResult {
@@ -53,6 +54,9 @@ export interface TaxEstimateResult {
   adjustedGainOrLoss: number;
   taxableAmount: number;
   estimatedTax: number;
+  federalEstimatedTax: number;
+  stateEstimatedTax: number;
+  combinedEstimatedTax: number;
   effectiveRateApplied: number | null;
   heldDays: number | null;
   holdingLabel: string;
@@ -247,6 +251,7 @@ export function calculateTaxEstimate(rule: TaxCountryRule, input: TaxEstimateInp
   let effectiveRateApplied: number | null = null;
   let holdingLabel = "Holding period not applied";
   let formulaLabel = "Gain x estimated rate";
+  const parsedStateRate = Math.max(0, input.stateRate ?? 0);
 
   if (rule.slug === "us") {
     const isLongTerm = heldDays !== null && rule.longTermHoldingDays !== undefined && heldDays > rule.longTermHoldingDays;
@@ -270,9 +275,12 @@ export function calculateTaxEstimate(rule: TaxCountryRule, input: TaxEstimateInp
     formulaLabel = "Adjusted gain x estimated CGT rate";
   }
 
-  const estimatedTax = taxableAmount > 0 && effectiveRateApplied !== null
+  const federalEstimatedTax = taxableAmount > 0 && effectiveRateApplied !== null
     ? taxableAmount * (effectiveRateApplied / 100)
     : 0;
+  const stateEstimatedTax = taxableAmount > 0 ? taxableAmount * (parsedStateRate / 100) : 0;
+  const combinedEstimatedTax = federalEstimatedTax + stateEstimatedTax;
+  const estimatedTax = combinedEstimatedTax;
 
   return {
     quantity: input.quantity,
@@ -283,6 +291,9 @@ export function calculateTaxEstimate(rule: TaxCountryRule, input: TaxEstimateInp
     adjustedGainOrLoss,
     taxableAmount,
     estimatedTax,
+    federalEstimatedTax,
+    stateEstimatedTax,
+    combinedEstimatedTax,
     effectiveRateApplied,
     heldDays,
     holdingLabel,
