@@ -278,6 +278,14 @@ textarea {
   background: var(--grad-press);
 }
 
+.footer-stat-value {
+  background: none !important;
+  -webkit-background-clip: border-box !important;
+  background-clip: border-box !important;
+  -webkit-text-fill-color: #c47aff !important;
+  color: #c47aff !important;
+}
+
 .clamp2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;

@@ -209,12 +209,12 @@ export function SiteFooter() {
                 {STATS.map((stat) => (
                   <div key={stat.l}>
                     <div
+                      className="footer-stat-value"
                       style={{
                         fontFamily: "var(--font-display)",
                         fontSize: 22,
                         fontWeight: 800,
                         lineHeight: 1,
-                        color: "#c47aff",
                       }}
                     >
                       {stat.n}
