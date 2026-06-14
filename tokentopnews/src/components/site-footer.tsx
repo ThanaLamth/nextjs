@@ -214,9 +214,10 @@ export function SiteFooter() {
                         fontSize: 22,
                         fontWeight: 800,
                         lineHeight: 1,
+                        color: "#c47aff",
                       }}
                     >
-                      <span className="grad-brand">{stat.n}</span>
+                      {stat.n}
                     </div>
                     <div style={{ fontSize: 10, color: "var(--text-3)", marginTop: 3 }}>
                       {stat.l}
