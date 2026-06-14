@@ -3,6 +3,21 @@ import Link from "next/link";
 import { ArrowRight, Calculator, FileText } from "lucide-react";
 import { getTaxCountries } from "@/lib/tax";
 
+function getCountryFlag(slug: string): string {
+  switch (slug) {
+    case "us":
+      return "🇺🇸";
+    case "uk":
+      return "🇬🇧";
+    case "canada":
+      return "🇨🇦";
+    case "australia":
+      return "🇦🇺";
+    default:
+      return "🌍";
+  }
+}
+
 export const metadata: Metadata = {
   title: "Crypto Tax Calculator by Country — CoinLineup",
   description:
@@ -37,7 +52,12 @@ export default function CryptoTaxCalculatorLandingPage() {
             style={{ background: "var(--card-bg)", borderColor: "var(--border)" }}
           >
             <div className="mb-4 flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-brand-orange/10 text-brand-orange">
+              <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-brand-orange/10 text-xl">
+                <span aria-hidden="true">{getCountryFlag(country.slug)}</span>
+              </span>
+              <span className="flex h-10 w-10 items-center justify-center rounded-2xl border text-brand-orange"
+                style={{ borderColor: "var(--border)", background: "var(--surface)" }}
+              >
                 <Calculator size={18} />
               </span>
               <div>
