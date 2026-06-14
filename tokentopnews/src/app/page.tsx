@@ -1,4 +1,6 @@
 import { HomePageClient } from "@/components/home-page-client";
+import { cacheLife, cacheTag } from "next/cache";
+import { chartToSvgPath, fetchCoinChart, fetchMarketData } from "@/lib/market-data";
 import {
   estimateReadTime,
   formatDisplayDate,
@@ -70,14 +72,36 @@ async function getSectionData(
   };
 }
 
+async function getCachedHomeMarketSnapshot() {
+  "use cache";
+
+  cacheLife("minutes");
+  cacheTag("home");
+  cacheTag("markets");
+
+  const [initialCoins, initialChart] = await Promise.all([
+    fetchMarketData().catch(() => []),
+    fetchCoinChart("bitcoin", "1").catch(() => []),
+  ]);
+
+  return {
+    initialCoins,
+    initialChartPts: chartToSvgPath(initialChart),
+  };
+}
+
 export default async function HomePage() {
-  const [latestPosts, categories] = await Promise.all([
+  const [latestPosts, categories, marketSnapshot] = await Promise.all([
     getLatestPosts(24),
     getAllCategories(),
+    getCachedHomeMarketSnapshot(),
   ]);
   const categoryBySlug = new Map(categories.map((category) => [category.slug, category]));
   const categoryMap = new Map(categories.map((category) => [category.id, category]));
   const sourceName = "TTN";
+  const initialCoins = marketSnapshot.initialCoins;
+  const initialBtc = initialCoins.find((coin) => coin.id === "bitcoin") ?? null;
+  const initialChartPts = marketSnapshot.initialChartPts;
 
   const [categorySections, sponsoredPosts, pressPosts] = await Promise.all([
     Promise.all(
@@ -112,6 +136,9 @@ export default async function HomePage() {
           toDisplayPost(post, sourceName),
         )
       }
+      initialCoins={initialCoins}
+      initialBtc={initialBtc}
+      initialChartPts={initialChartPts}
     />
   );
 }

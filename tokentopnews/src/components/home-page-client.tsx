@@ -14,6 +14,9 @@ type HomePageClientProps = {
   categorySections: CategorySectionData[];
   sponsored: DisplayPost[];
   press: DisplayPost[];
+  initialCoins: CoinPrice[];
+  initialBtc: CoinPrice | null;
+  initialChartPts: { line: string; area: string };
 };
 
 const PERIODS: Array<{ label: string; days: string }> = [
@@ -38,11 +41,14 @@ export function HomePageClient({
   categorySections,
   sponsored,
   press,
+  initialCoins,
+  initialBtc,
+  initialChartPts,
 }: HomePageClientProps) {
-  const [coins, setCoins] = useState<CoinPrice[]>([]);
+  const [coins, setCoins] = useState<CoinPrice[]>(initialCoins);
   const [period, setPeriod] = useState(0);
-  const [chartPts, setChartPts] = useState<{ line: string; area: string }>({ line: "", area: "" });
-  const [btc, setBtc] = useState<CoinPrice | null>(null);
+  const [chartPts, setChartPts] = useState<{ line: string; area: string }>(initialChartPts);
+  const [btc, setBtc] = useState<CoinPrice | null>(initialBtc);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
