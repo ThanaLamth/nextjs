@@ -124,25 +124,25 @@ function getUsStatePresets(): UsStatePreset[] {
     },
     {
       value: "no-state-income-tax",
-      label: "No state income tax",
+      label: "No state income tax state",
       stateRate: "0",
       help: "Use this rough preset for states that generally do not apply a broad state income-tax layer to capital gains.",
     },
     {
       value: "california",
-      label: "California-style state layer",
+      label: "California resident-style estimate",
       stateRate: "9.3",
       help: "Simple California-style estimate. California generally taxes capital gains as ordinary income at the state level.",
     },
     {
       value: "washington",
-      label: "Washington capital gains treatment",
+      label: "Washington capital gains case",
       stateRate: "7",
       help: "Simple Washington-style estimate using the state capital gains tax rate as a rough layer. This is a narrow approximation, not full Washington eligibility logic.",
     },
     {
       value: "custom",
-      label: "Custom state rate",
+      label: "Other state or custom rate",
       stateRate: "0",
       help: "Enter your own state tax layer if you want to model a different state scenario.",
     },
@@ -440,11 +440,11 @@ export default function CountryTaxCalculator({ rule }: Props) {
             style={{ background: "var(--surface)", borderColor: "var(--border)" }}
           >
             <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-brand-orange">
-              US state treatment
+              U.S. state situation
             </p>
             <label className="block">
               <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--text-secondary)" }}>
-                Choose a state scenario
+                Choose the situation that fits you best
               </span>
               <select
                 value={usStateTreatment}
@@ -470,7 +470,7 @@ export default function CountryTaxCalculator({ rule }: Props) {
             {usStateTreatment === "custom" ? (
               <label className="mt-4 block">
                 <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--text-secondary)" }}>
-                  Custom state rate (%)
+                  Enter your state rate (%)
                 </span>
                 <input
                   type="number"
@@ -487,7 +487,7 @@ export default function CountryTaxCalculator({ rule }: Props) {
                   }}
                 />
                 <span className="mt-1.5 block text-[11px]" style={{ color: "var(--text-muted)" }}>
-                  Use this if you want to test a different state tax layer than the built-in presets.
+                  Use this if your state is not covered by the built-in options above.
                 </span>
               </label>
             ) : null}
