@@ -248,7 +248,7 @@ export function SiteHeaderClient({
 	          <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
 	            <div>
 	              <img
-	                src="https://tokentopnews.com/wp-content/uploads/2025/04/TokenTopNews_2.png"
+	                src="https://tokentopnews.com/wp-content/uploads/2026/06/tokentopnews-logo-white.png"
 	                alt={siteName}
 	                style={{
 	                  display: "block",

@@ -64,7 +64,7 @@ export function SiteFooter() {
 	            <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: "var(--s4)" }}>
 	              <div>
 	                <img
-	                  src="https://tokentopnews.com/wp-content/uploads/2025/04/TokenTopNews_2.png"
+	                  src="https://tokentopnews.com/wp-content/uploads/2026/06/tokentopnews-logo-white.png"
 	                  alt="TokenTopNews"
 	                  style={{
 	                    display: "block",
