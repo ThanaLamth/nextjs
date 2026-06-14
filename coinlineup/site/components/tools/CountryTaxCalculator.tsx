@@ -31,12 +31,20 @@ interface RatePreset {
 }
 
 type UsStateTreatment = "federal-only" | "no-state-income-tax" | "california" | "washington" | "custom";
+type UsFilingStatus = "single" | "mfj" | "mfs" | "hoh";
 
 interface UsStatePreset {
   value: UsStateTreatment;
   label: string;
   stateRate: string;
   help: string;
+}
+
+interface UsIncomeBand {
+  value: string;
+  label: string;
+  shortRate: string;
+  longRate: string;
 }
 
 function getSampleScenario(rule: TaxCountryRule) {
@@ -149,39 +157,74 @@ function getUsStatePresets(): UsStatePreset[] {
   ];
 }
 
+function getUsFilingStatusOptions(): { value: UsFilingStatus; label: string }[] {
+  return [
+    { value: "single", label: "Single" },
+    { value: "mfj", label: "Married filing jointly" },
+    { value: "mfs", label: "Married filing separately" },
+    { value: "hoh", label: "Head of household" },
+  ];
+}
+
+function getUsIncomeBands(status: UsFilingStatus): UsIncomeBand[] {
+  switch (status) {
+    case "single":
+      return [
+        { value: "s-10", label: "Up to $11,925", shortRate: "10", longRate: "0" },
+        { value: "s-12", label: "$11,926 to $48,350", shortRate: "12", longRate: "0" },
+        { value: "s-12-15", label: "$48,351 to $48,475", shortRate: "12", longRate: "15" },
+        { value: "s-22", label: "$48,476 to $103,350", shortRate: "22", longRate: "15" },
+        { value: "s-24", label: "$103,351 to $197,300", shortRate: "24", longRate: "15" },
+        { value: "s-32", label: "$197,301 to $250,525", shortRate: "32", longRate: "15" },
+        { value: "s-35", label: "$250,526 to $533,400", shortRate: "35", longRate: "15" },
+        { value: "s-35-20", label: "$533,401 to $626,350", shortRate: "35", longRate: "20" },
+        { value: "s-37", label: "$626,351 and above", shortRate: "37", longRate: "20" },
+      ];
+    case "mfj":
+      return [
+        { value: "mfj-10", label: "Up to $23,850", shortRate: "10", longRate: "0" },
+        { value: "mfj-12", label: "$23,851 to $96,700", shortRate: "12", longRate: "0" },
+        { value: "mfj-12-15", label: "$96,701 to $96,950", shortRate: "12", longRate: "15" },
+        { value: "mfj-22", label: "$96,951 to $206,700", shortRate: "22", longRate: "15" },
+        { value: "mfj-24", label: "$206,701 to $394,600", shortRate: "24", longRate: "15" },
+        { value: "mfj-32", label: "$394,601 to $501,050", shortRate: "32", longRate: "15" },
+        { value: "mfj-35", label: "$501,051 to $600,050", shortRate: "35", longRate: "15" },
+        { value: "mfj-35-20", label: "$600,051 to $751,600", shortRate: "35", longRate: "20" },
+        { value: "mfj-37", label: "$751,601 and above", shortRate: "37", longRate: "20" },
+      ];
+    case "mfs":
+      return [
+        { value: "mfs-10", label: "Up to $11,925", shortRate: "10", longRate: "0" },
+        { value: "mfs-12", label: "$11,926 to $48,350", shortRate: "12", longRate: "0" },
+        { value: "mfs-12-15", label: "$48,351 to $48,475", shortRate: "12", longRate: "15" },
+        { value: "mfs-22", label: "$48,476 to $103,350", shortRate: "22", longRate: "15" },
+        { value: "mfs-24", label: "$103,351 to $197,300", shortRate: "24", longRate: "15" },
+        { value: "mfs-32", label: "$197,301 to $250,525", shortRate: "32", longRate: "15" },
+        { value: "mfs-35", label: "$250,526 to $300,000", shortRate: "35", longRate: "15" },
+        { value: "mfs-35-20", label: "$300,001 to $375,800", shortRate: "35", longRate: "20" },
+        { value: "mfs-37", label: "$375,801 and above", shortRate: "37", longRate: "20" },
+      ];
+    case "hoh":
+      return [
+        { value: "hoh-10", label: "Up to $17,000", shortRate: "10", longRate: "0" },
+        { value: "hoh-12", label: "$17,001 to $64,750", shortRate: "12", longRate: "0" },
+        { value: "hoh-12-15", label: "$64,751 to $64,850", shortRate: "12", longRate: "15" },
+        { value: "hoh-22", label: "$64,851 to $103,350", shortRate: "22", longRate: "15" },
+        { value: "hoh-24", label: "$103,351 to $197,300", shortRate: "24", longRate: "15" },
+        { value: "hoh-32", label: "$197,301 to $250,500", shortRate: "32", longRate: "15" },
+        { value: "hoh-35", label: "$250,501 to $566,700", shortRate: "35", longRate: "15" },
+        { value: "hoh-37", label: "$566,701 to $626,350", shortRate: "35", longRate: "20" },
+        { value: "hoh-37-top", label: "$626,351 and above", shortRate: "37", longRate: "20" },
+      ];
+    default:
+      return [];
+  }
+}
+
 function getRatePresets(rule: TaxCountryRule): RatePreset[] {
   switch (rule.slug) {
     case "us":
-      return [
-        {
-          value: "us-low",
-          label: "US lower bracket",
-          shortRate: "12",
-          longRate: "0",
-          help: "Simple estimate for lower ordinary-income bands with a 0% long-term capital gains assumption.",
-        },
-        {
-          value: "us-middle",
-          label: "US middle bracket",
-          shortRate: "24",
-          longRate: "15",
-          help: "Simple estimate for many middle-income cases where long-term gains often fall in the 15% band.",
-        },
-        {
-          value: "us-upper",
-          label: "US upper bracket",
-          shortRate: "35",
-          longRate: "15",
-          help: "Simple estimate for higher ordinary-income bands while still assuming a 15% long-term gains rate.",
-        },
-        {
-          value: "us-top",
-          label: "US top bracket",
-          shortRate: "37",
-          longRate: "20",
-          help: "Simple estimate for top-bracket cases using a 20% long-term gains assumption.",
-        },
-      ];
+      return [];
     case "uk":
       return [
         {
@@ -254,9 +297,11 @@ export default function CountryTaxCalculator({ rule }: Props) {
   const sample = getSampleScenario(rule);
   const ratePresets = getRatePresets(rule);
   const usStatePresets = getUsStatePresets();
+  const usFilingStatusOptions = getUsFilingStatusOptions();
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [rateMode, setRateMode] = useState<"preset" | "custom">("preset");
   const [selectedPreset, setSelectedPreset] = useState(ratePresets[1]?.value ?? ratePresets[0]?.value ?? "custom");
+  const [usFilingStatus, setUsFilingStatus] = useState<UsFilingStatus>("single");
   const [usStateTreatment, setUsStateTreatment] = useState<UsStateTreatment>("federal-only");
   const [customStateRate, setCustomStateRate] = useState("");
   const [quantity, setQuantity] = useState("1");
@@ -270,10 +315,21 @@ export default function CountryTaxCalculator({ rule }: Props) {
   const [longTermRate, setLongTermRate] = useState("");
   const [manualExemption, setManualExemption] = useState("");
 
+  const usIncomeBands = getUsIncomeBands(usFilingStatus);
+  const [selectedUsIncomeBand, setSelectedUsIncomeBand] = useState(usIncomeBands[0]?.value ?? "");
   const activePreset = ratePresets.find((preset) => preset.value === selectedPreset) ?? null;
   const activeUsStatePreset = usStatePresets.find((preset) => preset.value === usStateTreatment) ?? usStatePresets[0];
-  const effectiveEstimateRate = rateMode === "preset" && activePreset ? activePreset.shortRate : estimateRate;
-  const effectiveLongTermRate = rateMode === "preset" && activePreset ? (activePreset.longRate ?? "") : longTermRate;
+  const activeUsIncomeBand = usIncomeBands.find((band) => band.value === selectedUsIncomeBand) ?? usIncomeBands[0];
+  const effectiveEstimateRate = rule.slug === "us" && rateMode === "preset"
+    ? (activeUsIncomeBand?.shortRate ?? "")
+    : rateMode === "preset" && activePreset
+      ? activePreset.shortRate
+      : estimateRate;
+  const effectiveLongTermRate = rule.slug === "us" && rateMode === "preset"
+    ? (activeUsIncomeBand?.longRate ?? "")
+    : rateMode === "preset" && activePreset
+      ? (activePreset.longRate ?? "")
+      : longTermRate;
   const effectiveStateRate = rule.slug === "us"
     ? (usStateTreatment === "custom" ? customStateRate : activeUsStatePreset.stateRate)
     : "0";
@@ -341,6 +397,8 @@ export default function CountryTaxCalculator({ rule }: Props) {
                 setEstimateRate(sample.estimateRate);
                 setLongTermRate(sample.longTermRate);
                 setManualExemption(sample.manualExemption);
+                setUsFilingStatus("single");
+                setSelectedUsIncomeBand(getUsIncomeBands("single")[0]?.value ?? "");
                 setUsStateTreatment("federal-only");
                 setCustomStateRate("");
               }}
@@ -361,6 +419,8 @@ export default function CountryTaxCalculator({ rule }: Props) {
                 setSellDate("");
                 setRateMode("preset");
                 setSelectedPreset(ratePresets[1]?.value ?? ratePresets[0]?.value ?? "custom");
+                setUsFilingStatus("single");
+                setSelectedUsIncomeBand(getUsIncomeBands("single")[0]?.value ?? "");
                 setEstimateRate("");
                 setLongTermRate("");
                 setManualExemption("");
@@ -402,7 +462,63 @@ export default function CountryTaxCalculator({ rule }: Props) {
             ))}
           </div>
 
-          {rateMode === "preset" && ratePresets.length > 0 ? (
+          {rule.slug === "us" && rateMode === "preset" ? (
+            <div className="mt-4">
+              <label className="block">
+                <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--text-secondary)" }}>
+                  Filing status
+                </span>
+                <select
+                  value={usFilingStatus}
+                  onChange={(event) => {
+                    const nextStatus = event.target.value as UsFilingStatus;
+                    const nextBands = getUsIncomeBands(nextStatus);
+                    setUsFilingStatus(nextStatus);
+                    setSelectedUsIncomeBand(nextBands[0]?.value ?? "");
+                  }}
+                  className="w-full rounded-xl border px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-brand-orange"
+                  style={{
+                    background: "var(--card-bg)",
+                    borderColor: "var(--border)",
+                    color: "var(--text-primary)",
+                  }}
+                >
+                  {usFilingStatusOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="block">
+                <span className="mb-1.5 mt-4 block text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--text-secondary)" }}>
+                  Taxable income band
+                </span>
+                <select
+                  value={selectedUsIncomeBand}
+                  onChange={(event) => setSelectedUsIncomeBand(event.target.value)}
+                  className="w-full rounded-xl border px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-brand-orange"
+                  style={{
+                    background: "var(--card-bg)",
+                    borderColor: "var(--border)",
+                    color: "var(--text-primary)",
+                  }}
+                >
+                  {usIncomeBands.map((band) => (
+                    <option key={band.value} value={band.value}>
+                      {band.label}
+                    </option>
+                  ))}
+                </select>
+                <span className="mt-1.5 block text-[11px]" style={{ color: "var(--text-muted)" }}>
+                  Uses IRS 2025 filing-status brackets and long-term capital gains thresholds to set the simple federal estimate.
+                </span>
+              </label>
+            </div>
+          ) : null}
+
+          {rule.slug !== "us" && rateMode === "preset" && ratePresets.length > 0 ? (
             <div className="mt-4">
               <label className="block">
                 <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--text-secondary)" }}>
@@ -551,7 +667,7 @@ export default function CountryTaxCalculator({ rule }: Props) {
             </label>
           ))}
 
-          {rule.longTermRateLabel ? (
+          {rule.longTermRateLabel && rateMode === "custom" && !showAdvanced ? (
             <label className="block">
               <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--text-secondary)" }}>
                 {rule.longTermRateLabel}
@@ -813,7 +929,14 @@ export default function CountryTaxCalculator({ rule }: Props) {
                 <p><strong>How the holding period was treated:</strong> {result.holdingLabel}</p>
                 <p><strong>Units sold:</strong> {fmtNumber(result.quantity)}</p>
                 <p><strong>Rate used in the estimate:</strong> {result.effectiveRateApplied !== null ? `${result.effectiveRateApplied}%` : "Not applied"}</p>
-                {rateMode === "preset" && activePreset ? (
+                {rule.slug === "us" && rateMode === "preset" && activeUsIncomeBand ? (
+                  <>
+                    <p><strong>Filing status:</strong> {usFilingStatusOptions.find((option) => option.value === usFilingStatus)?.label}</p>
+                    <p><strong>Income band:</strong> {activeUsIncomeBand.label}</p>
+                    <p><strong>Federal long-term rate:</strong> {activeUsIncomeBand.longRate}%</p>
+                  </>
+                ) : null}
+                {rule.slug !== "us" && rateMode === "preset" && activePreset ? (
                   <p><strong>Preset:</strong> {activePreset.label}</p>
                 ) : null}
                 {rule.slug === "us" ? (
