@@ -5,6 +5,10 @@ import { cache, Suspense } from "react";
 
 import { RichText } from "@/components/rich-text";
 import {
+  removeInlineThumbnailFigures,
+  sanitizeHtmlImageUrls,
+} from "@/lib/media";
+import {
   absoluteUrl,
   decodeEntities,
   getAllCategories,
@@ -231,7 +235,6 @@ async function CatchAllPageContent({ params }: CatchAllPageProps) {
 
   if (entity.kind === "post") {
     const post = entity.post;
-    const featuredImage = getFeaturedImage(post);
     const author = getAuthor(post);
     const postCategories = getPostCategories(post);
     const allCategories = await getAllCategories();
@@ -242,7 +245,9 @@ async function CatchAllPageContent({ params }: CatchAllPageProps) {
     const categoryHref = primaryCategory
       ? getCategoryHref(primaryCategory, categoryMap)
       : null;
-    const articleHtml = injectHeadingIds(post.content?.rendered || "");
+    const articleHtml = sanitizeHtmlImageUrls(
+      removeInlineThumbnailFigures(injectHeadingIds(post.content?.rendered || "")),
+    );
     const headings = extractHeadings(post.content?.rendered || "");
     const relatedPosts = primaryCategory
       ? (await getPostsByCategoryId(primaryCategory.id, 6))
@@ -255,38 +260,26 @@ async function CatchAllPageContent({ params }: CatchAllPageProps) {
 
     return (
       <main>
-        <div
+        <section
           style={{
             position: "relative",
-            background:
-              "linear-gradient(to bottom, rgba(13,11,20,1) 0, rgba(13,11,20,1) 490px, var(--canvas) 620px)",
+            background: "var(--surface)",
+            borderBottom: "0.5px solid var(--border-subtle)",
+            padding: "var(--s10) 0",
+            marginBottom: "var(--s8)",
           }}
         >
           <div
             style={{
-              width: "100%",
-              height: 480,
-              background: featuredImage
-                ? `linear-gradient(to bottom,rgba(13,11,20,0) 0%,rgba(13,11,20,0.5) 50%,rgba(13,11,20,1) 100%), url(${featuredImage.source_url}) center/cover`
-                : "linear-gradient(to bottom,rgba(13,11,20,0.15),rgba(13,11,20,1))",
-              position: "relative",
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              height: 4,
+              background: categoryMeta.grad,
             }}
-          >
-            <div
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                height: 4,
-                background: categoryMeta.grad,
-              }}
-            />
-          </div>
-          <div
-            className="container"
-            style={{ position: "relative", marginTop: -200, paddingBottom: 48 }}
-          >
+          />
+          <div className="container">
             <div className="grid-12">
               <div className="article-main-col" style={{ gridColumn: "span 8" }}>
                 <div
@@ -319,8 +312,7 @@ async function CatchAllPageContent({ params }: CatchAllPageProps) {
                   style={{
                     fontSize: 32,
                     marginBottom: "var(--s5)",
-                    color: "#fff",
-                    textShadow: "0 2px 8px rgba(0,0,0,0.6)",
+                    color: "var(--text-1)",
                   }}
                 >
                   {decodeEntities(post.title.rendered)}
@@ -328,10 +320,9 @@ async function CatchAllPageContent({ params }: CatchAllPageProps) {
                 <p
                   className="t-body-lg"
                   style={{
-                    color: "rgba(255,255,255,0.85)",
+                    color: "var(--text-2)",
                     marginBottom: "var(--s5)",
                     maxWidth: 580,
-                    textShadow: "0 1px 4px rgba(0,0,0,0.7)",
                   }}
                 >
                   {stripHtml(post.excerpt.rendered)}
@@ -342,8 +333,7 @@ async function CatchAllPageContent({ params }: CatchAllPageProps) {
                     alignItems: "center",
                     gap: 16,
                     fontSize: 12,
-                    color: "rgba(255,255,255,0.8)",
-                    textShadow: "0 1px 4px rgba(0,0,0,0.7)",
+                    color: "var(--text-3)",
                   }}
                 >
                   <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
@@ -365,10 +355,10 @@ async function CatchAllPageContent({ params }: CatchAllPageProps) {
                       {(author?.name ?? "E")[0]}
                     </div>
                     <div>
-                      <div style={{ fontSize: 12, fontWeight: 600, color: "#fff" }}>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text-1)" }}>
                         {author?.name ?? "Editorial Team"}
                       </div>
-                      <div style={{ fontSize: 10, color: "rgba(255,255,255,0.65)" }}>TTN</div>
+                      <div style={{ fontSize: 10, color: "var(--text-3)" }}>TTN</div>
                     </div>
                   </div>
                   <span style={{ opacity: 0.5 }}>|</span>
@@ -379,9 +369,9 @@ async function CatchAllPageContent({ params }: CatchAllPageProps) {
               </div>
             </div>
           </div>
-        </div>
+        </section>
 
-        <div className="container" style={{ marginTop: "var(--s8)" }}>
+        <div className="container">
           <div className="grid-12">
             <div className="article-main-col" style={{ gridColumn: "span 8" }}>
               <div

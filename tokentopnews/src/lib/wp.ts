@@ -1,6 +1,7 @@
 import "server-only";
 
 import { cacheLife, cacheTag } from "next/cache";
+import { sanitizeImageUrl } from "@/lib/media";
 
 export type RenderedField = {
   rendered: string;
@@ -197,7 +198,32 @@ export function decodeEntities(text: string): string {
 }
 
 export function getFeaturedImage(post: WpPost): WpMedia | undefined {
-  return post._embedded?.["wp:featuredmedia"]?.[0];
+  const media = post._embedded?.["wp:featuredmedia"]?.[0];
+
+  if (!media) {
+    return undefined;
+  }
+
+  return {
+    ...media,
+    source_url: sanitizeImageUrl(media.source_url),
+    media_details: media.media_details
+      ? {
+          ...media.media_details,
+          sizes: media.media_details.sizes
+            ? Object.fromEntries(
+                Object.entries(media.media_details.sizes).map(([key, size]) => [
+                  key,
+                  {
+                    ...size,
+                    source_url: sanitizeImageUrl(size.source_url),
+                  },
+                ]),
+              )
+            : media.media_details.sizes,
+        }
+      : media.media_details,
+  };
 }
 
 export function getAuthor(post: WpPost): WpAuthor | undefined {
