@@ -64,13 +64,13 @@ export function SiteFooter() {
 	            <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: "var(--s4)" }}>
 	              <div>
 	                <img
-	                  src="https://tokentopnews.com/wp-content/uploads/2026/06/tokentopnews-logo-white.png"
+	                  src="/tokentopnews-logo-white.png"
 	                  alt="TokenTopNews"
 	                  style={{
 	                    display: "block",
-	                    width: "auto",
-	                    height: 28,
-	                    maxWidth: 180,
+	                    width: 180,
+	                    height: "auto",
+	                    maxWidth: "100%",
 	                    marginBottom: 4,
 	                  }}
 	                />

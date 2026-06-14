@@ -248,13 +248,13 @@ export function SiteHeaderClient({
 	          <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
 	            <div>
 	              <img
-	                src="https://tokentopnews.com/wp-content/uploads/2026/06/tokentopnews-logo-white.png"
+	                src="/tokentopnews-logo-white.png"
 	                alt={siteName}
 	                style={{
 	                  display: "block",
-	                  width: "auto",
-	                  height: 32,
-	                  maxWidth: 208,
+	                  width: 208,
+	                  height: "auto",
+	                  maxWidth: "100%",
 	                }}
 	              />
 	              <div
