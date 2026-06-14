@@ -9,6 +9,7 @@ import type { NavItemData } from "@/lib/site-ui";
 type SiteHeaderClientProps = {
   siteName: string;
   navItems: NavItemData[];
+  initialTicker: CoinPrice[];
 };
 
 type Theme = "dark" | "light";
@@ -63,10 +64,11 @@ function applyTheme(theme: Theme) {
 export function SiteHeaderClient({
   siteName,
   navItems,
+  initialTicker,
 }: SiteHeaderClientProps) {
   const [theme, setTheme] = useState<Theme>("dark");
   const [openMenu, setOpenMenu] = useState<string | null>(null);
-  const [ticker, setTicker] = useState<CoinPrice[]>([]);
+  const [ticker, setTicker] = useState<CoinPrice[]>(initialTicker);
   const [currentPath, setCurrentPath] = useState("");
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 

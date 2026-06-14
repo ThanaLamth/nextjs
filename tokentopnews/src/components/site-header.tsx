@@ -1,4 +1,5 @@
 import { SiteHeaderClient } from "@/components/site-header-client";
+import { getCachedHeaderTickerData } from "@/lib/market-data-server";
 import type { NavItemData } from "@/lib/site-ui";
 
 const NAV_ITEMS: NavItemData[] = [
@@ -56,6 +57,14 @@ const NAV_ITEMS: NavItemData[] = [
   },
 ];
 
-export function SiteHeader() {
-  return <SiteHeaderClient siteName="TokenTopNews" navItems={NAV_ITEMS} />;
+export async function SiteHeader() {
+  const initialTicker = await getCachedHeaderTickerData();
+
+  return (
+    <SiteHeaderClient
+      siteName="TokenTopNews"
+      navItems={NAV_ITEMS}
+      initialTicker={initialTicker}
+    />
+  );
 }
