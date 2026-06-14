@@ -10,6 +10,66 @@ interface Props {
   params: Promise<{ country: string }>;
 }
 
+function getUsageGuide(rule: NonNullable<ReturnType<typeof getTaxCountry>>) {
+  switch (rule.slug) {
+    case "us":
+      return {
+        steps: [
+          "1. Enter how many coins you sold and your buy and sell price per coin.",
+          "2. Stay in simple preset mode if you want a fast IRS-style estimate based on filing status and taxable income band.",
+          "3. Switch to custom mode only if you already know the short-term and long-term rate you want to test.",
+          "4. Add buy and sell dates so the calculator can decide whether to apply short-term or long-term treatment.",
+          "5. Choose the closest state scenario, then review the estimate summary against the official IRS and state sources.",
+        ],
+        footer: "Best for a quick single-sale U.S. estimate, not a full federal or state return.",
+      };
+    case "uk":
+      return {
+        steps: [
+          "1. Enter how many coins you sold and your buy and sell price per coin.",
+          "2. Use a simple preset if you want a rough CGT-style estimate, or switch to custom if you know your own rate.",
+          "3. Add any manual annual allowance or adjustment only if you want to reduce the taxable gain estimate.",
+          "4. Open advanced options if you need to include buy or sell fees in the disposal.",
+          "5. Review the result against HMRC guidance, especially if section 104 pooling or matching rules may apply.",
+        ],
+        footer: "Best for a quick single-disposal estimate, not a full HMRC capital gains calculation.",
+      };
+    case "canada":
+      return {
+        steps: [
+          "1. Enter the quantity sold and your buy and sell price per coin.",
+          "2. Use a marginal rate that reflects the tax rate you want to test on the taxable capital gain portion.",
+          "3. Add fees and any manual adjustment if you want the estimate to reflect your own records more closely.",
+          "4. Keep in mind this v1 tool applies the one-half inclusion approach, not a full adjusted cost base ledger.",
+          "5. Compare the result with CRA guidance before relying on it for reporting.",
+        ],
+        footer: "Best for a quick capital-account estimate, not a full CRA filing workflow.",
+      };
+    case "australia":
+      return {
+        steps: [
+          "1. Enter the quantity sold and your buy and sell price per coin.",
+          "2. Choose a simple marginal-rate preset or switch to custom if you already know the rate you want to test.",
+          "3. Add buy and sell dates so the tool can apply its simple 12-month discount assumption where relevant.",
+          "4. Open advanced options if you need to include fees or a manual adjustment.",
+          "5. Review the estimate against ATO guidance, especially if personal-use, business-income, or method-selection issues may apply.",
+        ],
+        footer: "Best for a quick single-sale estimate, not a full Australian CGT calculation.",
+      };
+    default:
+      return {
+        steps: [
+          "1. Enter the sale details.",
+          "2. Choose a simple preset or your own rate.",
+          "3. Add dates and fees if needed.",
+          "4. Review the estimate summary.",
+          "5. Compare the result with official guidance before relying on it.",
+        ],
+        footer: "Best for a quick estimate, not a full tax return.",
+      };
+  }
+}
+
 export async function generateStaticParams() {
   return getTaxCountries().map((country) => ({ country: country.slug }));
 }
@@ -43,6 +103,8 @@ export default async function CountryTaxCalculatorPage({ params }: Props) {
 
   if (!rule) notFound();
 
+  const usageGuide = getUsageGuide(rule);
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
       <div className="mb-8 max-w-4xl">
@@ -68,14 +130,12 @@ export default async function CountryTaxCalculatorPage({ params }: Props) {
             How to use this calculator
           </p>
           <ol className="space-y-2 text-sm" style={{ color: "var(--text-secondary)" }}>
-            <li>1. Enter how many coins you sold and your buy and sell price per coin.</li>
-            <li>2. Choose the simple preset mode if you want a fast estimate, or switch to custom if you already know your own rate.</li>
-            <li>3. Add buy and sell dates if you want the tool to estimate short-term versus long-term treatment.</li>
-            <li>4. Open advanced options only if you need fees, manual adjustments, or a separate long-term rate.</li>
-            <li>5. Review the estimate summary, then compare it against the official sources before relying on it.</li>
+            {usageGuide.steps.map((step) => (
+              <li key={step}>{step}</li>
+            ))}
           </ol>
           <p className="mt-4 text-sm" style={{ color: "var(--text-secondary)" }}>
-            Best for a quick single-sale estimate, not a full-year tax return.
+            {usageGuide.footer}
           </p>
         </div>
 
