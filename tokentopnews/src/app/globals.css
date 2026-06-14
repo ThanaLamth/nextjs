@@ -121,6 +121,22 @@ img {
   display: block;
 }
 
+.brand-logo {
+  display: block;
+}
+
+.brand-logo--dark {
+  display: none;
+}
+
+[data-theme="light"] .brand-logo--light {
+  display: none;
+}
+
+[data-theme="light"] .brand-logo--dark {
+  display: block;
+}
+
 button {
   cursor: pointer;
   border: none;

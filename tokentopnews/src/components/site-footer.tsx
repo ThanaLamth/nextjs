@@ -64,10 +64,21 @@ export function SiteFooter() {
 	            <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: "var(--s4)" }}>
 	              <div>
 	                <img
+	                  className="brand-logo brand-logo--light"
 	                  src="/tokentopnews-logo-white.png"
 	                  alt="TokenTopNews"
 	                  style={{
-	                    display: "block",
+	                    width: 180,
+	                    height: "auto",
+	                    maxWidth: "100%",
+	                    marginBottom: 4,
+	                  }}
+	                />
+	                <img
+	                  className="brand-logo brand-logo--dark"
+	                  src="/tokentopnews-logo-dark.png"
+	                  alt="TokenTopNews"
+	                  style={{
 	                    width: 180,
 	                    height: "auto",
 	                    maxWidth: "100%",

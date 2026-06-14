@@ -248,10 +248,20 @@ export function SiteHeaderClient({
 	          <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
 	            <div>
 	              <img
+	                className="brand-logo brand-logo--light"
 	                src="/tokentopnews-logo-white.png"
 	                alt={siteName}
 	                style={{
-	                  display: "block",
+	                  width: 208,
+	                  height: "auto",
+	                  maxWidth: "100%",
+	                }}
+	              />
+	              <img
+	                className="brand-logo brand-logo--dark"
+	                src="/tokentopnews-logo-dark.png"
+	                alt={siteName}
+	                style={{
 	                  width: 208,
 	                  height: "auto",
 	                  maxWidth: "100%",
