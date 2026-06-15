@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import type { ReactNode } from "react";
-import { ArrowRight, ExternalLink, Globe, Github, Info, Layers3, LineChart, Newspaper } from "lucide-react";
+import { ArrowRight, ExternalLink, Info, Layers3, LineChart, Newspaper } from "lucide-react";
 import CoinPriceChart from "@/components/CoinPriceChart";
 import CoinPriceConverter from "@/components/CoinPriceConverter";
 import NewsCard from "@/components/NewsCard";
@@ -139,6 +138,34 @@ function formatUrl(url: string): string {
   return url.replace(/^https?:\/\//, "").replace(/^www\./, "").replace(/\/$/, "");
 }
 
+function getLinkAnchor(label: string, url: string, index: number): string {
+  const cleaned = formatUrl(url);
+
+  if (label === "Website" || label === "Websites") {
+    return cleaned.split("/")[0] ?? cleaned;
+  }
+
+  if (label === "Whitepaper" || label === "Whitepapers") {
+    return index === 0 ? "Official whitepaper" : `Whitepaper ${index + 1}`;
+  }
+
+  if (label === "Block explorer" || label === "Block explorers") {
+    return cleaned.split("/")[0] ?? "Block explorer";
+  }
+
+  if (label === "Repository" || label === "Repositories") {
+    const parts = cleaned.split("/");
+    return parts.slice(0, Math.min(parts.length, 3)).join("/");
+  }
+
+  if (label === "Community" || label === "Communities") {
+    if (cleaned.includes("reddit.com")) return "Reddit community";
+    return cleaned.split("/")[0] ?? "Community";
+  }
+
+  return cleaned.split("/")[0] ?? cleaned;
+}
+
 function getEditorialProfile(id: string, name: string, symbol: string, marketCap: number | undefined, volume: number | undefined) {
   const profile = COIN_EDITORIAL[id];
   if (profile) {
@@ -155,32 +182,6 @@ function getEditorialProfile(id: string, name: string, symbol: string, marketCap
     supportedStandards: [],
     industries: [],
   };
-}
-
-function ResourceLink({
-  href,
-  icon,
-  label,
-}: {
-  href: string;
-  icon: ReactNode;
-  label: string;
-}) {
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="flex items-center justify-between gap-3 rounded-xl border px-4 py-3 text-sm hover:border-brand-orange hover:text-brand-orange"
-      style={{ borderColor: "var(--border)", color: "var(--text-secondary)", background: "var(--surface)" }}
-    >
-      <span className="flex items-center gap-2">
-        {icon}
-        <span>{label}</span>
-      </span>
-      <ExternalLink size={14} />
-    </a>
-  );
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -464,43 +465,6 @@ export default async function CoinPage({ params }: Props) {
             </div>
           </section>
 
-          <section id="resources" className="rounded-3xl border p-6 md:p-8" style={{ background: "var(--card-bg)", borderColor: "var(--border)" }}>
-            <p className="text-xs font-semibold uppercase tracking-widest text-brand-orange">Resources & Information</p>
-            <h2 className="mt-2 font-display text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
-              {name} resources & details
-            </h2>
-            <div className="mt-6 overflow-hidden rounded-2xl border" style={{ borderColor: "var(--border)" }}>
-              {infoSections.map((section) => (
-                <div key={section.label} className="grid grid-cols-1 sm:grid-cols-[200px_1fr] border-b last:border-0 px-6 py-4" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
-                  <dt className="text-xs font-semibold uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>
-                    {section.label}
-                  </dt>
-                  <dd className="mt-2 sm:mt-0 flex flex-wrap gap-x-6 gap-y-2">
-                    {section.values.map((value, i) => {
-                      const isLink = value.startsWith("http://") || value.startsWith("https://");
-                      return isLink ? (
-                        <a
-                          key={`${value}-${i}`}
-                          href={value}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-sm font-semibold text-brand-orange hover:underline break-all flex items-center gap-1"
-                        >
-                          {formatUrl(value)}
-                          <ExternalLink size={12} className="opacity-50" />
-                        </a>
-                      ) : (
-                        <span key={`${value}-${i}`} className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
-                          {value}
-                        </span>
-                      );
-                    })}
-                  </dd>
-                </div>
-              ))}
-            </div>
-          </section>
-
           <section className="rounded-3xl border p-6 md:p-8" style={{ background: "var(--card-bg)", borderColor: "var(--border)" }}>
             <p className="text-xs font-semibold uppercase tracking-widest text-brand-orange">Related news</p>
             <h2 className="mt-2 font-display text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
@@ -554,6 +518,43 @@ export default async function CoinPage({ params }: Props) {
 
         <aside className="space-y-6">
           <CoinPriceConverter coinName={name} coinSymbol={symbol} priceUsd={currentPrice} />
+
+          <section id="resources" className="rounded-2xl border p-5" style={{ background: "var(--card-bg)", borderColor: "var(--border)" }}>
+            <p className="text-xs font-semibold uppercase tracking-widest text-brand-orange">Resources & Information</p>
+            <h2 className="mt-2 font-display text-xl font-bold" style={{ color: "var(--text-primary)" }}>
+              {name} resources
+            </h2>
+            <div className="mt-5 overflow-hidden rounded-2xl border" style={{ borderColor: "var(--border)" }}>
+              {infoSections.map((section) => (
+                <div key={section.label} className="grid grid-cols-1 border-b last:border-0 px-4 py-4 sm:grid-cols-[140px_1fr]" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
+                  <dt className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>
+                    {section.label}
+                  </dt>
+                  <dd className="mt-2 flex flex-wrap gap-x-4 gap-y-2 sm:mt-0">
+                    {section.values.map((value, i) => {
+                      const isLink = value.startsWith("http://") || value.startsWith("https://");
+                      return isLink ? (
+                        <a
+                          key={`${value}-${i}`}
+                          href={value}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-sm font-semibold text-brand-orange hover:underline"
+                        >
+                          {getLinkAnchor(section.label, value, i)}
+                          <ExternalLink size={12} className="opacity-50" />
+                        </a>
+                      ) : (
+                        <span key={`${value}-${i}`} className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
+                          {value}
+                        </span>
+                      );
+                    })}
+                  </dd>
+                </div>
+              ))}
+            </div>
+          </section>
 
           <div className="rounded-2xl border p-5" style={{ background: "var(--card-bg)", borderColor: "var(--border)" }}>
             <p className="text-xs font-semibold uppercase tracking-widest text-brand-orange">Related markets</p>
