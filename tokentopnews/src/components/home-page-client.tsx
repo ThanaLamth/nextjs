@@ -3,7 +3,11 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-import { chartToSvgPath, fetchCoinChart, fetchMarketData, type CoinPrice } from "@/lib/market-data";
+import {
+  fetchMarketData,
+  type CoinChartSnapshot,
+  type CoinPrice,
+} from "@/lib/market-data";
 import { formatTimeAgo, type CategorySectionData, type DisplayPost } from "@/lib/site-ui";
 
 type HomePageClientProps = {
@@ -15,8 +19,7 @@ type HomePageClientProps = {
   sponsored: DisplayPost[];
   press: DisplayPost[];
   initialCoins: CoinPrice[];
-  initialBtc: CoinPrice | null;
-  initialChartPts: { line: string; area: string };
+  initialChartSnapshot: CoinChartSnapshot;
 };
 
 const PERIODS: Array<{ label: string; days: string }> = [
@@ -42,13 +45,12 @@ export function HomePageClient({
   sponsored,
   press,
   initialCoins,
-  initialBtc,
-  initialChartPts,
+  initialChartSnapshot,
 }: HomePageClientProps) {
   const [coins, setCoins] = useState<CoinPrice[]>(initialCoins);
   const [period, setPeriod] = useState(0);
-  const [chartPts, setChartPts] = useState<{ line: string; area: string }>(initialChartPts);
-  const [btc, setBtc] = useState<CoinPrice | null>(initialBtc);
+  const [chartSnapshot, setChartSnapshot] = useState<CoinChartSnapshot>(initialChartSnapshot);
+  const [chartLoading, setChartLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -63,12 +65,10 @@ export function HomePageClient({
         const data = await fetchMarketData();
         if (active) {
           setCoins(data);
-          setBtc(data.find((coin) => coin.id === "bitcoin") ?? null);
         }
       } catch {
         if (active) {
           setCoins([]);
-          setBtc(null);
         }
       }
     };
@@ -84,24 +84,45 @@ export function HomePageClient({
 
   useEffect(() => {
     let active = true;
+    const controller = new AbortController();
 
     const loadChart = async () => {
       try {
-        const points = await fetchCoinChart("bitcoin", PERIODS[period].days);
+        setChartLoading(true);
+        const response = await fetch(
+          `/api/market-chart?coin=bitcoin&days=${PERIODS[period].days}`,
+          { signal: controller.signal },
+        );
+
+        if (!response.ok) {
+          throw new Error("Market chart fetch failed");
+        }
+
+        const nextSnapshot = (await response.json()) as CoinChartSnapshot;
         if (active) {
-          setChartPts(chartToSvgPath(points));
+          setChartSnapshot(nextSnapshot);
         }
       } catch {
+        if (active && !controller.signal.aborted) {
+          setChartSnapshot((current) => current);
+        }
+      } finally {
         if (active) {
-          setChartPts({ line: "", area: "" });
+          setChartLoading(false);
         }
       }
     };
 
-    void loadChart();
+    if (period === 0) {
+      setChartSnapshot(initialChartSnapshot);
+      setChartLoading(false);
+    } else {
+      void loadChart();
+    }
 
     return () => {
       active = false;
+      controller.abort();
     };
   }, [period]);
 
@@ -406,6 +427,7 @@ export function HomePageClient({
                       key={periodOption.label}
                       type="button"
                       onClick={() => setPeriod(index)}
+                      disabled={chartLoading && index === period}
                       style={{
                         padding: "3px 10px",
                         background: index === period ? "#F7931A" : "var(--raised)",
@@ -417,6 +439,7 @@ export function HomePageClient({
                         color: index === period ? "#fff" : "var(--text-3)",
                         cursor: "pointer",
                         transition: "all 0.15s",
+                        opacity: chartLoading && index === period ? 0.75 : 1,
                       }}
                     >
                       {periodOption.label}
@@ -426,16 +449,21 @@ export function HomePageClient({
               </div>
               <div style={{ marginBottom: "var(--s3)" }}>
                 <div style={{ fontSize: 38, fontWeight: 800, fontFamily: "var(--font-display)", letterSpacing: "-0.02em" }}>
-                  {btc?.price || "—"}
+                  {chartSnapshot.price}
                 </div>
                 <div style={{ display: "flex", gap: 20, marginTop: 4, alignItems: "center" }}>
-                  <span className={btc?.bull ? "bull" : "bear"} style={{ fontSize: 13, fontWeight: 700 }}>
-                    {btc?.bull ? "▲" : "▼"} {btc?.chg || "—"} ({PERIODS[period].label})
+                  <span className={chartSnapshot.bull ? "bull" : "bear"} style={{ fontSize: 13, fontWeight: 700 }}>
+                    {chartSnapshot.bull ? "▲" : "▼"} {chartSnapshot.chg} ({PERIODS[period].label})
                   </span>
+                  {chartLoading ? (
+                    <span style={{ fontSize: 11, color: "var(--text-3)", fontWeight: 600 }}>
+                      Loading...
+                    </span>
+                  ) : null}
                   <div style={{ marginLeft: "auto", display: "flex", gap: 20 }}>
                     {[
-                      { label: "24H HIGH", value: btc?.high24h || "—" },
-                      { label: "24H LOW", value: btc?.low24h || "—" },
+                      { label: `${PERIODS[period].label} HIGH`, value: chartSnapshot.high },
+                      { label: `${PERIODS[period].label} LOW`, value: chartSnapshot.low },
                     ].map((stat) => (
                       <div key={stat.label}>
                         <div
@@ -454,7 +482,25 @@ export function HomePageClient({
                   </div>
                 </div>
               </div>
-              <div style={{ height: 130, background: "var(--raised)", borderRadius: "var(--r-md)", overflow: "hidden" }}>
+              <div
+                style={{
+                  height: 130,
+                  background: "var(--raised)",
+                  borderRadius: "var(--r-md)",
+                  overflow: "hidden",
+                  position: "relative",
+                }}
+              >
+                {chartLoading ? (
+                  <div
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      background: "rgba(13,11,20,0.18)",
+                      zIndex: 1,
+                    }}
+                  />
+                ) : null}
                 <svg viewBox="0 0 400 130" style={{ width: "100%", height: "100%" }} preserveAspectRatio="none">
                   <defs>
                     <linearGradient id="btcg" x1="0" y1="0" x2="0" y2="1">
@@ -462,10 +508,10 @@ export function HomePageClient({
                       <stop offset="100%" stopColor="#F7931A" stopOpacity="0" />
                     </linearGradient>
                   </defs>
-                  {chartPts.area ? <path d={chartPts.area} fill="url(#btcg)" /> : null}
-                  {chartPts.line ? (
+                  {chartSnapshot.area ? <path d={chartSnapshot.area} fill="url(#btcg)" /> : null}
+                  {chartSnapshot.line ? (
                     <path
-                      d={chartPts.line}
+                      d={chartSnapshot.line}
                       fill="none"
                       stroke="#F7931A"
                       strokeWidth="2"

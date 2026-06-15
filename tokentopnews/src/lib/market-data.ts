@@ -14,6 +14,16 @@ export type CoinPrice = {
   image: string;
 };
 
+export type CoinChartSnapshot = {
+  price: string;
+  chg: string;
+  bull: boolean;
+  high: string;
+  low: string;
+  line: string;
+  area: string;
+};
+
 const META: Record<string, { sym: string; name: string; color: string }> = {
   bitcoin: { sym: "BTC", name: "Bitcoin", color: "#F7931A" },
   ethereum: { sym: "ETH", name: "Ethereum", color: "#627EEA" },
@@ -23,7 +33,7 @@ const META: Record<string, { sym: string; name: string; color: string }> = {
   binancecoin: { sym: "BNB", name: "BNB", color: "#F3BA2F" },
 };
 
-function formatUsd(value: number) {
+export function formatUsd(value: number) {
   if (value >= 1000) {
     return `$${value.toLocaleString("en-US", { maximumFractionDigits: 2 })}`;
   }
@@ -108,4 +118,35 @@ export function chartToSvgPath(
   const area = `${line} L${width},${height} L0,${height} Z`;
 
   return { line, area };
+}
+
+export function summarizeCoinChart(points: [number, number][]): CoinChartSnapshot {
+  const { line, area } = chartToSvgPath(points);
+
+  if (!points.length) {
+    return {
+      price: "—",
+      chg: "—",
+      bull: false,
+      high: "—",
+      low: "—",
+      line,
+      area,
+    };
+  }
+
+  const prices = points.map((point) => point[1]);
+  const start = prices[0];
+  const end = prices[prices.length - 1];
+  const change = start ? ((end - start) / start) * 100 : 0;
+
+  return {
+    price: formatUsd(end),
+    chg: `${change >= 0 ? "+" : ""}${change.toFixed(2)}%`,
+    bull: change >= 0,
+    high: formatUsd(Math.max(...prices)),
+    low: formatUsd(Math.min(...prices)),
+    line,
+    area,
+  };
 }
