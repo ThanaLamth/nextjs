@@ -133,18 +133,12 @@ async function fetchCoinChartRange(
 async function fetchCoinChartFiveYearRange(coinId: string): Promise<[number, number][]> {
   const now = Math.floor(Date.now() / 1000);
   const year = 365 * 24 * 60 * 60;
-  const segments: Array<Promise<[number, number][]>> = [];
+  const merged: [number, number][] = [];
 
   for (let index = 5; index > 0; index -= 1) {
     const from = now - index * year;
     const to = index === 1 ? now : now - (index - 1) * year;
-    segments.push(fetchCoinChartRange(coinId, from, to));
-  }
-
-  const results = await Promise.all(segments);
-  const merged: [number, number][] = [];
-
-  for (const segment of results) {
+    const segment = await fetchCoinChartRange(coinId, from, to);
     for (const point of segment) {
       const previous = merged[merged.length - 1];
 
