@@ -65,6 +65,10 @@ export interface CoinDetail {
   };
 }
 
+export interface CoinMarketChart {
+  prices: [number, number][];
+}
+
 const BASE = "https://api.coingecko.com/api/v3";
 
 export async function getTopCoins(limit = 50): Promise<CoinPrice[]> {
@@ -126,6 +130,34 @@ export async function getCoinDetail(id: string): Promise<CoinDetail | null> {
         official_forum_url: [],
         repos_url: { github: [] },
       },
+    };
+  }
+}
+
+export async function getCoinMarketChart(id: string, days: 1 | 7 | 30): Promise<CoinMarketChart | null> {
+  try {
+    const url = new URL(`${BASE}/coins/${id}/market_chart`);
+    url.searchParams.set("vs_currency", "usd");
+    url.searchParams.set("days", String(days));
+    if (days === 1) {
+      url.searchParams.set("interval", "hourly");
+    }
+
+    const res = await fetch(url.toString(), {
+      next: { revalidate: 60 },
+    });
+    if (!res.ok) throw new Error("CoinGecko market chart fetch failed");
+    return res.json();
+  } catch {
+    const fallback = MOCK_COINS.find((coin) => coin.id === id || coin.symbol.toLowerCase() === id.toLowerCase());
+    const sparkline = fallback?.sparkline_in_7d?.price ?? [];
+    if (!sparkline.length) return null;
+
+    const now = Date.now();
+    const segment = days === 1 ? sparkline.slice(-24) : days === 7 ? sparkline.slice(-7 * 8) : sparkline;
+    const step = days === 1 ? 60 * 60 * 1000 : 6 * 60 * 60 * 1000;
+    return {
+      prices: segment.map((price, index) => [now - (segment.length - 1 - index) * step, price]),
     };
   }
 }

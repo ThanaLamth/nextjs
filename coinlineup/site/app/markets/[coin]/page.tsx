@@ -3,8 +3,11 @@ import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { ArrowRight, ExternalLink, Globe, Github, Info, Layers3, LineChart, Newspaper } from "lucide-react";
+import CoinPriceChart from "@/components/CoinPriceChart";
 import CoinPriceConverter from "@/components/CoinPriceConverter";
-import { getCoinDetail, getTopCoins, MOCK_COINS } from "@/lib/coingecko";
+import NewsCard from "@/components/NewsCard";
+import { getCoinDetail, getCoinMarketChart, getTopCoins, MOCK_COINS } from "@/lib/coingecko";
+import { searchWordPressContent } from "@/lib/wordpress";
 
 const COIN_META: Record<string, { name: string; symbol: string; description: string }> = {
   bitcoin: { name: "Bitcoin", symbol: "BTC", description: "Track Bitcoin price, market cap, volume, and the latest BTC news and analysis." },
@@ -12,6 +15,36 @@ const COIN_META: Record<string, { name: string; symbol: string; description: str
   ethereum: { name: "Ethereum", symbol: "ETH", description: "Track Ethereum price, market cap, volume, and the latest ETH news and analysis." },
   "ethereum-markets": { name: "Ethereum", symbol: "ETH", description: "Track Ethereum price, market cap, volume, and the latest ETH news and analysis." },
   xrp: { name: "XRP", symbol: "XRP", description: "Track XRP price, market cap, volume, and the latest XRP news and analysis." },
+};
+
+const COIN_EDITORIAL: Record<string, { summary: string; pillars: [string, string, string] }> = {
+  bitcoin: {
+    summary:
+      "Bitcoin is the largest and most widely followed crypto asset in the market. Readers typically watch it as both a macro risk barometer and the benchmark asset that influences broader sentiment across altcoins, exchange flows, and institutional allocation.",
+    pillars: [
+      "Bitcoin's price is often driven by ETF flows, macro liquidity conditions, rates expectations, and large exchange or treasury moves.",
+      "Its market dominance matters because strong Bitcoin moves often ripple across majors and altcoins, changing risk appetite across the whole crypto market.",
+      "Readers should track price, market cap, volume, supply scarcity, and headline catalysts together instead of reading any one metric in isolation.",
+    ],
+  },
+  ethereum: {
+    summary:
+      "Ethereum is the leading smart-contract network by ecosystem depth and developer activity. Its market profile is shaped not just by price action, but also by network usage, DeFi demand, staking participation, and broader sentiment around onchain applications.",
+    pillars: [
+      "Ethereum often reacts to network demand, staking flows, ETF or institutional narratives, and risk appetite across the broader altcoin market.",
+      "Because ETH sits at the center of many DeFi and token ecosystems, its price often reflects both macro crypto sentiment and application-layer activity.",
+      "Readers should watch volume, market cap, supply dynamics, and narrative shifts around Layer 2s, fees, and staking alongside the headline price.",
+    ],
+  },
+  ripple: {
+    summary:
+      "XRP is one of the most closely watched large-cap crypto assets for readers following payments narratives, exchange liquidity, and regulation-sensitive price moves. Its market profile often reacts strongly to headline developments and legal or policy sentiment.",
+    pillars: [
+      "XRP can move quickly on regulatory headlines, exchange access changes, and renewed attention to cross-border payments narratives.",
+      "Its price behavior is often more headline-sensitive than that of some other large-cap assets, which makes news flow especially important.",
+      "Readers should pair live price and volume data with legal, exchange, and liquidity context before drawing conclusions from short-term moves.",
+    ],
+  },
 };
 
 interface Props {
@@ -92,61 +125,20 @@ function stripHtml(html: string | undefined): string {
     .trim();
 }
 
-function SparklineCard({ prices, positive }: { prices: number[]; positive: boolean }) {
-  if (!prices.length) {
-    return (
-      <div className="rounded-2xl border p-5" style={{ background: "var(--card-bg)", borderColor: "var(--border)" }}>
-        <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
-          Chart data is loading.
-        </p>
-      </div>
-    );
+function getEditorialProfile(id: string, name: string, symbol: string, marketCap: number | undefined, volume: number | undefined) {
+  const profile = COIN_EDITORIAL[id];
+  if (profile) {
+    return profile;
   }
 
-  const width = 720;
-  const height = 240;
-  const min = Math.min(...prices);
-  const max = Math.max(...prices);
-  const range = max - min || 1;
-  const points = prices
-    .map((price, index) => {
-      const x = (index / (prices.length - 1)) * width;
-      const y = height - ((price - min) / range) * (height - 12) - 6;
-      return `${x},${y}`;
-    })
-    .join(" ");
-  const area = `${points} ${width},${height} 0,${height}`;
-  const color = positive ? "#00A86B" : "#E63946";
-
-  return (
-    <div className="rounded-2xl border p-5" style={{ background: "var(--card-bg)", borderColor: "var(--border)" }}>
-      <div className="mb-4 flex items-center justify-between gap-3">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-brand-orange">Price trend</p>
-          <h2 className="font-display text-xl font-bold" style={{ color: "var(--text-primary)" }}>
-            7-day market snapshot
-          </h2>
-        </div>
-        <div className="rounded-full border px-3 py-1 text-xs font-semibold" style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}>
-          Last 7 days
-        </div>
-      </div>
-      <svg viewBox={`0 0 ${width} ${height}`} className="h-56 w-full" preserveAspectRatio="none">
-        <defs>
-          <linearGradient id="coin-area-fill" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0%" stopColor={color} stopOpacity="0.28" />
-            <stop offset="100%" stopColor={color} stopOpacity="0.03" />
-          </linearGradient>
-        </defs>
-        <polygon points={area} fill="url(#coin-area-fill)" />
-        <polyline fill="none" stroke={color} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" points={points} />
-      </svg>
-      <div className="mt-4 flex items-center justify-between text-xs" style={{ color: "var(--text-muted)" }}>
-        <span>Low: {fmtPrice(min)}</span>
-        <span>High: {fmtPrice(max)}</span>
-      </div>
-    </div>
-  );
+  return {
+    summary: `${name} is a tracked crypto asset on CoinLineup. Readers usually evaluate it through a mix of live price action, trading volume, market-cap scale, supply profile, and the reliability of the project's external resources and news flow.`,
+    pillars: [
+      `${name} is currently being tracked with a market cap of ${fmtCompact(marketCap)} and 24-hour volume of ${fmtCompact(volume)}, which helps frame how large and active the asset is right now.`,
+      `Short-term moves in ${symbol} can reflect market-wide risk appetite, exchange liquidity, project-specific headlines, and broader narrative shifts affecting the sector it belongs to.`,
+      `Readers should combine live market data, external project resources, and recent editorial coverage before treating any single price move as a durable signal.`,
+    ] as [string, string, string],
+  };
 }
 
 function ResourceLink({
@@ -196,12 +188,15 @@ export default async function CoinPage({ params }: Props) {
   const meta = COIN_META[coin];
   const normalizedCoinId = normalizeCoinId(coin);
 
-  let topCoins = MOCK_COINS;
-  try {
-    topCoins = await getTopCoins(20);
-  } catch {}
+  const [detail, chart24h, chart7d, chart30d, topCoinsResult] = await Promise.all([
+    getCoinDetail(normalizedCoinId),
+    getCoinMarketChart(normalizedCoinId, 1),
+    getCoinMarketChart(normalizedCoinId, 7),
+    getCoinMarketChart(normalizedCoinId, 30),
+    getTopCoins(20).catch(() => MOCK_COINS),
+  ]);
 
-  const detail = await getCoinDetail(normalizedCoinId);
+  const topCoins = topCoinsResult;
   const fallbackCoin = topCoins.find(
     (item) => item.id.toLowerCase() === normalizedCoinId.toLowerCase() || item.symbol.toLowerCase() === (meta?.symbol ?? coin).toLowerCase()
   );
@@ -230,8 +225,13 @@ export default async function CoinPage({ params }: Props) {
   const athDrop = marketData?.ath_change_percentage?.usd ?? fallbackCoin?.ath_change_percentage;
   const atl = marketData?.atl?.usd ?? fallbackCoin?.atl;
   const atlLift = marketData?.atl_change_percentage?.usd ?? fallbackCoin?.atl_change_percentage;
-  const sparkline = marketData?.sparkline_7d?.price ?? fallbackCoin?.sparkline_in_7d?.price ?? [];
   const lastUpdated = marketData?.last_updated ?? fallbackCoin?.last_updated;
+  const editorial = getEditorialProfile(normalizedCoinId, name, symbol, marketCap, volume);
+  const chartDatasets = {
+    "24h": chart24h?.prices.map((point) => point[1]) ?? [],
+    "7d": chart7d?.prices.map((point) => point[1]) ?? marketData?.sparkline_7d?.price ?? fallbackCoin?.sparkline_in_7d?.price ?? [],
+    "30d": chart30d?.prices.map((point) => point[1]) ?? [],
+  };
 
   const description = stripHtml(detail?.description?.en);
   const lead =
@@ -245,6 +245,14 @@ export default async function CoinPage({ params }: Props) {
   const forum = detail?.links?.official_forum_url?.find(Boolean);
   const github = detail?.links?.repos_url?.github?.find(Boolean);
   const relatedCoins = topCoins.filter((item) => item.id !== (fallbackCoin?.id ?? normalizedCoinId)).slice(0, 4);
+  const newsQueries = [...new Set([name, symbol].filter(Boolean))];
+  const relatedNewsRaw = (
+    await Promise.all(newsQueries.map((query) => searchWordPressContent(query, 6).catch(() => [])))
+  ).flat();
+  const relatedNews = relatedNewsRaw
+    .filter((article) => article.category !== "Page")
+    .filter((article, index, array) => array.findIndex((candidate) => candidate.id === article.id) === index)
+    .slice(0, 4);
 
   const stats = [
     { label: "Market cap", value: fmtCompact(marketCap) },
@@ -329,7 +337,7 @@ export default async function CoinPage({ params }: Props) {
             </div>
           </div>
 
-          <SparklineCard prices={sparkline.slice(-60)} positive={positive} />
+          <CoinPriceChart datasets={chartDatasets} />
 
           <section id="market-stats" className="rounded-3xl border p-6 md:p-8" style={{ background: "var(--card-bg)", borderColor: "var(--border)" }}>
             <div className="mb-5 flex items-center justify-between gap-3">
@@ -365,7 +373,7 @@ export default async function CoinPage({ params }: Props) {
             </h2>
             <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1.1fr)_minmax(280px,0.9fr)]">
               <div className="space-y-4 text-sm leading-7" style={{ color: "var(--text-secondary)" }}>
-                {paragraphs.map((paragraph) => (
+                {[editorial.summary, ...paragraphs.slice(0, 2)].map((paragraph) => (
                   <p key={paragraph}>{paragraph}</p>
                 ))}
               </div>
@@ -405,11 +413,11 @@ export default async function CoinPage({ params }: Props) {
                 },
                 {
                   title: "Market depth",
-                  text: `CoinLineup is tracking a market cap of ${fmtCompact(marketCap)} and 24-hour trading volume of ${fmtCompact(volume)} for ${symbol}.`,
+                  text: editorial.pillars[0],
                 },
                 {
                   title: "Supply profile",
-                  text: supply ? `Current circulating supply is about ${fmtSupply(supply)} ${symbol}${maxSupply ? ` with a max supply of ${fmtSupply(maxSupply)} ${symbol}.` : "."}` : "Supply data is currently limited for this asset.",
+                  text: supply ? `Current circulating supply is about ${fmtSupply(supply)} ${symbol}${maxSupply ? ` with a max supply of ${fmtSupply(maxSupply)} ${symbol}.` : "."}` : editorial.pillars[2],
                 },
               ].map((card) => (
                 <div key={card.title} className="rounded-2xl border p-5" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
@@ -422,6 +430,24 @@ export default async function CoinPage({ params }: Props) {
                 </div>
               ))}
             </div>
+          </section>
+
+          <section className="rounded-3xl border p-6 md:p-8" style={{ background: "var(--card-bg)", borderColor: "var(--border)" }}>
+            <p className="text-xs font-semibold uppercase tracking-widest text-brand-orange">Related news</p>
+            <h2 className="mt-2 font-display text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
+              Recent coverage mentioning {name}
+            </h2>
+            {relatedNews.length > 0 ? (
+              <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
+                {relatedNews.map((article, index) => (
+                  <NewsCard key={article.id} article={article} variant="horizontal" index={index} />
+                ))}
+              </div>
+            ) : (
+              <p className="mt-4 text-sm" style={{ color: "var(--text-secondary)" }}>
+                CoinLineup does not have enough related editorial coverage for this asset yet.
+              </p>
+            )}
           </section>
 
           <section id="faq" className="rounded-3xl border p-6 md:p-8" style={{ background: "var(--card-bg)", borderColor: "var(--border)" }}>
