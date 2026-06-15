@@ -22,12 +22,12 @@ type HomePageClientProps = {
   initialChartSnapshot: CoinChartSnapshot;
 };
 
-const PERIODS: Array<{ label: string; days: string }> = [
-  { label: "24H", days: "1" },
-  { label: "7D", days: "7" },
-  { label: "30D", days: "30" },
-  { label: "1Y", days: "365" },
-  { label: "ALL", days: "max" },
+const PERIODS: Array<{ label: string; days: string; displayLabel: string }> = [
+  { label: "24H", days: "1", displayLabel: "24H" },
+  { label: "7D", days: "7", displayLabel: "1W" },
+  { label: "30D", days: "30", displayLabel: "1M" },
+  { label: "1Y", days: "365", displayLabel: "1Y" },
+  { label: "ALL", days: "max", displayLabel: "MAX" },
 ];
 
 function imageBackground(image?: string) {
@@ -128,6 +128,7 @@ export function HomePageClient({
 
   const featuredLead = featured[0];
   const featuredRest = featured.slice(1, 3);
+  const bitcoinCoin = coins.find((coin) => coin.id === "bitcoin") ?? null;
   const displayTimeAgo = (article: DisplayPost) =>
     mounted ? formatTimeAgo(article.publishedAt) : article.dateLabel;
 
@@ -408,11 +409,11 @@ export function HomePageClient({
             <div className="market-col--chart" style={{ gridColumn: "span 7", borderLeft: "0.5px solid var(--border-subtle)", paddingLeft: "var(--s6)" }}>
               <div
                 style={{
-                  background: "linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01))",
-                  border: "1px solid var(--border)",
-                  borderRadius: 22,
-                  padding: "20px 22px 18px",
-                  boxShadow: "0 16px 40px rgba(0,0,0,0.18)",
+                  background: "#f8faf7",
+                  border: "1px solid rgba(15,23,42,0.08)",
+                  borderRadius: 24,
+                  padding: "22px 22px 18px",
+                  boxShadow: "0 18px 44px rgba(0,0,0,0.16)",
                 }}
               >
                 <div
@@ -425,28 +426,46 @@ export function HomePageClient({
                     marginBottom: "var(--s5)",
                   }}
                 >
-                  <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
+                  <div style={{ display: "flex", gap: 14, alignItems: "center", minWidth: 0 }}>
                     <div style={{ position: "relative", width: 58, height: 32, flexShrink: 0 }}>
-                      <div
-                        style={{
-                          position: "absolute",
-                          left: 0,
-                          top: 0,
-                          width: 32,
-                          height: 32,
-                          borderRadius: "50%",
-                          background: "#F7931A",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          color: "#fff",
-                          fontSize: 15,
-                          fontWeight: 800,
-                          boxShadow: "0 6px 18px rgba(247,147,26,0.28)",
-                        }}
-                      >
-                        B
-                      </div>
+                      {bitcoinCoin?.image ? (
+                        <img
+                          src={bitcoinCoin.image}
+                          alt="Bitcoin"
+                          style={{
+                            position: "absolute",
+                            left: 0,
+                            top: 0,
+                            width: 32,
+                            height: 32,
+                            borderRadius: "50%",
+                            objectFit: "cover",
+                            boxShadow: "0 6px 18px rgba(247,147,26,0.28)",
+                            background: "#fff",
+                          }}
+                        />
+                      ) : (
+                        <div
+                          style={{
+                            position: "absolute",
+                            left: 0,
+                            top: 0,
+                            width: 32,
+                            height: 32,
+                            borderRadius: "50%",
+                            background: "#F7931A",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            color: "#fff",
+                            fontSize: 15,
+                            fontWeight: 800,
+                            boxShadow: "0 6px 18px rgba(247,147,26,0.28)",
+                          }}
+                        >
+                          B
+                        </div>
+                      )}
                       <div
                         style={{
                           position: "absolute",
@@ -455,62 +474,74 @@ export function HomePageClient({
                           width: 28,
                           height: 28,
                           borderRadius: "50%",
-                          border: "2px solid var(--surface)",
-                          background: "#1E9B6E",
+                          border: "2px solid #f8faf7",
+                          background: "#fff",
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
-                          color: "#fff",
-                          fontSize: 10,
-                          fontWeight: 800,
+                          color: "#111827",
+                          fontSize: 13,
+                          boxShadow: "0 4px 12px rgba(15,23,42,0.12)",
                         }}
                       >
-                        USD
+                        🇺🇸
                       </div>
                     </div>
-                    <div>
+                    <div style={{ minWidth: 0 }}>
                       <div
                         style={{
-                          fontSize: 11,
-                          color: "var(--text-3)",
+                          fontSize: 10,
+                          color: "#6b7280",
                           fontFamily: "var(--font-display)",
                           fontWeight: 700,
                           letterSpacing: "0.08em",
                           textTransform: "uppercase",
-                          marginBottom: 3,
+                          marginBottom: 4,
                         }}
                       >
-                        Bitcoin to US Dollar
+                        Mid-market exchange rate
                       </div>
                       <div
                         style={{
-                          fontSize: 26,
+                          fontSize: 28,
                           fontWeight: 800,
                           fontFamily: "var(--font-display)",
                           lineHeight: 1.05,
                           letterSpacing: "-0.03em",
+                          color: "#111827",
+                          marginBottom: 4,
                         }}
                       >
                         {chartSnapshot.price}
                       </div>
+                      <div
+                        style={{
+                          fontSize: 12,
+                          fontWeight: 700,
+                          color: "#374151",
+                          marginBottom: 4,
+                        }}
+                      >
+                        BTC to USD
+                      </div>
                       <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 6, flexWrap: "wrap" }}>
                         <span
-                          className={chartSnapshot.bull ? "bull" : "bear"}
                           style={{
                             display: "inline-flex",
                             alignItems: "center",
                             gap: 4,
                             fontSize: 12,
                             fontWeight: 700,
+                            color: chartSnapshot.bull ? "#15803d" : "#dc2626",
                           }}
                         >
                           {chartSnapshot.bull ? "▲" : "▼"} {chartSnapshot.chg}
                         </span>
-                        <span style={{ fontSize: 11, color: "var(--text-3)", fontWeight: 600 }}>
-                          {PERIODS[period].label} range
+                        <span style={{ fontSize: 11, color: "#6b7280", fontWeight: 600 }}>
+                          {PERIODS[period].displayLabel} range
                         </span>
                         {chartLoading ? (
-                          <span style={{ fontSize: 11, color: "var(--text-3)", fontWeight: 600 }}>
+                          <span style={{ fontSize: 11, color: "#6b7280", fontWeight: 600 }}>
                             Loading...
                           </span>
                         ) : null}
@@ -520,23 +551,23 @@ export function HomePageClient({
 
                   <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
                     {[
-                      { label: `${PERIODS[period].label} HIGH`, value: chartSnapshot.high },
-                      { label: `${PERIODS[period].label} LOW`, value: chartSnapshot.low },
+                      { label: `${PERIODS[period].displayLabel} HIGH`, value: chartSnapshot.high },
+                      { label: `${PERIODS[period].displayLabel} LOW`, value: chartSnapshot.low },
                     ].map((stat) => (
                       <div
                         key={stat.label}
                         style={{
                           minWidth: 110,
-                          padding: "10px 12px",
+                          padding: "10px 12px 11px",
                           borderRadius: 14,
-                          background: "rgba(255,255,255,0.03)",
-                          border: "1px solid var(--border-subtle)",
+                          background: "#eef2ef",
+                          border: "1px solid rgba(15,23,42,0.06)",
                         }}
                       >
                         <div
                           style={{
                             fontSize: 9,
-                            color: "var(--text-3)",
+                            color: "#6b7280",
                             fontFamily: "var(--font-display)",
                             letterSpacing: "0.08em",
                             textTransform: "uppercase",
@@ -545,7 +576,7 @@ export function HomePageClient({
                         >
                           {stat.label}
                         </div>
-                        <div style={{ fontSize: 14, fontWeight: 800, fontFamily: "var(--font-display)" }}>
+                        <div style={{ fontSize: 14, fontWeight: 800, fontFamily: "var(--font-display)", color: "#111827" }}>
                           {stat.value}
                         </div>
                       </div>
@@ -559,9 +590,8 @@ export function HomePageClient({
                     borderRadius: 18,
                     overflow: "hidden",
                     position: "relative",
-                    background:
-                      "linear-gradient(180deg, rgba(247,147,26,0.08) 0%, rgba(247,147,26,0.02) 100%), linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.01))",
-                    border: "1px solid rgba(255,255,255,0.04)",
+                    background: "#f3f4f6",
+                    border: "1px solid rgba(15,23,42,0.06)",
                   }}
                 >
                   <div
@@ -569,9 +599,9 @@ export function HomePageClient({
                       position: "absolute",
                       inset: 0,
                       backgroundImage:
-                        "linear-gradient(to right, rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.04) 1px, transparent 1px)",
+                        "linear-gradient(to right, rgba(17,24,39,0.06) 1px, transparent 1px), linear-gradient(to bottom, rgba(17,24,39,0.06) 1px, transparent 1px)",
                       backgroundSize: "20% 100%, 100% 25%",
-                      opacity: 0.35,
+                      opacity: 0.45,
                       pointerEvents: "none",
                     }}
                   />
@@ -580,7 +610,7 @@ export function HomePageClient({
                       style={{
                         position: "absolute",
                         inset: 0,
-                        background: "rgba(13,11,20,0.2)",
+                        background: "rgba(248,250,247,0.62)",
                         zIndex: 1,
                       }}
                     />
@@ -588,8 +618,8 @@ export function HomePageClient({
                   <svg viewBox="0 0 400 130" style={{ width: "100%", height: "100%" }} preserveAspectRatio="none">
                     <defs>
                       <linearGradient id="btcg" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#F7931A" stopOpacity="0.26" />
-                        <stop offset="100%" stopColor="#F7931A" stopOpacity="0" />
+                        <stop offset="0%" stopColor="#0f766e" stopOpacity="0.22" />
+                        <stop offset="100%" stopColor="#0f766e" stopOpacity="0" />
                       </linearGradient>
                     </defs>
                     {chartSnapshot.area ? <path d={chartSnapshot.area} fill="url(#btcg)" /> : null}
@@ -597,7 +627,7 @@ export function HomePageClient({
                       <path
                         d={chartSnapshot.line}
                         fill="none"
-                        stroke="#F7931A"
+                        stroke="#0f766e"
                         strokeWidth="2.4"
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -635,20 +665,20 @@ export function HomePageClient({
                       style={{
                         minWidth: 56,
                         padding: "8px 14px",
-                        background: index === period ? "#F7931A" : "rgba(255,255,255,0.03)",
-                        border: `1px solid ${index === period ? "#F7931A" : "var(--border)"}`,
+                        background: index === period ? "#dfe4df" : "#fff",
+                        border: `1px solid ${index === period ? "#d1d5db" : "#e5e7eb"}`,
                         borderRadius: "999px",
                         fontSize: 11,
                         fontWeight: 700,
                         fontFamily: "var(--font-display)",
-                        color: index === period ? "#fff" : "var(--text-2)",
+                        color: "#111827",
                         cursor: "pointer",
                         transition: "all 0.15s ease",
-                        boxShadow: index === period ? "0 8px 24px rgba(247,147,26,0.2)" : "none",
+                        boxShadow: index === period ? "inset 0 0 0 1px rgba(15,23,42,0.04)" : "none",
                         opacity: chartLoading && index === period ? 0.75 : 1,
                       }}
                     >
-                      {periodOption.label}
+                      {periodOption.displayLabel}
                     </button>
                   ))}
                 </div>
