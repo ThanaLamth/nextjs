@@ -28,7 +28,6 @@ const PERIODS: Array<{ label: string; days: string; displayLabel: string }> = [
   { label: "7D", days: "7", displayLabel: "1W" },
   { label: "30D", days: "30", displayLabel: "1M" },
   { label: "1Y", days: "365", displayLabel: "1Y" },
-  { label: "ALL", days: "max", displayLabel: "MAX" },
 ];
 
 function imageBackground(image?: string) {
