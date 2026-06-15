@@ -15,11 +15,11 @@ export function NewsletterForm({ compact = false }: NewsletterFormProps) {
         <input
           type="email"
           placeholder="your@email.com"
-          className="w-full px-3 py-2 rounded-lg bg-teal-900/60 border border-teal-700/40 text-teal-100 placeholder-teal-600 text-xs outline-none focus:border-teal-500 transition-colors"
+          className="w-full px-3 py-2 rounded-lg bg-[var(--color-bg-elevated)] border border-[var(--color-border-default)] text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] text-xs outline-none focus:border-[var(--color-border-teal)] focus:ring-1 focus:ring-[var(--color-border-teal)] transition-all shadow-inner"
         />
         <button
           type="submit"
-          className="w-full py-2 rounded-lg bg-amber-400 text-amber-950 text-xs font-bold hover:bg-amber-300 transition-colors"
+          className="w-full py-2 rounded-lg btn-gradient text-xs font-bold transition-transform hover:scale-[1.02] shadow-sm"
         >
           Subscribe Free
         </button>
@@ -32,11 +32,11 @@ export function NewsletterForm({ compact = false }: NewsletterFormProps) {
       <input
         type="email"
         placeholder="your@email.com"
-        className="px-3 py-2 rounded-lg bg-teal-800 border border-teal-700/40 text-teal-100 placeholder-teal-500 text-sm outline-none focus:border-teal-500 transition-colors"
+        className="px-3 py-2 rounded-lg bg-[var(--color-bg-elevated)] border border-[var(--color-border-default)] text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] text-sm outline-none focus:border-[var(--color-border-teal)] focus:ring-1 focus:ring-[var(--color-border-teal)] transition-all shadow-inner"
       />
       <button
         type="submit"
-        className="px-4 py-2 rounded-lg bg-amber-400 text-amber-950 text-sm font-semibold hover:bg-amber-300 transition-colors"
+        className="px-4 py-2 rounded-lg btn-gradient text-sm font-semibold transition-transform hover:scale-[1.02] shadow-sm"
       >
         Subscribe
       </button>
