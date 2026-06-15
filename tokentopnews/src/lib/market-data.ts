@@ -92,6 +92,15 @@ export async function fetchCoinChart(
   coinId: string,
   days: string,
 ): Promise<[number, number][]> {
+  if (days === "365") {
+    const now = Math.floor(Date.now() / 1000);
+    return fetchCoinChartRange(coinId, now - 365 * 24 * 60 * 60, now);
+  }
+
+  if (days === "max") {
+    return fetchCoinChartFiveYearRange(coinId);
+  }
+
   const response = await fetch(
     `${BASE}/coins/${coinId}/market_chart?vs_currency=usd&days=${days}`,
   );
@@ -102,6 +111,52 @@ export async function fetchCoinChart(
 
   const data = (await response.json()) as { prices: [number, number][] };
   return data.prices;
+}
+
+async function fetchCoinChartRange(
+  coinId: string,
+  from: number,
+  to: number,
+): Promise<[number, number][]> {
+  const response = await fetch(
+    `${BASE}/coins/${coinId}/market_chart/range?vs_currency=usd&from=${from}&to=${to}`,
+  );
+
+  if (!response.ok) {
+    throw new Error("Chart range fetch failed");
+  }
+
+  const data = (await response.json()) as { prices: [number, number][] };
+  return data.prices;
+}
+
+async function fetchCoinChartFiveYearRange(coinId: string): Promise<[number, number][]> {
+  const now = Math.floor(Date.now() / 1000);
+  const year = 365 * 24 * 60 * 60;
+  const segments: Array<Promise<[number, number][]>> = [];
+
+  for (let index = 5; index > 0; index -= 1) {
+    const from = now - index * year;
+    const to = index === 1 ? now : now - (index - 1) * year;
+    segments.push(fetchCoinChartRange(coinId, from, to));
+  }
+
+  const results = await Promise.all(segments);
+  const merged: [number, number][] = [];
+
+  for (const segment of results) {
+    for (const point of segment) {
+      const previous = merged[merged.length - 1];
+
+      if (previous && previous[0] === point[0]) {
+        continue;
+      }
+
+      merged.push(point);
+    }
+  }
+
+  return merged;
 }
 
 export async function fetchBitcoinBinanceChart(days: string): Promise<[number, number][]> {
