@@ -30,5 +30,5 @@ export async function getCachedCoinChartSnapshot(
   cacheTag(`market-chart:${coinId}:${days}`);
 
   const points = await fetchCoinChart(coinId, days).catch(() => []);
-  return summarizeCoinChart(points);
+  return summarizeCoinChart(points, days);
 }

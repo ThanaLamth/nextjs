@@ -22,6 +22,14 @@ export type CoinChartSnapshot = {
   low: string;
   line: string;
   area: string;
+  points: CoinChartPoint[];
+};
+
+export type CoinChartPoint = {
+  x: number;
+  y: number;
+  price: string;
+  label: string;
 };
 
 const META: Record<string, { sym: string; name: string; color: string }> = {
@@ -101,27 +109,87 @@ export function chartToSvgPath(
   width = 400,
   height = 100,
 ): { line: string; area: string } {
-  if (!points.length) {
+  const projected = projectChartPoints(points, width, height);
+
+  if (!projected.length) {
     return { line: "", area: "" };
   }
 
-  const prices = points.map((point) => point[1]);
-  const min = Math.min(...prices);
-  const max = Math.max(...prices);
-  const range = max - min || 1;
-  const xs = points.map((_, index) => (index / (points.length - 1)) * width);
-  const ys = prices.map(
-    (price) => height - ((price - min) / range) * (height * 0.85) - height * 0.05,
-  );
-  const coordinates = xs.map((x, index) => `${x.toFixed(1)},${ys[index].toFixed(1)}`);
+  const coordinates = projected.map((point) => `${point.x.toFixed(1)},${point.y.toFixed(1)}`);
   const line = `M${coordinates.join(" L")}`;
   const area = `${line} L${width},${height} L0,${height} Z`;
 
   return { line, area };
 }
 
-export function summarizeCoinChart(points: [number, number][]): CoinChartSnapshot {
-  const { line, area } = chartToSvgPath(points);
+function downsampleChartPoints(points: [number, number][], maxPoints = 120): [number, number][] {
+  if (points.length <= maxPoints) {
+    return points;
+  }
+
+  const sampled: [number, number][] = [];
+  const lastIndex = points.length - 1;
+
+  for (let index = 0; index < maxPoints; index += 1) {
+    const sourceIndex = Math.round((index / (maxPoints - 1)) * lastIndex);
+    sampled.push(points[sourceIndex]);
+  }
+
+  return sampled;
+}
+
+function formatPointLabel(timestamp: number, days: string): string {
+  const date = new Date(timestamp);
+
+  if (days === "1") {
+    return date.toLocaleString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+      month: "short",
+      day: "numeric",
+    });
+  }
+
+  if (days === "7" || days === "30") {
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+    });
+  }
+
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+function projectChartPoints(
+  points: [number, number][],
+  width = 400,
+  height = 100,
+): Array<{ x: number; y: number }> {
+  if (!points.length) {
+    return [];
+  }
+
+  const prices = points.map((point) => point[1]);
+  const min = Math.min(...prices);
+  const max = Math.max(...prices);
+  const range = max - min || 1;
+  const lastIndex = points.length - 1 || 1;
+
+  return points.map((point, index) => ({
+    x: (index / lastIndex) * width,
+    y: height - ((point[1] - min) / range) * (height * 0.85) - height * 0.05,
+  }));
+}
+
+export function summarizeCoinChart(points: [number, number][], days = "1"): CoinChartSnapshot {
+  const sampledPoints = downsampleChartPoints(points);
+  const { line, area } = chartToSvgPath(sampledPoints);
 
   if (!points.length) {
     return {
@@ -132,6 +200,7 @@ export function summarizeCoinChart(points: [number, number][]): CoinChartSnapsho
       low: "—",
       line,
       area,
+      points: [],
     };
   }
 
@@ -139,6 +208,7 @@ export function summarizeCoinChart(points: [number, number][]): CoinChartSnapsho
   const start = prices[0];
   const end = prices[prices.length - 1];
   const change = start ? ((end - start) / start) * 100 : 0;
+  const projectedPoints = projectChartPoints(sampledPoints);
 
   return {
     price: formatUsd(end),
@@ -148,5 +218,11 @@ export function summarizeCoinChart(points: [number, number][]): CoinChartSnapsho
     low: formatUsd(Math.min(...prices)),
     line,
     area,
+    points: sampledPoints.map((point, index) => ({
+      x: projectedPoints[index]?.x ?? 0,
+      y: projectedPoints[index]?.y ?? 0,
+      price: formatUsd(point[1]),
+      label: formatPointLabel(point[0], days),
+    })),
   };
 }

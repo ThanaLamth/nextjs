@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import type { MouseEvent, TouchEvent } from "react";
 import { useEffect, useState } from "react";
 
 import {
@@ -51,6 +52,7 @@ export function HomePageClient({
   const [period, setPeriod] = useState(0);
   const [chartSnapshot, setChartSnapshot] = useState<CoinChartSnapshot>(initialChartSnapshot);
   const [chartLoading, setChartLoading] = useState(false);
+  const [hoveredPointIndex, setHoveredPointIndex] = useState<number | null>(null);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -129,8 +131,40 @@ export function HomePageClient({
   const featuredLead = featured[0];
   const featuredRest = featured.slice(1, 3);
   const bitcoinCoin = coins.find((coin) => coin.id === "bitcoin") ?? null;
+  const chartPoints = chartSnapshot.points;
+  const hoveredPoint =
+    hoveredPointIndex !== null && hoveredPointIndex >= 0 && hoveredPointIndex < chartPoints.length
+      ? chartPoints[hoveredPointIndex]
+      : null;
   const displayTimeAgo = (article: DisplayPost) =>
     mounted ? formatTimeAgo(article.publishedAt) : article.dateLabel;
+
+  const updateHoveredPoint = (clientX: number, width: number, left: number) => {
+    if (!chartPoints.length || width <= 0) {
+      setHoveredPointIndex(null);
+      return;
+    }
+
+    const ratio = Math.min(1, Math.max(0, (clientX - left) / width));
+    const nextIndex = Math.round(ratio * (chartPoints.length - 1));
+    setHoveredPointIndex(nextIndex);
+  };
+
+  const handleChartMouseMove = (event: MouseEvent<SVGRectElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    updateHoveredPoint(event.clientX, rect.width, rect.left);
+  };
+
+  const handleChartTouch = (event: TouchEvent<SVGRectElement>) => {
+    const touch = event.touches[0] ?? event.changedTouches[0];
+
+    if (!touch) {
+      return;
+    }
+
+    const rect = event.currentTarget.getBoundingClientRect();
+    updateHoveredPoint(touch.clientX, rect.width, rect.left);
+  };
 
   return (
     <main>
@@ -605,6 +639,39 @@ export function HomePageClient({
                       pointerEvents: "none",
                     }}
                   />
+                  {hoveredPoint ? (
+                    <div
+                      style={{
+                        position: "absolute",
+                        left: `${(Math.min(338, Math.max(62, hoveredPoint.x)) / 400) * 100}%`,
+                        top: `${Math.max(6, Math.min(58, (hoveredPoint.y / 130) * 100 - 24))}%`,
+                        transform: "translateX(-50%)",
+                        padding: "9px 11px 10px",
+                        borderRadius: 12,
+                        background: "#fff",
+                        border: "1px solid rgba(15,23,42,0.08)",
+                        boxShadow: "0 12px 30px rgba(15,23,42,0.16)",
+                        zIndex: 2,
+                        minWidth: 116,
+                        pointerEvents: "none",
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontSize: 12,
+                          fontWeight: 800,
+                          fontFamily: "var(--font-display)",
+                          color: "#111827",
+                          marginBottom: 2,
+                        }}
+                      >
+                        {hoveredPoint.price}
+                      </div>
+                      <div style={{ fontSize: 10, color: "#6b7280", fontWeight: 600 }}>
+                        {hoveredPoint.label}
+                      </div>
+                    </div>
+                  ) : null}
                   {chartLoading ? (
                     <div
                       style={{
@@ -641,6 +708,39 @@ export function HomePageClient({
                         strokeOpacity="0.3"
                       />
                     )}
+                    {hoveredPoint ? (
+                      <>
+                        <line
+                          x1={hoveredPoint.x}
+                          y1="0"
+                          x2={hoveredPoint.x}
+                          y2="130"
+                          stroke="rgba(15,118,110,0.22)"
+                          strokeWidth="1.2"
+                          strokeDasharray="4 4"
+                        />
+                        <circle
+                          cx={hoveredPoint.x}
+                          cy={hoveredPoint.y}
+                          r="4.5"
+                          fill="#fff"
+                          stroke="#0f766e"
+                          strokeWidth="2.5"
+                        />
+                      </>
+                    ) : null}
+                    <rect
+                      x="0"
+                      y="0"
+                      width="400"
+                      height="130"
+                      fill="transparent"
+                      onMouseMove={handleChartMouseMove}
+                      onMouseLeave={() => setHoveredPointIndex(null)}
+                      onTouchStart={handleChartTouch}
+                      onTouchMove={handleChartTouch}
+                      onTouchEnd={() => setHoveredPointIndex(null)}
+                    />
                   </svg>
                 </div>
 
@@ -665,19 +765,19 @@ export function HomePageClient({
                       style={{
                         minWidth: 56,
                         padding: "8px 14px",
-                        background: index === period ? "#dfe4df" : "#fff",
-                        border: `1px solid ${index === period ? "#d1d5db" : "#e5e7eb"}`,
-                        borderRadius: "999px",
-                        fontSize: 11,
-                        fontWeight: 700,
+                      background: index === period ? "#dfe4df" : "#fff",
+                      border: `1px solid ${index === period ? "#d1d5db" : "#e5e7eb"}`,
+                      borderRadius: "999px",
+                      fontSize: 11,
+                      fontWeight: 700,
                         fontFamily: "var(--font-display)",
-                        color: "#111827",
-                        cursor: "pointer",
-                        transition: "all 0.15s ease",
-                        boxShadow: index === period ? "inset 0 0 0 1px rgba(15,23,42,0.04)" : "none",
-                        opacity: chartLoading && index === period ? 0.75 : 1,
-                      }}
-                    >
+                      color: "#111827",
+                      cursor: "pointer",
+                      transition: "all 0.15s ease",
+                      boxShadow: index === period ? "0 2px 0 rgba(15,23,42,0.04), inset 0 0 0 1px rgba(15,23,42,0.04)" : "none",
+                      opacity: chartLoading && index === period ? 0.75 : 1,
+                    }}
+                  >
                       {periodOption.displayLabel}
                     </button>
                   ))}
