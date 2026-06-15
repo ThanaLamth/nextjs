@@ -229,6 +229,23 @@ function getExchangeBadge(exchange: string): string {
     .toUpperCase();
 }
 
+function getExchangeLogoSrc(exchange: string): string | null {
+  switch (exchange.toLowerCase()) {
+    case "binance":
+      return "/exchanges/binance.svg";
+    case "gate.io":
+      return "/exchanges/gateio.svg";
+    case "bitget":
+      return "/exchanges/bitget.svg";
+    case "coinbase":
+      return "/exchanges/coinbase.svg";
+    case "okx":
+      return "/exchanges/okx.svg";
+    default:
+      return null;
+  }
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { coin } = await params;
   const meta = COIN_META[coin];
@@ -444,6 +461,7 @@ export default async function CoinPage({ params }: Props) {
               <div>
                 {venueRows.map((row) => {
                   const up = row.change24h >= 0;
+                  const exchangeLogo = getExchangeLogoSrc(row.exchange);
                   return (
                     <div
                       key={`${row.exchange}-${row.instrumentCode}`}
@@ -451,8 +469,8 @@ export default async function CoinPage({ params }: Props) {
                       style={{ borderColor: "var(--border)", background: "var(--surface)" }}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-orange/10 text-xs font-bold text-brand-orange">
-                          {symbol}
+                        <div className="relative h-11 w-11 overflow-hidden rounded-2xl border" style={{ borderColor: "var(--border)", background: "var(--card-bg)" }}>
+                          <Image src={image} alt={`${name} logo`} fill className="object-cover" sizes="44px" />
                         </div>
                         <div className="min-w-0">
                           <p className="font-display text-sm font-bold" style={{ color: "var(--text-primary)" }}>
@@ -465,10 +483,16 @@ export default async function CoinPage({ params }: Props) {
                       </div>
 
                       <div className="flex items-center gap-3">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-full border text-[11px] font-bold"
-                          style={{ borderColor: "var(--border)", color: "var(--text-secondary)", background: "var(--card-bg)" }}>
-                          {getExchangeBadge(row.exchange)}
-                        </div>
+                        {exchangeLogo ? (
+                          <div className="relative h-9 w-9 overflow-hidden rounded-full border" style={{ borderColor: "var(--border)", background: "var(--card-bg)" }}>
+                            <Image src={exchangeLogo} alt={`${row.exchange} logo`} fill className="object-cover" sizes="36px" />
+                          </div>
+                        ) : (
+                          <div className="flex h-9 w-9 items-center justify-center rounded-full border text-[11px] font-bold"
+                            style={{ borderColor: "var(--border)", color: "var(--text-secondary)", background: "var(--card-bg)" }}>
+                            {getExchangeBadge(row.exchange)}
+                          </div>
+                        )}
                         <div>
                           <p className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
                             {row.exchange}
