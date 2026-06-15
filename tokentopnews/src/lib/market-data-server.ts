@@ -3,6 +3,7 @@ import "server-only";
 import { cacheLife, cacheTag } from "next/cache";
 
 import {
+  fetchBitcoinBinanceChart,
   fetchCoinChart,
   fetchMarketData,
   summarizeCoinChart,
@@ -29,6 +30,11 @@ export async function getCachedCoinChartSnapshot(
   cacheTag("markets");
   cacheTag(`market-chart:${coinId}:${days}`);
 
-  const points = await fetchCoinChart(coinId, days).catch(() => []);
+  let points = await fetchCoinChart(coinId, days).catch(() => []);
+
+  if (!points.length && coinId === "bitcoin" && (days === "365" || days === "max")) {
+    points = await fetchBitcoinBinanceChart(days).catch(() => []);
+  }
+
   return summarizeCoinChart(points, days);
 }

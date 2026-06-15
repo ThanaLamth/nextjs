@@ -104,6 +104,33 @@ export async function fetchCoinChart(
   return data.prices;
 }
 
+export async function fetchBitcoinBinanceChart(days: string): Promise<[number, number][]> {
+  const config =
+    days === "365"
+      ? { interval: "1d", limit: 365 }
+      : days === "max"
+        ? { interval: "1w", limit: 1000 }
+        : null;
+
+  if (!config) {
+    throw new Error("Unsupported Binance chart range");
+  }
+
+  const response = await fetch(
+    `https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=${config.interval}&limit=${config.limit}`,
+  );
+
+  if (!response.ok) {
+    throw new Error("Binance chart fetch failed");
+  }
+
+  const data = (await response.json()) as Array<
+    [number, string, string, string, string, string, number, string, number, string, string, string]
+  >;
+
+  return data.map((row) => [row[0], Number(row[4])]);
+}
+
 export function chartToSvgPath(
   points: [number, number][],
   width = 400,
