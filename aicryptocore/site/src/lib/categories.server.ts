@@ -4,6 +4,15 @@ import type { Category } from '@/types/category'
 import { getWordPressCategorySummaries } from '@/lib/wp'
 import { CATEGORY_ORDER, decodeHtmlEntities, getCategoryMeta, titleizeSlug } from '@/lib/categories'
 
+const HEADER_CATEGORY_SLUGS = [
+  'news',
+  'altcoin-insights',
+  'crypto-ai-tools',
+  'mining',
+  'top-projects',
+  'blockchain-event',
+] as const
+
 function sortCategories(categories: Category[]) {
   return [...categories].sort((left, right) => {
     const leftIndex = CATEGORY_ORDER.indexOf(left.slug)
@@ -57,6 +66,15 @@ export async function getRuntimeCategories(): Promise<Category[]> {
 
 export async function getNavigationCategories(): Promise<Category[]> {
   return getRuntimeCategories()
+}
+
+export async function getHeaderCategories(): Promise<Category[]> {
+  const categories = await getRuntimeCategories()
+  const categoriesBySlug = new Map(categories.map((category) => [category.slug, category]))
+
+  return HEADER_CATEGORY_SLUGS.map((slug) => categoriesBySlug.get(slug)).filter(
+    (category): category is Category => Boolean(category)
+  )
 }
 
 export async function getRuntimeCategoryBySlug(slug: string): Promise<Category | undefined> {
