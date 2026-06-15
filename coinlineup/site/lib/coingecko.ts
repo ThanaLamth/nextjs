@@ -11,7 +11,58 @@ export interface CoinPrice {
   high_24h: number;
   low_24h: number;
   circulating_supply: number;
+  total_supply?: number | null;
+  max_supply?: number | null;
+  ath?: number;
+  atl?: number;
+  ath_change_percentage?: number;
+  atl_change_percentage?: number;
+  last_updated?: string;
   sparkline_in_7d?: { price: number[] };
+}
+
+export interface CoinDetail {
+  id: string;
+  symbol: string;
+  name: string;
+  image?: {
+    thumb?: string;
+    small?: string;
+    large?: string;
+  };
+  description?: {
+    en?: string;
+  };
+  hashing_algorithm?: string | null;
+  genesis_date?: string | null;
+  categories?: string[];
+  links?: {
+    homepage?: string[];
+    blockchain_site?: string[];
+    official_forum_url?: string[];
+    repos_url?: {
+      github?: string[];
+    };
+  };
+  market_cap_rank?: number;
+  market_data?: {
+    current_price?: { usd?: number };
+    market_cap?: { usd?: number };
+    fully_diluted_valuation?: { usd?: number };
+    total_volume?: { usd?: number };
+    high_24h?: { usd?: number };
+    low_24h?: { usd?: number };
+    price_change_percentage_24h?: number;
+    circulating_supply?: number;
+    total_supply?: number | null;
+    max_supply?: number | null;
+    ath?: { usd?: number };
+    ath_change_percentage?: { usd?: number };
+    atl?: { usd?: number };
+    atl_change_percentage?: { usd?: number };
+    sparkline_7d?: { price: number[] };
+    last_updated?: string;
+  };
 }
 
 const BASE = "https://api.coingecko.com/api/v3";
@@ -26,6 +77,56 @@ export async function getTopCoins(limit = 50): Promise<CoinPrice[]> {
     return res.json();
   } catch {
     return MOCK_COINS;
+  }
+}
+
+export async function getCoinDetail(id: string): Promise<CoinDetail | null> {
+  try {
+    const res = await fetch(
+      `${BASE}/coins/${id}?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=true`,
+      { next: { revalidate: 60 } }
+    );
+    if (!res.ok) throw new Error("CoinGecko coin detail fetch failed");
+    return res.json();
+  } catch {
+    const fallback = MOCK_COINS.find((coin) => coin.id === id || coin.symbol.toLowerCase() === id.toLowerCase());
+    if (!fallback) return null;
+
+    return {
+      id: fallback.id,
+      symbol: fallback.symbol,
+      name: fallback.name,
+      image: { small: fallback.image, large: fallback.image },
+      description: {
+        en: `${fallback.name} is one of the tracked crypto assets on CoinLineup. This fallback profile includes live market metrics and a simplified description while external API detail is unavailable.`,
+      },
+      categories: ["Cryptocurrency"],
+      market_cap_rank: fallback.market_cap_rank,
+      market_data: {
+        current_price: { usd: fallback.current_price },
+        market_cap: { usd: fallback.market_cap },
+        fully_diluted_valuation: { usd: fallback.max_supply ? fallback.max_supply * fallback.current_price : fallback.market_cap },
+        total_volume: { usd: fallback.total_volume },
+        high_24h: { usd: fallback.high_24h },
+        low_24h: { usd: fallback.low_24h },
+        price_change_percentage_24h: fallback.price_change_percentage_24h,
+        circulating_supply: fallback.circulating_supply,
+        total_supply: fallback.total_supply ?? null,
+        max_supply: fallback.max_supply ?? null,
+        ath: { usd: fallback.ath ?? fallback.high_24h },
+        ath_change_percentage: { usd: fallback.ath_change_percentage ?? 0 },
+        atl: { usd: fallback.atl ?? fallback.low_24h },
+        atl_change_percentage: { usd: fallback.atl_change_percentage ?? 0 },
+        sparkline_7d: fallback.sparkline_in_7d,
+        last_updated: fallback.last_updated,
+      },
+      links: {
+        homepage: [],
+        blockchain_site: [],
+        official_forum_url: [],
+        repos_url: { github: [] },
+      },
+    };
   }
 }
 

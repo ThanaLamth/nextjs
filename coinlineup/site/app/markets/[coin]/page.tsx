@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
+import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, TrendingUp } from "lucide-react";
-import { getTopCoins, MOCK_COINS } from "@/lib/coingecko";
+import type { ReactNode } from "react";
+import { ArrowRight, ExternalLink, Globe, Github, Info, Layers3, LineChart, Newspaper } from "lucide-react";
+import CoinPriceConverter from "@/components/CoinPriceConverter";
+import { getCoinDetail, getTopCoins, MOCK_COINS } from "@/lib/coingecko";
 
 const COIN_META: Record<string, { name: string; symbol: string; description: string }> = {
   bitcoin: { name: "Bitcoin", symbol: "BTC", description: "Track Bitcoin price, market cap, volume, and the latest BTC news and analysis." },
@@ -11,6 +13,10 @@ const COIN_META: Record<string, { name: string; symbol: string; description: str
   "ethereum-markets": { name: "Ethereum", symbol: "ETH", description: "Track Ethereum price, market cap, volume, and the latest ETH news and analysis." },
   xrp: { name: "XRP", symbol: "XRP", description: "Track XRP price, market cap, volume, and the latest XRP news and analysis." },
 };
+
+interface Props {
+  params: Promise<{ coin: string }>;
+}
 
 function formatCoinSlug(value: string): string {
   return value
@@ -23,92 +29,488 @@ function formatCoinSlug(value: string): string {
     .join(" ");
 }
 
-interface Props {
-  params: Promise<{ coin: string }>;
+function normalizeCoinId(value: string): string {
+  switch (value) {
+    case "bitcoin-markets":
+      return "bitcoin";
+    case "ethereum-markets":
+      return "ethereum";
+    case "xrp":
+      return "ripple";
+    default:
+      return value;
+  }
+}
+
+function fmtPrice(price: number): string {
+  if (!Number.isFinite(price)) return "$0";
+  if (price >= 1000) return "$" + price.toLocaleString("en-US", { maximumFractionDigits: 0 });
+  if (price >= 1) return "$" + price.toLocaleString("en-US", { maximumFractionDigits: 2 });
+  return "$" + price.toLocaleString("en-US", { maximumFractionDigits: 6 });
+}
+
+function fmtCompact(value: number | null | undefined): string {
+  if (value === null || value === undefined || !Number.isFinite(value)) return "Unavailable";
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    notation: "compact",
+    maximumFractionDigits: 2,
+  }).format(value);
+}
+
+function fmtSupply(value: number | null | undefined): string {
+  if (value === null || value === undefined || !Number.isFinite(value)) return "Unavailable";
+  return new Intl.NumberFormat("en-US", { notation: "compact", maximumFractionDigits: 2 }).format(value);
+}
+
+function fmtPercent(value: number | null | undefined): string {
+  if (value === null || value === undefined || !Number.isFinite(value)) return "Unavailable";
+  return `${value >= 0 ? "+" : ""}${value.toFixed(2)}%`;
+}
+
+function formatUpdated(value: string | null | undefined): string {
+  if (!value) return "Recently";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Recently";
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    timeZoneName: "short",
+  }).format(date);
+}
+
+function stripHtml(html: string | undefined): string {
+  if (!html) return "";
+  return html
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function SparklineCard({ prices, positive }: { prices: number[]; positive: boolean }) {
+  if (!prices.length) {
+    return (
+      <div className="rounded-2xl border p-5" style={{ background: "var(--card-bg)", borderColor: "var(--border)" }}>
+        <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
+          Chart data is loading.
+        </p>
+      </div>
+    );
+  }
+
+  const width = 720;
+  const height = 240;
+  const min = Math.min(...prices);
+  const max = Math.max(...prices);
+  const range = max - min || 1;
+  const points = prices
+    .map((price, index) => {
+      const x = (index / (prices.length - 1)) * width;
+      const y = height - ((price - min) / range) * (height - 12) - 6;
+      return `${x},${y}`;
+    })
+    .join(" ");
+  const area = `${points} ${width},${height} 0,${height}`;
+  const color = positive ? "#00A86B" : "#E63946";
+
+  return (
+    <div className="rounded-2xl border p-5" style={{ background: "var(--card-bg)", borderColor: "var(--border)" }}>
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-widest text-brand-orange">Price trend</p>
+          <h2 className="font-display text-xl font-bold" style={{ color: "var(--text-primary)" }}>
+            7-day market snapshot
+          </h2>
+        </div>
+        <div className="rounded-full border px-3 py-1 text-xs font-semibold" style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}>
+          Last 7 days
+        </div>
+      </div>
+      <svg viewBox={`0 0 ${width} ${height}`} className="h-56 w-full" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="coin-area-fill" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stopColor={color} stopOpacity="0.28" />
+            <stop offset="100%" stopColor={color} stopOpacity="0.03" />
+          </linearGradient>
+        </defs>
+        <polygon points={area} fill="url(#coin-area-fill)" />
+        <polyline fill="none" stroke={color} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" points={points} />
+      </svg>
+      <div className="mt-4 flex items-center justify-between text-xs" style={{ color: "var(--text-muted)" }}>
+        <span>Low: {fmtPrice(min)}</span>
+        <span>High: {fmtPrice(max)}</span>
+      </div>
+    </div>
+  );
+}
+
+function ResourceLink({
+  href,
+  icon,
+  label,
+}: {
+  href: string;
+  icon: ReactNode;
+  label: string;
+}) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex items-center justify-between gap-3 rounded-xl border px-4 py-3 text-sm hover:border-brand-orange hover:text-brand-orange"
+      style={{ borderColor: "var(--border)", color: "var(--text-secondary)", background: "var(--surface)" }}
+    >
+      <span className="flex items-center gap-2">
+        {icon}
+        <span>{label}</span>
+      </span>
+      <ExternalLink size={14} />
+    </a>
+  );
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { coin } = await params;
   const meta = COIN_META[coin];
-  const name = meta?.name ?? formatCoinSlug(coin);
-  return { title: `${name} Price & Analysis — CoinLineup` };
+  const detail = await getCoinDetail(normalizeCoinId(coin));
+  const name = detail?.name ?? meta?.name ?? formatCoinSlug(coin);
+  const detailDescription = stripHtml(detail?.description?.en).slice(0, 155);
+  const description = meta?.description
+    ? meta.description
+    : detailDescription || `Track ${name} price, market cap, volume, and key market data on CoinLineup.`;
+
+  return {
+    title: `${name} Price & Analysis — CoinLineup`,
+    description,
+  };
 }
 
-function fmt(price: number): string {
-  if (price >= 1000) return "$" + price.toLocaleString("en-US", { maximumFractionDigits: 0 });
-  if (price >= 1) return "$" + price.toFixed(2);
-  return "$" + price.toFixed(5);
-}
-
-export default function CoinPage({ params }: Props) {
-  return (
-    <Suspense fallback={<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10" />}>
-      <CoinContent params={params} />
-    </Suspense>
-  );
-}
-
-async function CoinContent({ params }: Props) {
+export default async function CoinPage({ params }: Props) {
   const { coin } = await params;
   const meta = COIN_META[coin];
+  const normalizedCoinId = normalizeCoinId(coin);
 
-  let coins = MOCK_COINS;
-  try { coins = await getTopCoins(20); } catch {}
+  let topCoins = MOCK_COINS;
+  try {
+    topCoins = await getTopCoins(20);
+  } catch {}
 
-  const coinData = coins.find(
-    (c) => c.symbol.toLowerCase() === (meta?.symbol ?? coin).toLowerCase() ||
-           c.id.toLowerCase() === coin.toLowerCase()
+  const detail = await getCoinDetail(normalizedCoinId);
+  const fallbackCoin = topCoins.find(
+    (item) => item.id.toLowerCase() === normalizedCoinId.toLowerCase() || item.symbol.toLowerCase() === (meta?.symbol ?? coin).toLowerCase()
   );
 
-  const name = coinData?.name ?? meta?.name ?? formatCoinSlug(coin);
-  const up = (coinData?.price_change_percentage_24h ?? 0) >= 0;
+  const name = detail?.name ?? fallbackCoin?.name ?? meta?.name ?? formatCoinSlug(coin);
+  const symbol = (detail?.symbol ?? fallbackCoin?.symbol ?? meta?.symbol ?? coin).toUpperCase();
+  const image =
+    detail?.image?.large ??
+    detail?.image?.small ??
+    fallbackCoin?.image ??
+    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'%3E%3Crect width='96' height='96' rx='24' fill='%231A1A1A'/%3E%3Ctext x='50%25' y='54%25' text-anchor='middle' font-size='24' fill='%23F7931A' font-family='Arial'%3E%24%3C/text%3E%3C/svg%3E";
+
+  const marketData = detail?.market_data;
+  const currentPrice = marketData?.current_price?.usd ?? fallbackCoin?.current_price ?? 0;
+  const dayChange = marketData?.price_change_percentage_24h ?? fallbackCoin?.price_change_percentage_24h ?? 0;
+  const positive = dayChange >= 0;
+  const marketCap = marketData?.market_cap?.usd ?? fallbackCoin?.market_cap;
+  const fdv = marketData?.fully_diluted_valuation?.usd ?? null;
+  const volume = marketData?.total_volume?.usd ?? fallbackCoin?.total_volume;
+  const high24h = marketData?.high_24h?.usd ?? fallbackCoin?.high_24h;
+  const low24h = marketData?.low_24h?.usd ?? fallbackCoin?.low_24h;
+  const supply = marketData?.circulating_supply ?? fallbackCoin?.circulating_supply;
+  const totalSupply = marketData?.total_supply ?? fallbackCoin?.total_supply ?? null;
+  const maxSupply = marketData?.max_supply ?? fallbackCoin?.max_supply ?? null;
+  const ath = marketData?.ath?.usd ?? fallbackCoin?.ath;
+  const athDrop = marketData?.ath_change_percentage?.usd ?? fallbackCoin?.ath_change_percentage;
+  const atl = marketData?.atl?.usd ?? fallbackCoin?.atl;
+  const atlLift = marketData?.atl_change_percentage?.usd ?? fallbackCoin?.atl_change_percentage;
+  const sparkline = marketData?.sparkline_7d?.price ?? fallbackCoin?.sparkline_in_7d?.price ?? [];
+  const lastUpdated = marketData?.last_updated ?? fallbackCoin?.last_updated;
+
+  const description = stripHtml(detail?.description?.en);
+  const lead =
+    description ||
+    meta?.description ||
+    `Track ${name} with live market pricing, supply metrics, and reference resources for quick research on CoinLineup.`;
+  const paragraphs = lead.match(/[^.!?]+[.!?]+/g)?.slice(0, 3) ?? [lead];
+
+  const homepage = detail?.links?.homepage?.find(Boolean);
+  const explorer = detail?.links?.blockchain_site?.find(Boolean);
+  const forum = detail?.links?.official_forum_url?.find(Boolean);
+  const github = detail?.links?.repos_url?.github?.find(Boolean);
+  const relatedCoins = topCoins.filter((item) => item.id !== (fallbackCoin?.id ?? normalizedCoinId)).slice(0, 4);
+
+  const stats = [
+    { label: "Market cap", value: fmtCompact(marketCap) },
+    { label: "Fully diluted valuation", value: fmtCompact(fdv) },
+    { label: "24h trading volume", value: fmtCompact(volume) },
+    { label: "24h range", value: high24h && low24h ? `${fmtPrice(low24h)} - ${fmtPrice(high24h)}` : "Unavailable" },
+    { label: "Circulating supply", value: supply ? `${fmtSupply(supply)} ${symbol}` : "Unavailable" },
+    { label: "Max supply", value: maxSupply ? `${fmtSupply(maxSupply)} ${symbol}` : "Unavailable" },
+    { label: "All-time high", value: ath ? `${fmtPrice(ath)} (${fmtPercent(athDrop)})` : "Unavailable" },
+    { label: "All-time low", value: atl ? `${fmtPrice(atl)} (${fmtPercent(atlLift)})` : "Unavailable" },
+  ];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <div className="mb-8">
-        <div className="flex items-center gap-2 mb-2">
-          <TrendingUp size={20} className="text-brand-orange" />
-          <p className="text-brand-orange font-display font-semibold text-sm uppercase tracking-widest">Markets</p>
-        </div>
-        <h1 className="font-display font-bold text-4xl mb-3" style={{ color: "var(--text-primary)" }}>
-          {name} <span className="gradient-text">Price</span>
-        </h1>
-        <p className="text-base" style={{ color: "var(--text-secondary)" }}>
-          {meta?.description ?? `Real-time ${name} price data, charts, and market analysis.`}
-        </p>
+    <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+      <div className="mb-6 flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>
+        <Link href="/markets" className="hover:text-brand-orange">Markets</Link>
+        <span>/</span>
+        <span style={{ color: "var(--text-secondary)" }}>{name}</span>
       </div>
 
-      {coinData ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-          {[
-            { label: "Price", value: fmt(coinData.current_price) },
-            { label: "24h Change", value: `${up ? "+" : ""}${coinData.price_change_percentage_24h?.toFixed(2)}%`, color: up ? "#00A86B" : "#E63946" },
-            { label: "Market Cap", value: "$" + (coinData.market_cap / 1e9).toFixed(1) + "B" },
-            { label: "24h Volume", value: "$" + (coinData.total_volume / 1e9).toFixed(1) + "B" },
-          ].map((stat) => (
-            <div key={stat.label} className="rounded-xl border p-5"
-              style={{ background: "var(--card-bg)", borderColor: "var(--border)" }}>
-              <p className="text-xs uppercase tracking-wider mb-1" style={{ color: "var(--text-muted)" }}>{stat.label}</p>
-              <p className="font-display font-bold text-2xl" style={{ color: stat.color ?? "var(--text-primary)" }}>
-                {stat.value}
-              </p>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className="rounded-xl border p-8 text-center mb-10" style={{ background: "var(--card-bg)", borderColor: "var(--border)" }}>
-          <p className="font-semibold mb-1" style={{ color: "var(--text-secondary)" }}>Live price data unavailable</p>
-          <p className="text-sm" style={{ color: "var(--text-muted)" }}>Check back shortly for real-time {name} data.</p>
-        </div>
-      )}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(320px,0.75fr)]">
+        <div className="space-y-6">
+          <div className="rounded-3xl border p-6 md:p-8" style={{ background: "var(--card-bg)", borderColor: "var(--border)" }}>
+            <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
+              <div className="flex items-start gap-4">
+                <div className="relative h-14 w-14 flex-shrink-0 overflow-hidden rounded-2xl">
+                  <Image src={image} alt={name} fill className="object-cover" sizes="56px" />
+                </div>
+                <div>
+                  <div className="mb-2 flex flex-wrap items-center gap-2">
+                    <span className="rounded-full bg-brand-orange/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-brand-orange">
+                      {symbol}
+                    </span>
+                    {detail?.market_cap_rank || fallbackCoin?.market_cap_rank ? (
+                      <span className="rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wider" style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}>
+                        Rank #{detail?.market_cap_rank ?? fallbackCoin?.market_cap_rank}
+                      </span>
+                    ) : null}
+                  </div>
+                  <h1 className="font-display text-4xl font-bold" style={{ color: "var(--text-primary)" }}>
+                    {name} price
+                  </h1>
+                  <p className="mt-3 max-w-3xl text-sm leading-7" style={{ color: "var(--text-secondary)" }}>
+                    {meta?.description ?? paragraphs[0]}
+                  </p>
+                </div>
+              </div>
 
-      <div className="flex items-center justify-between">
-        <p className="text-sm" style={{ color: "var(--text-muted)" }}>
-          This page focuses on the latest live pricing snapshot while broader market coverage continues across CoinLineup.
-        </p>
-        <Link href="/markets" className="text-brand-orange text-sm font-semibold flex items-center gap-1 hover:gap-2 transition-all">
-          View all markets <ArrowRight size={14} />
-        </Link>
+              <div className="rounded-2xl border px-5 py-4 md:min-w-[260px]" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
+                <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>
+                  Live price
+                </p>
+                <p className="mt-2 font-display text-4xl font-bold" style={{ color: "var(--text-primary)" }}>
+                  {fmtPrice(currentPrice)}
+                </p>
+                <p className={`mt-2 text-sm font-semibold ${positive ? "price-up" : "price-down"}`}>
+                  {fmtPercent(dayChange)} in the last 24 hours
+                </p>
+                <p className="mt-2 text-xs" style={{ color: "var(--text-muted)" }}>
+                  Updated {formatUpdated(lastUpdated)}
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 flex flex-wrap gap-3">
+              {[
+                { href: "#overview", label: "Overview", icon: <Info size={14} /> },
+                { href: "#market-stats", label: "Market stats", icon: <LineChart size={14} /> },
+                { href: "#about", label: "About", icon: <Layers3 size={14} /> },
+                { href: "#faq", label: "FAQ", icon: <Newspaper size={14} /> },
+              ].map((item) => (
+                <a
+                  key={item.label}
+                  href={item.href}
+                  className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold hover:border-brand-orange hover:text-brand-orange"
+                  style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}
+                >
+                  {item.icon}
+                  {item.label}
+                </a>
+              ))}
+            </div>
+          </div>
+
+          <SparklineCard prices={sparkline.slice(-60)} positive={positive} />
+
+          <section id="market-stats" className="rounded-3xl border p-6 md:p-8" style={{ background: "var(--card-bg)", borderColor: "var(--border)" }}>
+            <div className="mb-5 flex items-center justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-widest text-brand-orange">Market stats</p>
+                <h2 className="font-display text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
+                  Key metrics for {name}
+                </h2>
+              </div>
+              <span className="rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wider" style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}>
+                Source: CoinGecko
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              {stats.map((stat) => (
+                <div key={stat.label} className="rounded-2xl border p-4" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
+                  <p className="text-xs uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
+                    {stat.label}
+                  </p>
+                  <p className="mt-2 font-display text-xl font-bold" style={{ color: "var(--text-primary)" }}>
+                    {stat.value}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section id="overview" className="rounded-3xl border p-6 md:p-8" style={{ background: "var(--card-bg)", borderColor: "var(--border)" }}>
+            <p className="text-xs font-semibold uppercase tracking-widest text-brand-orange">Overview</p>
+            <h2 className="mt-2 font-display text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
+              {name} at a glance
+            </h2>
+            <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1.1fr)_minmax(280px,0.9fr)]">
+              <div className="space-y-4 text-sm leading-7" style={{ color: "var(--text-secondary)" }}>
+                {paragraphs.map((paragraph) => (
+                  <p key={paragraph}>{paragraph}</p>
+                ))}
+              </div>
+              <div className="rounded-2xl border p-5" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
+                <p className="text-xs font-semibold uppercase tracking-widest text-brand-orange">Quick facts</p>
+                <div className="mt-4 space-y-3 text-sm">
+                  {[
+                    { label: "Symbol", value: symbol },
+                    { label: "Genesis date", value: detail?.genesis_date ?? "Unavailable" },
+                    { label: "Hashing algorithm", value: detail?.hashing_algorithm ?? "Unavailable" },
+                    {
+                      label: "Categories",
+                      value: detail?.categories?.filter(Boolean).slice(0, 3).join(", ") || "Unavailable",
+                    },
+                    { label: "Total supply", value: totalSupply ? `${fmtSupply(totalSupply)} ${symbol}` : "Unavailable" },
+                  ].map((item) => (
+                    <div key={item.label} className="flex items-start justify-between gap-3 border-b pb-3 last:border-0 last:pb-0" style={{ borderColor: "var(--border)" }}>
+                      <span style={{ color: "var(--text-muted)" }}>{item.label}</span>
+                      <span className="text-right font-semibold" style={{ color: "var(--text-primary)" }}>{item.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section id="about" className="rounded-3xl border p-6 md:p-8" style={{ background: "var(--card-bg)", borderColor: "var(--border)" }}>
+            <p className="text-xs font-semibold uppercase tracking-widest text-brand-orange">About</p>
+            <h2 className="mt-2 font-display text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
+              What readers should know about {name}
+            </h2>
+            <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-3">
+              {[
+                {
+                  title: "Price action",
+                  text: `${name} is currently trading at ${fmtPrice(currentPrice)}, with a 24-hour move of ${fmtPercent(dayChange)}.`,
+                },
+                {
+                  title: "Market depth",
+                  text: `CoinLineup is tracking a market cap of ${fmtCompact(marketCap)} and 24-hour trading volume of ${fmtCompact(volume)} for ${symbol}.`,
+                },
+                {
+                  title: "Supply profile",
+                  text: supply ? `Current circulating supply is about ${fmtSupply(supply)} ${symbol}${maxSupply ? ` with a max supply of ${fmtSupply(maxSupply)} ${symbol}.` : "."}` : "Supply data is currently limited for this asset.",
+                },
+              ].map((card) => (
+                <div key={card.title} className="rounded-2xl border p-5" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
+                  <h3 className="font-display text-lg font-bold" style={{ color: "var(--text-primary)" }}>
+                    {card.title}
+                  </h3>
+                  <p className="mt-3 text-sm leading-7" style={{ color: "var(--text-secondary)" }}>
+                    {card.text}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section id="faq" className="rounded-3xl border p-6 md:p-8" style={{ background: "var(--card-bg)", borderColor: "var(--border)" }}>
+            <p className="text-xs font-semibold uppercase tracking-widest text-brand-orange">FAQ</p>
+            <h2 className="mt-2 font-display text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
+              Common questions about {name}
+            </h2>
+            <div className="mt-5 space-y-4">
+              {[
+                {
+                  q: `What is the current ${name} price?`,
+                  a: `${name} is currently trading around ${fmtPrice(currentPrice)} based on the latest market snapshot available to CoinLineup.`,
+                },
+                {
+                  q: `How much volume is ${name} trading?`,
+                  a: `The tracked 24-hour volume is about ${fmtCompact(volume)}. High volume usually means stronger short-term market activity.`,
+                },
+                {
+                  q: `Where can I research ${name} further?`,
+                  a: `Use the official links, explorer references, and methodology notes on this page, then compare them against broader market news and primary project sources.`,
+                },
+              ].map((item) => (
+                <div key={item.q} className="rounded-2xl border p-5" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
+                  <h3 className="font-display text-lg font-bold" style={{ color: "var(--text-primary)" }}>
+                    {item.q}
+                  </h3>
+                  <p className="mt-2 text-sm leading-7" style={{ color: "var(--text-secondary)" }}>
+                    {item.a}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </section>
+        </div>
+
+        <aside className="space-y-6">
+          <CoinPriceConverter coinName={name} coinSymbol={symbol} priceUsd={currentPrice} />
+
+          <div className="rounded-2xl border p-5" style={{ background: "var(--card-bg)", borderColor: "var(--border)" }}>
+            <p className="text-xs font-semibold uppercase tracking-widest text-brand-orange">Official resources</p>
+            <div className="mt-4 space-y-3">
+              {homepage ? <ResourceLink href={homepage} icon={<Globe size={14} />} label="Official website" /> : null}
+              {explorer ? <ResourceLink href={explorer} icon={<Layers3 size={14} />} label="Blockchain explorer" /> : null}
+              {forum ? <ResourceLink href={forum} icon={<Newspaper size={14} />} label="Community or forum" /> : null}
+              {github ? <ResourceLink href={github} icon={<Github size={14} />} label="GitHub repository" /> : null}
+              {!homepage && !explorer && !forum && !github ? (
+                <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
+                  External project resources are not available in the current data snapshot.
+                </p>
+              ) : null}
+            </div>
+          </div>
+
+          <div className="rounded-2xl border p-5" style={{ background: "var(--card-bg)", borderColor: "var(--border)" }}>
+            <p className="text-xs font-semibold uppercase tracking-widest text-brand-orange">Related markets</p>
+            <div className="mt-4 space-y-3">
+              {relatedCoins.map((item) => (
+                <Link
+                  key={item.id}
+                  href={`/markets/${item.id}`}
+                  className="flex items-center justify-between gap-3 rounded-xl border px-4 py-3 hover:border-brand-orange"
+                  style={{ borderColor: "var(--border)", background: "var(--surface)" }}
+                >
+                  <div>
+                    <p className="font-display font-bold text-sm" style={{ color: "var(--text-primary)" }}>
+                      {item.name}
+                    </p>
+                    <p className="text-xs uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
+                      {item.symbol}
+                    </p>
+                  </div>
+                  <span className={`text-sm font-semibold ${item.price_change_percentage_24h >= 0 ? "price-up" : "price-down"}`}>
+                    {fmtPercent(item.price_change_percentage_24h)}
+                  </span>
+                </Link>
+              ))}
+            </div>
+            <Link href="/markets" className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-brand-orange">
+              View all markets <ArrowRight size={14} />
+            </Link>
+          </div>
+
+          <div className="rounded-2xl border p-5" style={{ background: "var(--card-bg)", borderColor: "var(--border)" }}>
+            <p className="text-xs font-semibold uppercase tracking-widest text-brand-orange">Editorial note</p>
+            <p className="mt-3 text-sm leading-7" style={{ color: "var(--text-secondary)" }}>
+              CoinLineup uses public market data feeds for these pages. Prices, supply figures, and rankings can move quickly, so use this page as a live snapshot rather than a final trading or investment decision document.
+            </p>
+          </div>
+        </aside>
       </div>
     </div>
   );
