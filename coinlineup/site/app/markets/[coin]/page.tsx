@@ -194,6 +194,15 @@ interface MarketVenueRow {
   change24h: number;
 }
 
+interface SupportedPlatformRow {
+  tradingAs: string;
+  tokenStandard: string;
+  builtOn: string;
+  contractAddress: string;
+  launchDate: string;
+  geckoUrl?: string;
+}
+
 function getMarketVenueRows(name: string, symbol: string, priceUsd: number, change24h: number): MarketVenueRow[] {
   const usdRows = [
     { exchange: "Binance", benchmark: "AA", quoteCurrency: "USDT", codeSuffix: "USDT", priceOffset: 0.0008, changeOffset: 0.05 },
@@ -244,6 +253,83 @@ function getExchangeLogoSrc(exchange: string): string | null {
     default:
       return null;
   }
+}
+
+function formatPlatformName(value: string): string {
+  return value
+    .split("-")
+    .filter(Boolean)
+    .map((part) => {
+      if (part.length <= 4) return part.toUpperCase();
+      return part.charAt(0).toUpperCase() + part.slice(1);
+    })
+    .join(" ");
+}
+
+function inferTokenStandard(platformId: string, contractAddress: string): string {
+  if (!contractAddress || contractAddress === "Native asset") return "Native";
+
+  const normalized = platformId.toLowerCase();
+  if (normalized === "ethereum" || normalized === "base" || normalized === "arbitrum-one" || normalized === "optimistic-ethereum" || normalized === "avalanche" || normalized === "celo" || normalized === "world-chain" || normalized === "zksync" || normalized === "sei-v2" || normalized === "morph-l2" || normalized === "sonic" || normalized === "ink" || normalized === "unichain" || normalized === "xdc-network" || normalized === "hyperevm" || normalized === "plume-network") {
+    return "ERC-20";
+  }
+  if (normalized === "binance-smart-chain" || normalized === "binancecoin") return "BEP20";
+  if (normalized === "polygon-pos") return "POL";
+  if (normalized === "solana") return "SPL";
+  if (normalized === "tron") return "TRC-20";
+  if (normalized === "stellar") return "Stellar asset";
+  if (normalized === "xrp") return "XRPL issued token";
+  if (normalized === "aptos") return "Aptos token";
+  if (normalized === "sui") return "Sui object";
+  if (normalized === "algorand") return "ASA";
+  if (normalized === "hedera-hashgraph") return "HTS";
+  if (normalized === "near-protocol") return "NEP-141";
+  if (normalized === "injective") return "CW20";
+  if (normalized === "polkadot") return "Parachain asset";
+  return "Token";
+}
+
+function inferNativeNetwork(detailId: string, name: string): string {
+  const normalized = detailId.toLowerCase();
+  if (normalized === "bitcoin") return "Bitcoin";
+  if (normalized === "ethereum") return "Ethereum";
+  if (normalized === "ripple") return "XRP Ledger";
+  if (normalized === "solana") return "Solana";
+  if (normalized === "binancecoin") return "BNB Chain";
+  if (normalized === "cardano") return "Cardano";
+  if (normalized === "avalanche-2") return "Avalanche";
+  if (normalized === "polkadot") return "Polkadot";
+  if (normalized === "dogecoin") return "Dogecoin";
+  if (normalized === "chainlink") return "Ethereum";
+  return name;
+}
+
+function getSupportedPlatformRows(detail: Awaited<ReturnType<typeof getCoinDetail>>, symbol: string): SupportedPlatformRow[] {
+  const detailPlatforms = detail?.detail_platforms ?? {};
+  const entries = Object.entries(detailPlatforms).filter(
+    ([platformId, platformDetail]) => platformId && !!platformDetail?.contract_address
+  );
+
+  if (entries.length > 0) {
+    return entries.slice(0, 8).map(([platformId, platformDetail]) => ({
+      tradingAs: symbol,
+      tokenStandard: inferTokenStandard(platformId, platformDetail.contract_address ?? ""),
+      builtOn: formatPlatformName(platformId),
+      contractAddress: platformDetail.contract_address ?? "Unavailable",
+      launchDate: detail?.genesis_date ?? "Unavailable",
+      geckoUrl: platformDetail.geckoterminal_url,
+    }));
+  }
+
+  return [
+    {
+      tradingAs: symbol,
+      tokenStandard: "Native",
+      builtOn: inferNativeNetwork(detail?.id ?? symbol, detail?.name ?? symbol),
+      contractAddress: "Native asset",
+      launchDate: detail?.genesis_date ?? "Unavailable",
+    },
+  ];
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -360,6 +446,7 @@ export default async function CoinPage({ params }: Props) {
     { label: "All-time low", value: atl ? `${fmtPrice(atl)} (${fmtPercent(atlLift)})` : "Unavailable" },
   ];
   const venueRows = getMarketVenueRows(name, symbol, currentPrice, dayChange);
+  const supportedPlatformRows = getSupportedPlatformRows(detail, symbol);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
@@ -522,6 +609,100 @@ export default async function CoinPage({ params }: Props) {
                     </div>
                   );
                 })}
+              </div>
+            </div>
+          </section>
+
+          <section className="rounded-3xl border p-6 md:p-8" style={{ background: "var(--card-bg)", borderColor: "var(--border)" }}>
+            <div className="mb-5 flex items-center justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-widest text-brand-orange">Supported platforms</p>
+                <h2 className="font-display text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
+                  {name} supported platforms
+                </h2>
+              </div>
+              <span className="rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wider" style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}>
+                Onchain references
+              </span>
+            </div>
+
+            <div className="overflow-hidden rounded-2xl border" style={{ borderColor: "var(--border)" }}>
+              <div
+                className="hidden grid-cols-[110px_130px_120px_minmax(0,1fr)_110px] gap-4 border-b px-5 py-3 text-[11px] font-semibold uppercase tracking-widest lg:grid"
+                style={{ borderColor: "var(--border)", background: "var(--surface)", color: "var(--text-muted)" }}
+              >
+                <span>Trading As</span>
+                <span>Token Standard</span>
+                <span>Built On</span>
+                <span>Smart Contract Address</span>
+                <span className="text-right">Launch Date</span>
+              </div>
+
+              <div>
+                {supportedPlatformRows.map((row) => (
+                  <div
+                    key={`${row.builtOn}-${row.contractAddress}`}
+                    className="grid grid-cols-1 gap-3 border-b px-5 py-4 last:border-0 lg:grid-cols-[110px_130px_120px_minmax(0,1fr)_110px] lg:items-center"
+                    style={{ borderColor: "var(--border)", background: "var(--surface)" }}
+                  >
+                    <div>
+                      <p className="text-[11px] font-semibold uppercase tracking-widest lg:hidden" style={{ color: "var(--text-muted)" }}>
+                        Trading As
+                      </p>
+                      <p className="font-display text-sm font-bold" style={{ color: "var(--text-primary)" }}>
+                        {row.tradingAs}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="text-[11px] font-semibold uppercase tracking-widest lg:hidden" style={{ color: "var(--text-muted)" }}>
+                        Token Standard
+                      </p>
+                      <span className="inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold uppercase tracking-wider" style={{ borderColor: "var(--border)", color: "var(--text-secondary)", background: "var(--card-bg)" }}>
+                        {row.tokenStandard}
+                      </span>
+                    </div>
+
+                    <div>
+                      <p className="text-[11px] font-semibold uppercase tracking-widest lg:hidden" style={{ color: "var(--text-muted)" }}>
+                        Built On
+                      </p>
+                      <p className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
+                        {row.builtOn}
+                      </p>
+                    </div>
+
+                    <div className="min-w-0">
+                      <p className="text-[11px] font-semibold uppercase tracking-widest lg:hidden" style={{ color: "var(--text-muted)" }}>
+                        Smart Contract Address
+                      </p>
+                      {row.geckoUrl ? (
+                        <a
+                          href={row.geckoUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="block truncate text-sm font-semibold text-brand-orange hover:underline"
+                          title={row.contractAddress}
+                        >
+                          {row.contractAddress}
+                        </a>
+                      ) : (
+                        <p className="truncate text-sm font-semibold" title={row.contractAddress} style={{ color: "var(--text-primary)" }}>
+                          {row.contractAddress}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="text-left lg:text-right">
+                      <p className="text-[11px] font-semibold uppercase tracking-widest lg:hidden" style={{ color: "var(--text-muted)" }}>
+                        Launch Date
+                      </p>
+                      <p className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
+                        {row.launchDate}
+                      </p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </section>

@@ -25,6 +25,16 @@ export interface CoinDetail {
   id: string;
   symbol: string;
   name: string;
+  asset_platform_id?: string | null;
+  platforms?: Record<string, string>;
+  detail_platforms?: Record<
+    string,
+    {
+      decimal_place?: number | null;
+      contract_address?: string;
+      geckoterminal_url?: string;
+    }
+  >;
   image?: {
     thumb?: string;
     small?: string;
@@ -102,6 +112,9 @@ export async function getCoinDetail(id: string): Promise<CoinDetail | null> {
       id: fallback.id,
       symbol: fallback.symbol,
       name: fallback.name,
+      asset_platform_id: null,
+      platforms: {},
+      detail_platforms: {},
       image: { small: fallback.image, large: fallback.image },
       description: {
         en: `${fallback.name} is one of the tracked crypto assets on CoinLineup. This fallback profile includes live market metrics and a simplified description while external API detail is unavailable.`,
