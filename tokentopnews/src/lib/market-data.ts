@@ -98,7 +98,7 @@ export async function fetchCoinChart(
   }
 
   if (days === "max") {
-    return fetchCoinChartFiveYearRange(coinId);
+    return fetchBitcoinYahooMaxChart();
   }
 
   const response = await fetch(
@@ -130,27 +130,40 @@ async function fetchCoinChartRange(
   return data.prices;
 }
 
-async function fetchCoinChartFiveYearRange(coinId: string): Promise<[number, number][]> {
-  const now = Math.floor(Date.now() / 1000);
-  const year = 365 * 24 * 60 * 60;
-  const merged: [number, number][] = [];
+async function fetchBitcoinYahooMaxChart(): Promise<[number, number][]> {
+  const response = await fetch(
+    "https://query1.finance.yahoo.com/v8/finance/chart/BTC-USD?range=5y&interval=1wk",
+    {
+      headers: {
+        "User-Agent": "Mozilla/5.0",
+      },
+    },
+  );
 
-  for (let index = 5; index > 0; index -= 1) {
-    const from = now - index * year;
-    const to = index === 1 ? now : now - (index - 1) * year;
-    const segment = await fetchCoinChartRange(coinId, from, to);
-    for (const point of segment) {
-      const previous = merged[merged.length - 1];
-
-      if (previous && previous[0] === point[0]) {
-        continue;
-      }
-
-      merged.push(point);
-    }
+  if (!response.ok) {
+    throw new Error("Yahoo max chart fetch failed");
   }
 
-  return merged;
+  const data = (await response.json()) as {
+    chart?: {
+      result?: Array<{
+        timestamp?: number[];
+        indicators?: {
+          quote?: Array<{
+            close?: Array<number | null>;
+          }>;
+        };
+      }>;
+    };
+  };
+
+  const result = data.chart?.result?.[0];
+  const timestamps = result?.timestamp ?? [];
+  const closes = result?.indicators?.quote?.[0]?.close ?? [];
+
+  return timestamps
+    .map((timestamp, index) => [timestamp * 1000, closes[index]] as const)
+    .filter((point): point is [number, number] => typeof point[1] === "number");
 }
 
 export async function fetchBitcoinBinanceChart(days: string): Promise<[number, number][]> {
