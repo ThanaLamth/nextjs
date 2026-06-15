@@ -17,7 +17,12 @@ const COIN_META: Record<string, { name: string; symbol: string; description: str
   xrp: { name: "XRP", symbol: "XRP", description: "Track XRP price, market cap, volume, and the latest XRP news and analysis." },
 };
 
-const COIN_EDITORIAL: Record<string, { summary: string; pillars: [string, string, string] }> = {
+const COIN_EDITORIAL: Record<string, {
+  summary: string;
+  pillars: [string, string, string];
+  supportedStandards?: string[];
+  industries?: string[];
+}> = {
   bitcoin: {
     summary:
       "Bitcoin is the largest and most widely followed crypto asset in the market. Readers typically watch it as both a macro risk barometer and the benchmark asset that influences broader sentiment across altcoins, exchange flows, and institutional allocation.",
@@ -26,6 +31,8 @@ const COIN_EDITORIAL: Record<string, { summary: string; pillars: [string, string
       "Its market dominance matters because strong Bitcoin moves often ripple across majors and altcoins, changing risk appetite across the whole crypto market.",
       "Readers should track price, market cap, volume, supply scarcity, and headline catalysts together instead of reading any one metric in isolation.",
     ],
+    supportedStandards: ["BRC-20"],
+    industries: ["Payment"],
   },
   ethereum: {
     summary:
@@ -35,6 +42,8 @@ const COIN_EDITORIAL: Record<string, { summary: string; pillars: [string, string
       "Because ETH sits at the center of many DeFi and token ecosystems, its price often reflects both macro crypto sentiment and application-layer activity.",
       "Readers should watch volume, market cap, supply dynamics, and narrative shifts around Layer 2s, fees, and staking alongside the headline price.",
     ],
+    supportedStandards: ["ERC-20", "ERC-721"],
+    industries: ["Smart Contracts", "DeFi"],
   },
   ripple: {
     summary:
@@ -44,6 +53,7 @@ const COIN_EDITORIAL: Record<string, { summary: string; pillars: [string, string
       "Its price behavior is often more headline-sensitive than that of some other large-cap assets, which makes news flow especially important.",
       "Readers should pair live price and volume data with legal, exchange, and liquidity context before drawing conclusions from short-term moves.",
     ],
+    industries: ["Payments"],
   },
 };
 
@@ -138,6 +148,8 @@ function getEditorialProfile(id: string, name: string, symbol: string, marketCap
       `Short-term moves in ${symbol} can reflect market-wide risk appetite, exchange liquidity, project-specific headlines, and broader narrative shifts affecting the sector it belongs to.`,
       `Readers should combine live market data, external project resources, and recent editorial coverage before treating any single price move as a durable signal.`,
     ] as [string, string, string],
+    supportedStandards: [],
+    industries: [],
   };
 }
 
@@ -241,8 +253,10 @@ export default async function CoinPage({ params }: Props) {
   const paragraphs = lead.match(/[^.!?]+[.!?]+/g)?.slice(0, 3) ?? [lead];
 
   const homepage = detail?.links?.homepage?.find(Boolean);
+  const whitepaper = detail?.links?.whitepaper;
   const explorer = detail?.links?.blockchain_site?.find(Boolean);
   const forum = detail?.links?.official_forum_url?.find(Boolean);
+  const subreddit = detail?.links?.subreddit_url;
   const github = detail?.links?.repos_url?.github?.find(Boolean);
   const relatedCoins = topCoins.filter((item) => item.id !== (fallbackCoin?.id ?? normalizedCoinId)).slice(0, 4);
   const newsQueries = [...new Set([name, symbol].filter(Boolean))];
@@ -253,6 +267,16 @@ export default async function CoinPage({ params }: Props) {
     .filter((article) => article.category !== "Page")
     .filter((article, index, array) => array.findIndex((candidate) => candidate.id === article.id) === index)
     .slice(0, 4);
+  const infoSections = [
+    { label: "Websites", values: homepage ? [homepage] : [] },
+    { label: "Whitepaper", values: whitepaper ? [whitepaper] : [] },
+    { label: "Block explorers", values: explorer ? [explorer] : [] },
+    { label: "Repositories", values: github ? [github] : [] },
+    { label: "Hashing algorithm", values: detail?.hashing_algorithm ? [detail.hashing_algorithm] : [] },
+    { label: "Supported standards", values: editorial.supportedStandards ?? [] },
+    { label: "Industries", values: editorial.industries ?? [] },
+    { label: "Communities", values: subreddit ? [subreddit] : forum ? [forum] : [] },
+  ].filter((section) => section.values.length > 0);
 
   const stats = [
     { label: "Market cap", value: fmtCompact(marketCap) },
@@ -430,6 +454,48 @@ export default async function CoinPage({ params }: Props) {
                 </div>
               ))}
             </div>
+          </section>
+
+          <section className="rounded-3xl border p-6 md:p-8" style={{ background: "var(--card-bg)", borderColor: "var(--border)" }}>
+            <p className="text-xs font-semibold uppercase tracking-widest text-brand-orange">Coin information</p>
+            <h2 className="mt-2 font-display text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
+              {name} information
+            </h2>
+            {infoSections.length > 0 ? (
+              <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
+                {infoSections.map((section) => (
+                  <div key={section.label} className="rounded-2xl border p-5" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
+                    <p className="text-xs font-semibold uppercase tracking-widest text-brand-orange">
+                      {section.label}
+                    </p>
+                    <div className="mt-3 space-y-2 text-sm">
+                      {section.values.map((value) => {
+                        const isLink = value.startsWith("http://") || value.startsWith("https://");
+                        return isLink ? (
+                          <a
+                            key={value}
+                            href={value}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="block break-all text-brand-orange hover:underline"
+                          >
+                            {value.replace(/^https?:\/\//, "").replace(/\/$/, "")}
+                          </a>
+                        ) : (
+                          <p key={value} style={{ color: "var(--text-secondary)" }}>
+                            {value}
+                          </p>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="mt-4 text-sm" style={{ color: "var(--text-secondary)" }}>
+                Structured project information is limited in the current data snapshot.
+              </p>
+            )}
           </section>
 
           <section className="rounded-3xl border p-6 md:p-8" style={{ background: "var(--card-bg)", borderColor: "var(--border)" }}>

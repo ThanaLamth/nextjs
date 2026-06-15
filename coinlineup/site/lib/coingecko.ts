@@ -38,8 +38,10 @@ export interface CoinDetail {
   categories?: string[];
   links?: {
     homepage?: string[];
+    whitepaper?: string;
     blockchain_site?: string[];
     official_forum_url?: string[];
+    subreddit_url?: string | null;
     repos_url?: {
       github?: string[];
     };
@@ -126,8 +128,10 @@ export async function getCoinDetail(id: string): Promise<CoinDetail | null> {
       },
       links: {
         homepage: [],
+        whitepaper: "",
         blockchain_site: [],
         official_forum_url: [],
+        subreddit_url: "",
         repos_url: { github: [] },
       },
     };
