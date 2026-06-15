@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { TrendingUp, TrendingDown, Star } from "lucide-react";
-import type { CoinPrice } from "@/lib/coingecko";
+import { getCoinMarketHref, type CoinPrice } from "@/lib/coingecko";
 
 function fmt(price: number): string {
   if (price >= 1000) return "$" + price.toLocaleString("en-US", { maximumFractionDigits: 0 });
@@ -90,7 +90,7 @@ function MarketPanel({ title, icon, iconColor, coins, sortKey, viewHref }: Panel
               className="grid grid-cols-12 items-center px-4 py-2 border-t hover:bg-brand-orange/5 transition-colors"
               style={{ borderColor: "var(--border)" }}>
               <span className="col-span-1 text-xs font-bold" style={{ color: "var(--text-muted)" }}>{i + 1}</span>
-              <div className="col-span-5 flex items-center gap-2">
+              <Link href={getCoinMarketHref(coin)} className="col-span-5 flex items-center gap-2 min-w-0 hover:opacity-85 transition-opacity">
                 <div className="relative w-6 h-6 flex-shrink-0">
                   <Image src={coin.image} alt={coin.name} fill className="rounded-full object-cover" sizes="24px" />
                 </div>
@@ -100,7 +100,7 @@ function MarketPanel({ title, icon, iconColor, coins, sortKey, viewHref }: Panel
                   </p>
                   <p className="text-[10px] truncate" style={{ color: "var(--text-muted)" }}>{coin.name}</p>
                 </div>
-              </div>
+              </Link>
               <span className="col-span-3 text-xs font-display font-bold text-right" style={{ color: "var(--text-primary)" }}>
                 {fmt(coin.current_price)}
               </span>

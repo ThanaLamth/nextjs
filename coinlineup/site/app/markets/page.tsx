@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { TrendingUp, TrendingDown, BarChart2, Activity, DollarSign } from "lucide-react";
-import { getTopCoins, MOCK_COINS, type CoinPrice } from "@/lib/coingecko";
+import { getCoinMarketHref, getTopCoins, MOCK_COINS, type CoinPrice } from "@/lib/coingecko";
 
 export const metadata: Metadata = { title: "Markets — Live Crypto Prices" };
 
@@ -88,10 +89,10 @@ export default async function MarketsPage() {
                 <div className="relative w-7 h-7 flex-shrink-0">
                   <Image src={coin.image} alt={coin.name} fill className="rounded-full object-cover" sizes="28px" />
                 </div>
-                <div className="flex-1">
+                <Link href={getCoinMarketHref(coin)} className="flex-1 min-w-0 hover:opacity-85 transition-opacity">
                   <p className="font-display font-bold text-white text-sm">{coin.symbol.toUpperCase()}</p>
                   <p className="text-brand-gray-50 text-xs">{fmt(coin.current_price)}</p>
-                </div>
+                </Link>
                 <span className="text-brand-green font-bold text-sm">+{coin.price_change_percentage_24h.toFixed(2)}%</span>
               </div>
             ))}
@@ -109,10 +110,10 @@ export default async function MarketsPage() {
                 <div className="relative w-7 h-7 flex-shrink-0">
                   <Image src={coin.image} alt={coin.name} fill className="rounded-full object-cover" sizes="28px" />
                 </div>
-                <div className="flex-1">
+                <Link href={getCoinMarketHref(coin)} className="flex-1 min-w-0 hover:opacity-85 transition-opacity">
                   <p className="font-display font-bold text-white text-sm">{coin.symbol.toUpperCase()}</p>
                   <p className="text-brand-gray-50 text-xs">{fmt(coin.current_price)}</p>
-                </div>
+                </Link>
                 <span className="text-brand-red font-bold text-sm">{coin.price_change_percentage_24h.toFixed(2)}%</span>
               </div>
             ))}
@@ -155,10 +156,10 @@ export default async function MarketsPage() {
                         <div className="relative w-8 h-8 flex-shrink-0">
                           <Image src={coin.image} alt={coin.name} fill className="rounded-full object-cover" sizes="32px" />
                         </div>
-                        <div>
+                        <Link href={getCoinMarketHref(coin)} className="block hover:opacity-85 transition-opacity">
                           <p className="font-display font-bold text-white text-sm">{coin.name}</p>
                           <p className="text-brand-gray-50 text-xs uppercase">{coin.symbol}</p>
-                        </div>
+                        </Link>
                       </div>
                     </td>
                     <td className="px-4 py-3 text-right font-display font-bold text-white">{fmt(coin.current_price)}</td>

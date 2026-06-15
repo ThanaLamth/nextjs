@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { TrendingUp, TrendingDown } from "lucide-react";
 import { motion } from "framer-motion";
-import type { CoinPrice } from "@/lib/coingecko";
+import { getCoinMarketHref, type CoinPrice } from "@/lib/coingecko";
 
 function SparkLine({ prices }: { prices: number[] }) {
   if (!prices || prices.length < 2) return null;
@@ -42,7 +42,7 @@ export default function MarketMiniCard({ coin, index }: { coin: CoinPrice; index
   return (
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.04 }}>
       <Link
-        href={`/markets#${coin.id}`}
+        href={getCoinMarketHref(coin)}
         className="flex items-center gap-3 p-3 rounded-xl transition-all group border"
         style={{ background: "var(--card-bg)", borderColor: "var(--border)" }}
         onMouseEnter={(e) => {

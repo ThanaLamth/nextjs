@@ -1,7 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { TrendingUp, TrendingDown } from "lucide-react";
+import { getCoinMarketHref } from "@/lib/coingecko";
 
 interface TickerCoin {
   id: string;
@@ -76,7 +78,11 @@ export default function CryptoTicker() {
           {doubled.map((coin, i) => {
             const up = coin.price_change_percentage_24h >= 0;
             return (
-              <span key={`${coin.id}-${i}`} className="inline-flex items-center gap-2 px-5 cursor-default select-none">
+              <Link
+                key={`${coin.id}-${i}`}
+                href={getCoinMarketHref(coin.id)}
+                className="inline-flex items-center gap-2 px-5 select-none hover:opacity-85 transition-opacity"
+              >
                 <span className="font-display font-bold" style={{ color: "var(--text-primary)" }}>
                   {coin.symbol}
                 </span>
@@ -86,7 +92,7 @@ export default function CryptoTicker() {
                   {up ? "+" : ""}{coin.price_change_percentage_24h?.toFixed(2)}%
                 </span>
                 <span style={{ color: "var(--border-hover)" }}>·</span>
-              </span>
+              </Link>
             );
           })}
         </div>

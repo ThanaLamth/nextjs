@@ -40,6 +40,11 @@ export async function getGlobalData() {
   }
 }
 
+export function getCoinMarketHref(coin: Pick<CoinPrice, "id"> | string): string {
+  const id = typeof coin === "string" ? coin : coin.id;
+  return `/markets/${id}`;
+}
+
 // Fallback mock data if API fails
 export const MOCK_COINS: CoinPrice[] = [
   { id: "bitcoin", symbol: "btc", name: "Bitcoin", current_price: 104250, price_change_percentage_24h: 2.34, market_cap: 2060000000000, total_volume: 38000000000, image: "https://coin-images.coingecko.com/coins/images/1/large/bitcoin.png", market_cap_rank: 1, high_24h: 105800, low_24h: 101200, circulating_supply: 19700000 },

@@ -12,6 +12,17 @@ const COIN_META: Record<string, { name: string; symbol: string; description: str
   xrp: { name: "XRP", symbol: "XRP", description: "Track XRP price, market cap, volume, and the latest XRP news and analysis." },
 };
 
+function formatCoinSlug(value: string): string {
+  return value
+    .split("-")
+    .filter(Boolean)
+    .map((part) => {
+      if (part.length <= 4) return part.toUpperCase();
+      return part.charAt(0).toUpperCase() + part.slice(1);
+    })
+    .join(" ");
+}
+
 interface Props {
   params: Promise<{ coin: string }>;
 }
@@ -19,7 +30,7 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { coin } = await params;
   const meta = COIN_META[coin];
-  const name = meta?.name ?? coin.toUpperCase();
+  const name = meta?.name ?? formatCoinSlug(coin);
   return { title: `${name} Price & Analysis — CoinLineup` };
 }
 
@@ -49,7 +60,7 @@ async function CoinContent({ params }: Props) {
            c.id.toLowerCase() === coin.toLowerCase()
   );
 
-  const name = meta?.name ?? coin.toUpperCase();
+  const name = coinData?.name ?? meta?.name ?? formatCoinSlug(coin);
   const up = (coinData?.price_change_percentage_24h ?? 0) >= 0;
 
   return (
