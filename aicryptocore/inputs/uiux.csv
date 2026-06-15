@@ -1,0 +1,298 @@
+﻿,,,,,,,,,,,
+No,Area,Screenshot,Issue ,Recommendation,Design,Dev,Note,,,,
+1,Homepage Structure,,"- Biến homepage thành các category nhóm mới
+",,"- Hero + Signal Map giữ top
+- Sau đó chia section theo từng category
+- Mỗi section = 1 intent rõ","- Refactor data query theo category slug
+- API trả về theo từng cluster
+- Không dùng global latest feed","Chuyển homepage thành category-driven layout (AI Agents, AI Infrastructure , AI Trading, AI Data, AI Ecosystem)",,,,
+2,Hero Section,,Giữ hero nhưng bổ sung  thêm time ,,"- 1 big visual + 1 title + 1 CTA
+- Remove noise (meta dư)
+- Focus narrative AI x Crypto","- Hero lấy từ “featured insight” flag
+- CMS thêm field: featured = true",Chuyển hero thành Insight-driven (1 narrative chính),,,,
+3,Content Hierarchy,,"Content đang lẫn lộn (news, tools, categories không rõ tầng)",,"- AI Agents section
+- AI Infra section
+- AI Trading section
+- AI Data section
+- AI Ecosystem section","- Query theo category slug + subcategory
+- Mỗi section load 4–6 bài",Map lại thành category sections riêng biệt,,,,
+4,Duplicate Content,,"Layout cũ rời rạc, icon không đồng nhất, thiếu CTA và use-case rõ ràng",,"- Không render 1 bài 2 lần
+- Priority: Hero > Category > More News","- Add ID tracking
+- Exclude article đã render",Áp dụng dedup logic toàn page,,Website gốc ,Hình mẫu minh họa ,
+5,Category System,,"Sidebar dài, nhiều block không cần thiết, UX nặng, không prioritize nội dung",,"- Tầng 1: AI Agents, Infra, Trading…
+- Tầng 2: DeFi Agents, Trading Agents…",- Build taxonomy 2 level,Chuyển thành Top Tabs + Sub Tabs,,,,
+6,Sidebar UX,,"Duplicate content với các section phía trên, không có logic phân tầng nội dung",,"- AI Stack Navigator
+- Narrative Tracker
+- Why it matters","- Remove widget cũ (search, latest posts)
+- Replace bằng signal modules",Chuyển thành Insight Sidebar,,,,
+7,Footer,,"Footer nhiều link nhưng thiếu cấu trúc rõ, chưa tối ưu SEO & trust",,"- About + Category + Resources
+- Newsletter CTA
+- Social icons","- Clean menu
+- Remove duplicate links
+- Add structured footer schema",Chuyển thành Footer chuẩn (Data + SEO + Trust),,,,
+8,Signal Layer,Chưa có ,"Homepage chưa có “core intelligence”, chỉ là content",,"- 5 signal cards (Momentum, Infra, Data, Narrative, Capital)
+- Mini chart + trạng thái (Strong, Hot…)","- API trả về metrics real-time
+- Có thể mock trước → replace sau",Thêm AI × Crypto Signal Map làm feature chính,,,,
+9,Trust Layer,Chưa có ,Nội dung không có trust signal → user khó đánh giá chất lượng,,"- Badge nhỏ trên card (Research-backed, On-chain…)
+- Color + icon rõ ràng","- CMS thêm field: trust_type[]
+- Render dynamic badges",Thêm Content Trust Layer (badge system),,"TEXT THEO TỪNG SECTION NẾU IMAGE BỊ MỜ QUÁ 
+1. HEADER
+AI Crypto 
+ AI × CRYPTO INTELLIGENCE
+Menu:
+  AI Agents 
+  AI Infrastructure 
+  AI Trading 
+  AI Data 
+  AI Ecosystem 
+ 
+CTA:
+  Sign in 
+ 
+2. HERO – FEATURED INSIGHT
+FEATURED INSIGHT
+Autonomous agents are reshaping the future of on-chain coordination
+AI agents are evolving from simple tools into autonomous systems that execute, transact and create real economic value.
+CTA:
+ Read Full Insight →
+3. AI × CRYPTO SIGNAL MAP
+AI × CRYPTO SIGNAL MAP
+ Updated just now
+  Agent Momentum → 78 (+12.4%) → Strong 
+  Infra Expansion → 72 (+8.7%) → Strong 
+  Data Reliability → 64 (+5.1%) → Moderate 
+  Narrative Heat → 81 (+15.6%) → Very Hot 
+  Capital Activity → 69 (+6.3%) → Strong 
+ 
+Metrics:
+  Active Projects → 2,847 (+18.3%) 
+  On-chain AI Txns (7D) → 1.24M (+22.7%) 
+  AI Protocols Tracked → 468 (+14.1%) 
+  Funding (30D) → $412M (+31.4%) 
+  Partnerships (30D) → 147 (+27.6%) 
+ 
+4. AI STACK NAVIGATOR
+AI STACK NAVIGATOR
+  Application Layer
+ AI apps and user experiences 
+  Agent Layer
+ Autonomous agents & workflows 
+  Data Layer
+ Datasets, indexing & oracles 
+  Compute Layer
+ Compute, GPUs & decentralization 
+  Execution Layer
+ Settlement, rollups & infra 
+  Security Layer
+ Security, identity & trust 
+ 
+CTA:
+ View All Layers
+5. CONTENT TRUST LAYER
+CONTENT TRUST LAYER
+  Research-backed
+ Evidence & data driven 
+  On-chain Evidence
+ Verified on-chain activity 
+  Use-case Driven
+ Real world applications 
+  Infra Relevant
+ Core infrastructure impact 
+  Early Narrative
+ Emerging opportunities 
+  Opinion Sensitive
+ Analyst perspective 
+ 
+6. CATEGORY TABS (TẦNG 1 + TẦNG 2)
+Tầng 1:
+  AI Agents → 1,324 articles 
+  AI Infrastructure → 1,201 articles 
+  AI Trading → 1,045 articles 
+  AI Data → 896 articles 
+  AI Ecosystem → 1,287 articles 
+ 
+Tầng 2 (AI Agents đang active):
+  All AI Agents 
+  DeFi Agents 
+  Trading Agents 
+  On-chain Agents 
+  Economy 
+ 
+Sort:
+  Latest 
+ 
+7. TOP INSIGHTS IN AI AGENTS
+TOP INSIGHTS IN AI AGENTS
+ CTA: View all insights →
+Card 1
+AI AGENTS | On-chain Agents
+ElizaOS V2 brings modular memory and on-chain execution
+ElizaOS introduces a plugin architecture for persistent memory and autonomous transactions.
+Apr 20 • 6 min read
+Card 2
+AI AGENTS | DeFi Agents
+DeFi agents are optimizing yields across multiple protocols
+Autonomous agents monitor markets and rebalance positions 24/7 to maximize risk-adjusted returns.
+Apr 19 • 7 min read
+Card 3
+AI AGENTS | Trading Agents
+Trading agents learn faster with on-chain reinforcement
+On-chain data enables agents to train on real outcomes instead of synthetic backtests.
+Apr 18 • 5 min read
+Card 4
+AI AGENTS | Economy
+Agent economies are forming new market structures
+Token incentives and reputation systems align agents with long-term network growth.
+Apr 17 • 6 min read
+8. PROJECT MATURITY DISTRIBUTION
+PROJECT MATURITY DISTRIBUTION IN AI AGENTS
+ CTA: View all projects →
+  Concept → 240 projects
+ Early stage ideas and research 
+  Early Build → 612 projects
+ MVPs and testnets in development 
+  Live Product → 834 projects
+ Live products with real users 
+  Ecosystem Expanding → 712 projects
+ Growing integrations and usage 
+  Adoption Watching → 489 projects
+ Monitoring traction and risk 
+ 
+9. AI TOOLS SPOTLIGHT
+AI TOOLS SPOTLIGHT
+  AgentKit
+ No-code agent framework for web3 builders
+ Tag: AGENT TOOLING 
+  RAG3
+ Web3-native RAG engine for on-chain data
+ Tag: DATA 
+  OxScope
+ On-chain AI analytics & agent intelligence
+ Tag: ANALYTICS 
+  Compute Horde
+ Decentralized GPU network for AI workloads
+ Tag: COMPUTE 
+ 
+CTA:
+ View all tools →
+10. USE CASE RADAR
+USE CASE RADAR – AI AGENTS
+Axes:
+  Real Users 
+  Transactions 
+  Infra Readiness 
+  Composability 
+  Security 
+  Monetization Potential 
+ 
+Legend:
+  Current State 
+  Potential 
+ 
+11. EVIDENCE DENSITY GUIDE
+EVIDENCE DENSITY GUIDE
+  High Evidence
+ Strong on-chain and product signals 
+  Medium Evidence
+ Some proof, more data needed 
+  Low Evidence
+ Limited signals, higher uncertainty 
+ 
+12. NARRATIVE LIFECYCLE TRACKER
+NARRATIVE LIFECYCLE TRACKER
+  AI Agents → Accelerating 
+  DeFi Agents → Accelerating 
+  Trading Agents → Accelerating 
+  On-chain Agents → Emerging 
+  Agent Economy → Crowded 
+ 
+CTA:
+ View Full Tracker
+13. WHY THIS MATTERS TO OPERATORS
+WHY THIS MATTERS TO OPERATORS
+  For Traders
+ Agent activity is driving new liquidity flows and alpha surfaces 
+  For Builders
+ Composable AI infra unlocks new onchain use cases 
+  For Researchers
+ Better data + models = stronger onchain intelligence 
+  For Allocators
+ Infrastructure maturity is becoming a key allocation signal 
+ 
+CTA:
+ View All Insights
+14. AGENT WATCHLIST
+AGENT WATCHLIST
+  ElizaOS → On-chain Agents → 2h ago 
+  Aether Net → Infra / Compute → 5h ago 
+  Spectral → On-chain Agents → 8h ago 
+  Autonolas → On-chain Agents → 12h ago 
+  Fetch.ai → Ecosystem / Agents → 1d ago 
+ 
+CTA:
+ View all →
+15. BRIEF SECTION
+STAY AHEAD WITH AI × CRYPTO BRIEFS
+  Daily Brief
+ Top signals, narratives & news curated daily
+ Subscribe → 
+  Builder Brief
+ Infra updates, tools, and technical deep dives
+ Subscribe → 
+  Signal Brief
+ High conviction signals and trend analysis
+ Subscribe → 
+ 
+16. FOOTER STRIP (VALUE PROPS)
+  On-chain Data
+ Indexed from 50+ chains 
+  AI Signal Engine
+ Pattern detection & scoring 
+  Research Framework
+ Multi-layer validation 
+  Transparent Methodology
+ Evidence over narratives 
+  Community Driven
+ Built with operator feedback 
+ 
+17. FOOTER
+AI Crypto Hub
+ AI × Crypto intelligence hub for operators, builders, researchers and allocators.
+Explore
+  AI Agents 
+  AI Infrastructure 
+  AI Trading 
+  AI Data 
+  AI Ecosystem 
+ 
+Resources
+  Research 
+  Reports 
+  Guides 
+  Newsletter 
+  API 
+ 
+Company
+  About Us 
+  Careers 
+  Contact 
+  Advertise 
+  Privacy Policy 
+ 
+Newsletter CTA
+Join 18,742+ subscribers
+ Get the best AI × Crypto insights straight to your inbox
+Field: Enter your email
+ Button: Subscribe",,
+10,"
+Content Card",Chưa có ,"Card hiện tại giống blog, thiếu context",,"- Tag chính (AI Agents)
+- Tag phụ (Trading Agents…)","- Map category_slug + sub_slug
+- Không hardcode",Bắt buộc mỗi card có Category + Subcategory,,,,
+11,"
+Data Layer",Chưa có ,Thiếu layer phân tích,,"- Radar chart (SVG)
+- Maturity cards
+- Evidence guide","- Render bằng SVG/Canvas
+- Data có thể static phase đầu",Thêm Radar + Maturity + Evidence,,,,
+12,Identity Feature,Chưa có ,Site chưa có “signature feature” riêng,,"- List project + trend mini chart
+- Update time (2h ago…)","- API list project + simple trend data
+- Cache nhẹ",Thêm Agent Watchlist,,,,

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <rect width="32" height="32" rx="8" fill="#053D30"/>
+  <path d="M16 4 L28 10 L28 18 C28 24 22 28 16 30 C10 28 4 24 4 18 L4 10 Z" fill="#14B8A6" opacity="0.2" stroke="#14B8A6" stroke-width="1.5"/>
+  <text x="16" y="21" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="700" font-size="11" fill="#CCFBF1">AIC</text>
+</svg>

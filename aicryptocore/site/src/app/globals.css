@@ -1,0 +1,292 @@
+@import "tailwindcss";
+
+@theme {
+  /* ── MIDNIGHT TEAL PALETTE ── */
+
+  /* Primary — Teal */
+  --color-teal-50:  #F0FDF9;
+  --color-teal-100: #CCFBF1;
+  --color-teal-200: #99F6E4;
+  --color-teal-300: #5EEAD4;
+  --color-teal-400: #2DD4BF;
+  --color-teal-500: #14B8A6;
+  --color-teal-600: #0F8A6E;
+  --color-teal-700: #0A6652;
+  --color-teal-800: #085041;
+  --color-teal-900: #053D30;
+  --color-teal-950: #032B22;
+
+  /* Accent — Amber/Gold */
+  --color-amber-50:  #FFFBEB;
+  --color-amber-100: #FEF3C7;
+  --color-amber-200: #FDE68A;
+  --color-amber-300: #FCD34D;
+  --color-amber-400: #F59E0B;
+  --color-amber-500: #D97706;
+  --color-amber-600: #B45309;
+  --color-amber-700: #854F0B;
+  --color-amber-800: #633806;
+  --color-amber-900: #412402;
+  --color-amber-950: #271500;
+
+  /* Foundation — Navy */
+  --color-navy-950: #050D1A;
+  --color-navy-900: #0A1628;
+  --color-navy-800: #0F2040;
+  --color-navy-700: #162C55;
+  --color-navy-600: #1E3A6E;
+
+  /* Price indicators */
+  --color-price-up:   #22C55E;
+  --color-price-down: #EF4444;
+  --color-warning:    #F59E0B;
+  --color-info:       #2563EB;
+  --color-premium:    #8B5CF6;
+
+  /* ── FONTS ── */
+  --font-display: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-ui:      'Inter', system-ui, sans-serif;
+  --font-body:    'Lora', Georgia, serif;
+  --font-mono:    'JetBrains Mono', 'Fira Code', monospace;
+
+  /* ── SPACING (base-4) ── */
+  --spacing-1:  4px;
+  --spacing-2:  8px;
+  --spacing-3:  12px;
+  --spacing-4:  16px;
+  --spacing-5:  20px;
+  --spacing-6:  24px;
+  --spacing-8:  32px;
+  --spacing-10: 40px;
+  --spacing-12: 48px;
+  --spacing-16: 64px;
+  --spacing-20: 80px;
+  --spacing-24: 96px;
+
+  /* ── SHADOWS ── */
+  --shadow-sm:    0 2px 4px rgba(0,0,0,0.3);
+  --shadow-md:    0 4px 12px rgba(0,0,0,0.4);
+  --shadow-lg:    0 8px 24px rgba(0,0,0,0.5);
+  --shadow-brand: 0 4px 16px rgba(20,184,166,0.25);
+  --shadow-amber: 0 4px 16px rgba(245,158,11,0.20);
+
+  /* ── TRANSITIONS ── */
+  --transition-fast:   150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow:   400ms ease;
+}
+
+/* ── BASE RESET ── */
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    background-color: #053D30;
+    color: #CCFBF1;
+    font-family: var(--font-ui);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: #053D30;
+    color: #CCFBF1;
+    min-height: 100vh;
+  }
+
+  /* Selection */
+  ::selection {
+    background-color: rgba(20, 184, 166, 0.3);
+    color: #CCFBF1;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #053D30; }
+  ::-webkit-scrollbar-thumb { background: #0A6652; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #0F8A6E; }
+
+  /* Focus ring */
+  :focus-visible {
+    outline: 2px solid #2DD4BF;
+    outline-offset: 2px;
+  }
+}
+
+/* ── UTILITIES ── */
+@layer utilities {
+  .focus-ring {
+    outline: none;
+  }
+  .focus-ring:focus-visible {
+    outline: 2px solid #2DD4BF;
+    outline-offset: 2px;
+  }
+}
+
+/* ── TICKER ANIMATION ── */
+@keyframes ticker-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.ticker-track {
+  display: inline-flex;
+  animation: ticker-scroll 40s linear infinite;
+  white-space: nowrap;
+}
+
+.ticker-wrap {
+  overflow: hidden;
+  width: 100%;
+}
+
+.ticker-track:hover {
+  animation-play-state: paused;
+}
+
+/* ── ARTICLE PROSE ── */
+.prose-aicrypto {
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.75;
+  color: #CCFBF1;
+  max-width: 680px;
+}
+
+.prose-aicrypto h2 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 700;
+  color: #F0FDF9;
+  margin: 2em 0 0.75em;
+  border-bottom: 1px solid rgba(45, 212, 191, 0.15);
+  padding-bottom: 0.5em;
+}
+
+.prose-aicrypto h3 {
+  font-family: var(--font-ui);
+  font-size: 20px;
+  font-weight: 600;
+  color: #CCFBF1;
+  margin: 1.5em 0 0.5em;
+}
+
+.prose-aicrypto p {
+  margin: 1em 0;
+}
+
+.prose-aicrypto a {
+  color: #2DD4BF;
+  text-decoration: underline;
+  text-decoration-color: rgba(45, 212, 191, 0.4);
+  transition: color 150ms ease;
+}
+
+.prose-aicrypto a:hover {
+  color: #F59E0B;
+}
+
+.prose-aicrypto blockquote {
+  border-left: 4px solid #14B8A6;
+  background: #085041;
+  padding: 1rem 1.25rem;
+  border-radius: 0 8px 8px 0;
+  color: #99F6E4;
+  font-style: italic;
+  margin: 1.5em 0;
+}
+
+.prose-aicrypto code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  background: #085041;
+  color: #FCD34D;
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+}
+
+.prose-aicrypto pre {
+  background: #085041;
+  border: 1px solid rgba(45, 212, 191, 0.15);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  margin: 1.5em 0;
+}
+
+.prose-aicrypto pre code {
+  background: none;
+  padding: 0;
+  font-size: 0.875em;
+  color: #99F6E4;
+}
+
+.prose-aicrypto table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5em 0;
+}
+
+.prose-aicrypto th {
+  background: #085041;
+  color: #99F6E4;
+  font-family: var(--font-ui);
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(45, 212, 191, 0.3);
+}
+
+.prose-aicrypto td {
+  border-bottom: 1px solid rgba(45, 212, 191, 0.15);
+  padding: 10px 12px;
+}
+
+.prose-aicrypto strong {
+  color: #FCD34D;
+  font-weight: 700;
+}
+
+.prose-aicrypto hr {
+  border: none;
+  border-top: 1px solid rgba(45, 212, 191, 0.15);
+  margin: 2em 0;
+}
+
+.prose-aicrypto ul {
+  list-style: disc;
+  padding-left: 1.5em;
+  margin: 1em 0;
+}
+
+.prose-aicrypto ol {
+  list-style: decimal;
+  padding-left: 1.5em;
+  margin: 1em 0;
+}
+
+.prose-aicrypto li {
+  margin: 0.5em 0;
+}
+
+/* ── REDUCED MOTION ── */
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track { animation: none; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── LIGHT MODE (for theme toggle) ── */
+.light body {
+  background-color: #F0FDF9;
+  color: #053D30;
+}
+
+.light .ticker-wrap {
+  background-color: #CCFBF1;
+}
