@@ -135,6 +135,10 @@ function stripHtml(html: string | undefined): string {
     .trim();
 }
 
+function formatUrl(url: string): string {
+  return url.replace(/^https?:\/\//, "").replace(/^www\./, "").replace(/\/$/, "");
+}
+
 function getEditorialProfile(id: string, name: string, symbol: string, marketCap: number | undefined, volume: number | undefined) {
   const profile = COIN_EDITORIAL[id];
   if (profile) {
@@ -252,12 +256,26 @@ export default async function CoinPage({ params }: Props) {
     `Track ${name} with live market pricing, supply metrics, and reference resources for quick research on CoinLineup.`;
   const paragraphs = lead.match(/[^.!?]+[.!?]+/g)?.slice(0, 3) ?? [lead];
 
-  const homepage = detail?.links?.homepage?.find(Boolean);
-  const whitepaper = detail?.links?.whitepaper;
-  const explorer = detail?.links?.blockchain_site?.find(Boolean);
-  const forum = detail?.links?.official_forum_url?.find(Boolean);
-  const subreddit = detail?.links?.subreddit_url;
-  const github = detail?.links?.repos_url?.github?.find(Boolean);
+  const websites = detail?.links?.homepage?.filter(Boolean) ?? [];
+  const whitepapers = detail?.links?.whitepaper ? [detail.links.whitepaper] : [];
+  const explorers = detail?.links?.blockchain_site?.filter(Boolean) ?? [];
+  const githubs = detail?.links?.repos_url?.github?.filter(Boolean) ?? [];
+  const communities = [
+    detail?.links?.subreddit_url,
+    ...(detail?.links?.official_forum_url ?? []),
+  ].filter((link): link is string => !!link);
+
+  const infoSections = [
+    { label: websites.length > 1 ? "Websites" : "Website", values: websites },
+    { label: whitepapers.length > 1 ? "Whitepapers" : "Whitepaper", values: whitepapers },
+    { label: explorers.length > 1 ? "Block explorers" : "Block explorer", values: explorers },
+    { label: githubs.length > 1 ? "Repositories" : "Repository", values: githubs },
+    { label: communities.length > 1 ? "Communities" : "Community", values: communities },
+    { label: "Hashing algorithm", values: detail?.hashing_algorithm ? [detail.hashing_algorithm] : [] },
+    { label: "Supported standards", values: editorial.supportedStandards ?? [] },
+    { label: "Industries", values: editorial.industries ?? [] },
+  ].filter((section) => section.values.length > 0);
+
   const relatedCoins = topCoins.filter((item) => item.id !== (fallbackCoin?.id ?? normalizedCoinId)).slice(0, 4);
   const newsQueries = [...new Set([name, symbol].filter(Boolean))];
   const relatedNewsRaw = (
@@ -267,16 +285,6 @@ export default async function CoinPage({ params }: Props) {
     .filter((article) => article.category !== "Page")
     .filter((article, index, array) => array.findIndex((candidate) => candidate.id === article.id) === index)
     .slice(0, 4);
-  const infoSections = [
-    { label: "Websites", values: homepage ? [homepage] : [] },
-    { label: "Whitepaper", values: whitepaper ? [whitepaper] : [] },
-    { label: "Block explorers", values: explorer ? [explorer] : [] },
-    { label: "Repositories", values: github ? [github] : [] },
-    { label: "Hashing algorithm", values: detail?.hashing_algorithm ? [detail.hashing_algorithm] : [] },
-    { label: "Supported standards", values: editorial.supportedStandards ?? [] },
-    { label: "Industries", values: editorial.industries ?? [] },
-    { label: "Communities", values: subreddit ? [subreddit] : forum ? [forum] : [] },
-  ].filter((section) => section.values.length > 0);
 
   const stats = [
     { label: "Market cap", value: fmtCompact(marketCap) },
@@ -456,46 +464,41 @@ export default async function CoinPage({ params }: Props) {
             </div>
           </section>
 
-          <section className="rounded-3xl border p-6 md:p-8" style={{ background: "var(--card-bg)", borderColor: "var(--border)" }}>
-            <p className="text-xs font-semibold uppercase tracking-widest text-brand-orange">Coin information</p>
+          <section id="resources" className="rounded-3xl border p-6 md:p-8" style={{ background: "var(--card-bg)", borderColor: "var(--border)" }}>
+            <p className="text-xs font-semibold uppercase tracking-widest text-brand-orange">Resources & Information</p>
             <h2 className="mt-2 font-display text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
-              {name} information
+              {name} resources & details
             </h2>
-            {infoSections.length > 0 ? (
-              <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
-                {infoSections.map((section) => (
-                  <div key={section.label} className="rounded-2xl border p-5" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
-                    <p className="text-xs font-semibold uppercase tracking-widest text-brand-orange">
-                      {section.label}
-                    </p>
-                    <div className="mt-3 space-y-2 text-sm">
-                      {section.values.map((value) => {
-                        const isLink = value.startsWith("http://") || value.startsWith("https://");
-                        return isLink ? (
-                          <a
-                            key={value}
-                            href={value}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="block break-all text-brand-orange hover:underline"
-                          >
-                            {value.replace(/^https?:\/\//, "").replace(/\/$/, "")}
-                          </a>
-                        ) : (
-                          <p key={value} style={{ color: "var(--text-secondary)" }}>
-                            {value}
-                          </p>
-                        );
-                      })}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="mt-4 text-sm" style={{ color: "var(--text-secondary)" }}>
-                Structured project information is limited in the current data snapshot.
-              </p>
-            )}
+            <div className="mt-6 overflow-hidden rounded-2xl border" style={{ borderColor: "var(--border)" }}>
+              {infoSections.map((section) => (
+                <div key={section.label} className="grid grid-cols-1 sm:grid-cols-[200px_1fr] border-b last:border-0 px-6 py-4" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
+                  <dt className="text-xs font-semibold uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>
+                    {section.label}
+                  </dt>
+                  <dd className="mt-2 sm:mt-0 flex flex-wrap gap-x-6 gap-y-2">
+                    {section.values.map((value, i) => {
+                      const isLink = value.startsWith("http://") || value.startsWith("https://");
+                      return isLink ? (
+                        <a
+                          key={`${value}-${i}`}
+                          href={value}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm font-semibold text-brand-orange hover:underline break-all flex items-center gap-1"
+                        >
+                          {formatUrl(value)}
+                          <ExternalLink size={12} className="opacity-50" />
+                        </a>
+                      ) : (
+                        <span key={`${value}-${i}`} className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
+                          {value}
+                        </span>
+                      );
+                    })}
+                  </dd>
+                </div>
+              ))}
+            </div>
           </section>
 
           <section className="rounded-3xl border p-6 md:p-8" style={{ background: "var(--card-bg)", borderColor: "var(--border)" }}>
@@ -551,21 +554,6 @@ export default async function CoinPage({ params }: Props) {
 
         <aside className="space-y-6">
           <CoinPriceConverter coinName={name} coinSymbol={symbol} priceUsd={currentPrice} />
-
-          <div className="rounded-2xl border p-5" style={{ background: "var(--card-bg)", borderColor: "var(--border)" }}>
-            <p className="text-xs font-semibold uppercase tracking-widest text-brand-orange">Official resources</p>
-            <div className="mt-4 space-y-3">
-              {homepage ? <ResourceLink href={homepage} icon={<Globe size={14} />} label="Official website" /> : null}
-              {explorer ? <ResourceLink href={explorer} icon={<Layers3 size={14} />} label="Blockchain explorer" /> : null}
-              {forum ? <ResourceLink href={forum} icon={<Newspaper size={14} />} label="Community or forum" /> : null}
-              {github ? <ResourceLink href={github} icon={<Github size={14} />} label="GitHub repository" /> : null}
-              {!homepage && !explorer && !forum && !github ? (
-                <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
-                  External project resources are not available in the current data snapshot.
-                </p>
-              ) : null}
-            </div>
-          </div>
 
           <div className="rounded-2xl border p-5" style={{ background: "var(--card-bg)", borderColor: "var(--border)" }}>
             <p className="text-xs font-semibold uppercase tracking-widest text-brand-orange">Related markets</p>
