@@ -2,27 +2,25 @@ import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { ArticleGrid } from '@/components/article/ArticleGrid'
 import { Sidebar } from '@/components/layout/Sidebar'
-import { getCategoryBySlug, CATEGORY_SLUGS } from '@/lib/categories'
+import { getNavigationCategories, getRuntimeCategoryBySlug } from '@/lib/categories.server'
 import { getArticlesByCategory, getTrendingArticles } from '@/lib/content'
 import { SITE_NAME } from '@/lib/constants'
 import type { CategorySlug } from '@/types/category'
 
 export const revalidate = 900
-export const dynamicParams = false
 
 interface PageProps {
   params: Promise<{ category: string }>
 }
 
 export async function generateStaticParams() {
-  return CATEGORY_SLUGS.filter(
-    (s) => s !== 'sponsored-articles' && s !== 'press-release'
-  ).map((slug) => ({ category: slug }))
+  const categories = await getNavigationCategories()
+  return categories.map((category) => ({ category: category.slug }))
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { category: categorySlug } = await params
-  const category = getCategoryBySlug(categorySlug)
+  const category = await getRuntimeCategoryBySlug(categorySlug)
   if (!category) return {}
   return {
     title: `${category.label} News & Analysis`,
@@ -33,7 +31,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function CategoryPage({ params }: PageProps) {
   const { category: categorySlug } = await params
-  const category = getCategoryBySlug(categorySlug)
+  const category = await getRuntimeCategoryBySlug(categorySlug)
 
   if (!category) notFound()
 

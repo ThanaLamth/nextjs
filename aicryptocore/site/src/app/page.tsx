@@ -12,7 +12,7 @@ import {
   getArticlesByCategory,
   getTrendingArticles,
 } from '@/lib/content'
-import { CATEGORIES } from '@/lib/categories'
+import { getNavigationCategories } from '@/lib/categories.server'
 
 export const revalidate = 300
 export const metadata = {
@@ -22,26 +22,26 @@ export const metadata = {
 }
 
 export default async function HomePage() {
-  const [allArticles, featuredArticles, trendingArticles] = await Promise.all([
+  const [allArticles, featuredArticles, trendingArticles, categories] = await Promise.all([
     getAllArticles(),
     getFeaturedArticles(1),
     getTrendingArticles(5),
+    getNavigationCategories(),
   ])
   const featuredArticle = featuredArticles[0]
+  const categoryCounts = new Map(categories.map((category) => [category.slug, category.count ?? 0]))
 
-  const mainCategories = CATEGORIES.filter(
-    (c) => c.slug !== 'sponsored-articles' && c.slug !== 'press-release'
-  )
+  const mainCategories = categories.filter((category) => category.slug !== 'press-release')
 
   const recentArticles = allArticles
     .filter((a) => a.slug !== featuredArticle?.slug)
     .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
 
   const statBoxes = [
-    { label: 'News', count: allArticles.filter((a) => a.category === 'news').length + 68, color: '#5EEAD4', bg: 'rgba(20,184,166,0.12)' },
-    { label: 'Altcoins', count: allArticles.filter((a) => a.category === 'altcoin-insights').length + 44, color: '#93C5FD', bg: 'rgba(147,197,253,0.10)' },
-    { label: 'AI Tools', count: allArticles.filter((a) => a.category === 'crypto-ai-tools').length + 79, color: '#FCD34D', bg: 'rgba(252,211,77,0.10)' },
-    { label: 'Mining', count: allArticles.filter((a) => a.category === 'mining').length + 36, color: '#C4B5FD', bg: 'rgba(196,181,253,0.10)' },
+    { label: 'News', count: categoryCounts.get('news') ?? 0, color: '#5EEAD4', bg: 'rgba(20,184,166,0.12)' },
+    { label: 'Altcoins', count: categoryCounts.get('altcoin-insights') ?? 0, color: '#93C5FD', bg: 'rgba(147,197,253,0.10)' },
+    { label: 'AI Tools', count: categoryCounts.get('crypto-ai-tools') ?? 0, color: '#FCD34D', bg: 'rgba(252,211,77,0.10)' },
+    { label: 'Mining', count: categoryCounts.get('mining') ?? 0, color: '#C4B5FD', bg: 'rgba(196,181,253,0.10)' },
   ]
 
   const platformStats = [
@@ -52,8 +52,10 @@ export default async function HomePage() {
   ]
 
   const gridArticles = recentArticles.slice(0, 4)
-  const altcoinInsights = await getArticlesByCategory('altcoin-insights', 4)
-  const topProjects = await getArticlesByCategory('top-projects', 4)
+  const [altcoinInsights, topProjects] = await Promise.all([
+    getArticlesByCategory('altcoin-insights', 4),
+    getArticlesByCategory('top-projects', 4),
+  ])
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
@@ -101,7 +103,7 @@ export default async function HomePage() {
       </div>
 
       {/* ── CATEGORY NAV PILLS ── */}
-      <CategoryNavRow />
+      <CategoryNavRow categories={categories} />
 
       {/* ── MAIN 2-COL ── */}
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_268px] gap-7">

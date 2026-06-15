@@ -1,102 +1,64 @@
 import type { Article } from '@/types/article'
-import MOCK_ARTICLES from '@/lib/mockArticles'
+import {
+  getLatestArticles as getLatestWordPressArticles,
+  getPostBySlug,
+  getPostsByCategorySlug,
+  getRelatedPosts,
+  searchPosts,
+} from '@/lib/wp'
 
-function withHref(article: Article): Article {
-  return {
-    ...article,
-    href: `/${article.category}/${article.slug}`,
-    seo: {
-      ...article.seo,
-      canonicalUrl: `https://aicryptocore.com/${article.category}/${article.slug}`,
-    },
-  }
-}
-
-const ARTICLES = MOCK_ARTICLES.map(withHref)
-
-function sortByPublishedDate(articles: Article[]) {
-  return [...articles].sort(
-    (left, right) => new Date(right.publishedAt).getTime() - new Date(left.publishedAt).getTime()
-  )
-}
-
-export async function getAllArticles(limit?: number): Promise<Article[]> {
-  const articles = sortByPublishedDate(ARTICLES)
-  return typeof limit === 'number' ? articles.slice(0, limit) : articles
+export async function getAllArticles(limit = 100): Promise<Article[]> {
+  return getLatestWordPressArticles(limit)
 }
 
 export async function getArticleBySlug(category: string, slug: string): Promise<Article | undefined> {
-  return ARTICLES.find((article) => article.category === category && article.slug === slug)
+  const article = await getPostBySlug(slug)
+
+  if (!article || article.category !== category) {
+    return undefined
+  }
+
+  return article
 }
 
 export async function getArticleByFlatSlug(slug: string): Promise<Article | undefined> {
-  return ARTICLES.find((article) => article.slug === slug)
+  return getPostBySlug(slug)
 }
 
 export async function getArticlesByCategory(category: string, limit = 24): Promise<Article[]> {
-  return sortByPublishedDate(ARTICLES.filter((article) => article.category === category)).slice(0, limit)
+  return getPostsByCategorySlug(category, limit)
 }
 
-export async function getArticlesBySubcategory(subcategory: string, limit = 24): Promise<Article[]> {
-  return sortByPublishedDate(ARTICLES.filter((article) => article.subcategory === subcategory)).slice(0, limit)
+export async function getArticlesBySubcategory(_subcategory: string, _limit = 24): Promise<Article[]> {
+  void _subcategory
+  void _limit
+  return []
 }
 
 export async function getFeaturedArticles(count = 1): Promise<Article[]> {
-  return sortByPublishedDate(ARTICLES.filter((article) => article.featured)).slice(0, count)
+  return getLatestWordPressArticles(count)
 }
 
 export async function getLatestArticles(count = 6): Promise<Article[]> {
-  return sortByPublishedDate(ARTICLES).slice(0, count)
+  return getLatestWordPressArticles(count)
 }
 
 export async function getRelatedArticles(article: Article, count = 3): Promise<Article[]> {
-  return ARTICLES.filter(
-    (candidate) =>
-      candidate.slug !== article.slug &&
-      (candidate.category === article.category ||
-        candidate.subcategory === article.subcategory ||
-        candidate.tags.some((tag) => article.tags.includes(tag)))
-  ).slice(0, count)
+  return getRelatedPosts(article, count)
 }
 
-export async function getSponsoredArticles(): Promise<Article[]> {
-  return sortByPublishedDate(ARTICLES.filter((article) => article.sponsored))
+export async function getSponsoredArticles(limit = 24): Promise<Article[]> {
+  return getPostsByCategorySlug('sponsored-articles', limit)
 }
 
 export async function getPressReleaseArticles(limit = 24): Promise<Article[]> {
-  return sortByPublishedDate(ARTICLES.filter((article) => article.pressRelease)).slice(0, limit)
+  return getPostsByCategorySlug('press-release', limit)
 }
 
 export async function getTrendingArticles(count = 5): Promise<Article[]> {
-  return sortByPublishedDate(ARTICLES).slice(0, count)
+  return getLatestWordPressArticles(count)
 }
 
 export async function searchDemoArticles(query: string, category?: string, limit = 24): Promise<Article[]> {
-  const normalizedQuery = query.trim().toLowerCase()
-  let articles = ARTICLES
-
-  if (category && category !== 'all') {
-    articles = articles.filter((article) => article.category === category)
-  }
-
-  if (!normalizedQuery) {
-    return sortByPublishedDate(articles).slice(0, limit)
-  }
-
-  const matches = articles.filter((article) =>
-    [
-      article.title,
-      article.description,
-      article.author.name,
-      article.category,
-      article.subcategory,
-      ...article.tags,
-    ]
-      .filter(Boolean)
-      .join(' ')
-      .toLowerCase()
-      .includes(normalizedQuery)
-  )
-
-  return sortByPublishedDate(matches).slice(0, limit)
+  return searchPosts(query, category, limit)
 }

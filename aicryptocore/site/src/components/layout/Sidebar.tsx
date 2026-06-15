@@ -2,28 +2,16 @@ import Link from 'next/link'
 import type { Article } from '@/types/article'
 import { TrendingUp } from 'lucide-react'
 import { getCategoryDisplayLabel } from '@/lib/categories'
+import { getNavigationCategories } from '@/lib/categories.server'
 import { MarketPricesWidget } from '@/components/data/MarketPricesWidget'
 
 interface SidebarProps {
   trendingArticles: Article[]
 }
 
-/* ── All categories (matches Footer Explore) ── */
-const ALL_CATEGORIES = [
-  { label: 'Altcoin Insights',  href: '/altcoin-insights'  },
-  { label: 'Blockchain',        href: '/blockchain'        },
+export async function Sidebar({ trendingArticles }: SidebarProps) {
+  const categories = await getNavigationCategories()
 
-  { label: 'CMC',               href: '/cmc'               },
-  { label: 'Crypto AI Tools',   href: '/crypto-ai-tools'   },
-  { label: 'Crypto Investment', href: '/crypto-investment'  },
-  { label: 'Mining',            href: '/mining'            },
-  { label: 'News',              href: '/news'              },
-  { label: 'Press Release',     href: '/press-release'     },
-  { label: 'Scams & Security',  href: '/scams-security'    },
-  { label: 'Top Projects',      href: '/top-projects'      },
-]
-
-export function Sidebar({ trendingArticles }: SidebarProps) {
   return (
     <aside className="space-y-4">
 
@@ -69,13 +57,13 @@ export function Sidebar({ trendingArticles }: SidebarProps) {
       <div className="card-cosmic p-4">
         <p className="text-xs font-semibold uppercase tracking-widest text-[var(--color-text-secondary)] mb-3">Categories</p>
         <ul className="divide-y divide-white/[0.04]">
-          {ALL_CATEGORIES.map((cat) => (
-            <li key={cat.href}>
+          {categories.map((category) => (
+            <li key={category.slug}>
               <Link
-                href={cat.href}
+                href={`/${category.slug}`}
                 className="flex items-center justify-between py-2 text-xs text-[var(--color-text-secondary)] hover:text-[var(--color-text-teal)] transition-colors"
               >
-                {cat.label}
+                {category.label}
               </Link>
             </li>
           ))}

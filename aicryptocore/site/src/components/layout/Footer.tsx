@@ -2,10 +2,12 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { ExternalLink, Code2, Globe, Mail } from 'lucide-react'
 import { SITE_NAME, SITE_DESCRIPTION } from '@/lib/constants'
+import { getNavigationCategories } from '@/lib/categories.server'
 import { NewsletterForm } from '@/components/ui/NewsletterForm'
 
-export function Footer() {
+export async function Footer() {
   const year = 2026
+  const categories = await getNavigationCategories()
 
   return (
     <footer className="border-t border-white/[0.06] mt-16" style={{ background: 'rgba(10,10,15,0.9)' }}>
@@ -43,22 +45,13 @@ export function Footer() {
           <div className="lg:min-w-[140px]">
             <h3 className="text-sm font-semibold text-[var(--color-text-primary)] mb-3 uppercase tracking-wide">Explore</h3>
             <ul className="space-y-2">
-              {[
-                { label: 'Altcoin Insights',  href: '/altcoin-insights' },
-                { label: 'Blockchain',         href: '/blockchain' },
-
-                { label: 'CMC',                href: '/cmc' },
-                { label: 'Crypto AI Tools',    href: '/crypto-ai-tools' },
-                { label: 'Crypto Investment',  href: '/crypto-investment' },
-                { label: 'Mining',             href: '/mining' },
-                { label: 'News',               href: '/news' },
-                { label: 'Press Release',      href: '/press-release' },
-                { label: 'Scams & Security',   href: '/scams-security' },
-                { label: 'Top Projects',       href: '/top-projects' },
-              ].map((item) => (
-                <li key={item.href}>
-                  <Link href={item.href} className="text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-teal)] transition-colors">
-                    {item.label}
+              {categories.map((category) => (
+                <li key={category.slug}>
+                  <Link
+                    href={`/${category.slug}`}
+                    className="text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-teal)] transition-colors"
+                  >
+                    {category.label}
                   </Link>
                 </li>
               ))}

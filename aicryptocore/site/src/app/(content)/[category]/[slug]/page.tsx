@@ -7,24 +7,15 @@ import { RelatedArticles } from '@/components/article/RelatedArticles'
 import { ReadingProgress } from '@/components/article/ReadingProgress'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { ArticleJsonLd, BreadcrumbJsonLd } from '@/components/seo/JsonLd'
-import { getAllArticles, getArticleBySlug, getRelatedArticles, getTrendingArticles } from '@/lib/content'
-import { getCategoryBySlug } from '@/lib/categories'
+import { getArticleBySlug, getRelatedArticles, getTrendingArticles } from '@/lib/content'
+import { getRuntimeCategoryBySlug } from '@/lib/categories.server'
 import { generateArticleMetadata } from '@/lib/seo'
 import { SITE_URL } from '@/lib/constants'
 
 export const revalidate = 3600
-export const dynamicParams = false
 
 interface PageProps {
   params: Promise<{ category: string; slug: string }>
-}
-
-export async function generateStaticParams() {
-  const articles = await getAllArticles()
-  return articles.map((a) => ({
-    category: a.category,
-    slug: a.slug,
-  }))
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -44,7 +35,7 @@ export default async function ArticlePage({ params }: PageProps) {
     getRelatedArticles(article, 3),
     getTrendingArticles(5),
   ])
-  const category = getCategoryBySlug(catSlug)
+  const category = await getRuntimeCategoryBySlug(catSlug)
 
   const breadcrumbItems = [
     { name: category?.label ?? catSlug, url: `${SITE_URL}/${catSlug}` },

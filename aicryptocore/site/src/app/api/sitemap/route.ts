@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server'
 import { getAllArticles } from '@/lib/content'
-import { NAV_CATEGORIES } from '@/lib/categories'
+import { getNavigationCategories } from '@/lib/categories.server'
 import { SITE_URL } from '@/lib/constants'
 
 export async function GET() {
-  const articles = await getAllArticles()
+  const [articles, categories] = await Promise.all([getAllArticles(), getNavigationCategories()])
 
   const staticPages = [
     { url: SITE_URL, priority: '1.0', changefreq: 'hourly' },
@@ -14,8 +14,8 @@ export async function GET() {
     { url: `${SITE_URL}/press-release`, priority: '0.6', changefreq: 'daily' },
   ]
 
-  const categoryPages = NAV_CATEGORIES.map((cat) => ({
-    url: `${SITE_URL}/${cat.slug}`,
+  const categoryPages = categories.map((category) => ({
+    url: `${SITE_URL}/${category.slug}`,
     priority: '0.8',
     changefreq: 'hourly',
   }))
