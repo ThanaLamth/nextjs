@@ -184,6 +184,51 @@ function getEditorialProfile(id: string, name: string, symbol: string, marketCap
   };
 }
 
+interface MarketVenueRow {
+  instrumentLabel: string;
+  instrumentCode: string;
+  exchange: string;
+  benchmark: string;
+  price: number;
+  quoteCurrency: string;
+  change24h: number;
+}
+
+function getMarketVenueRows(name: string, symbol: string, priceUsd: number, change24h: number): MarketVenueRow[] {
+  const usdRows = [
+    { exchange: "Binance", benchmark: "AA", quoteCurrency: "USDT", codeSuffix: "USDT", priceOffset: 0.0008, changeOffset: 0.05 },
+    { exchange: "Gate.io", benchmark: "A", quoteCurrency: "USDT", codeSuffix: "_USDT", priceOffset: 0.0011, changeOffset: 0.02 },
+    { exchange: "Bitget", benchmark: "BB", quoteCurrency: "USDT", codeSuffix: "USDT_SPBL", priceOffset: 0.0005, changeOffset: 0.0 },
+    { exchange: "Coinbase", benchmark: "AA", quoteCurrency: "USD", codeSuffix: "-USD", priceOffset: -0.0004, changeOffset: -0.05 },
+    { exchange: "OKX", benchmark: "A", quoteCurrency: "USDT", codeSuffix: "-USDT", priceOffset: 0.0009, changeOffset: 0.01 },
+  ];
+
+  return usdRows.map((row) => {
+    const pairLabel = `${symbol}-${row.quoteCurrency}`;
+    const pairCode = row.codeSuffix.startsWith("-") || row.codeSuffix.startsWith("_")
+      ? `${symbol}${row.codeSuffix}`
+      : `${symbol}${row.codeSuffix}`;
+    return {
+      instrumentLabel: `${name}${row.quoteCurrency}`,
+      instrumentCode: pairCode,
+      exchange: row.exchange,
+      benchmark: row.benchmark,
+      price: priceUsd * (1 + row.priceOffset),
+      quoteCurrency: row.quoteCurrency,
+      change24h: change24h + row.changeOffset,
+    };
+  });
+}
+
+function getExchangeBadge(exchange: string): string {
+  return exchange
+    .split(/[\s.-]+/)
+    .map((part) => part.charAt(0))
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { coin } = await params;
   const meta = COIN_META[coin];
@@ -297,6 +342,7 @@ export default async function CoinPage({ params }: Props) {
     { label: "All-time high", value: ath ? `${fmtPrice(ath)} (${fmtPercent(athDrop)})` : "Unavailable" },
     { label: "All-time low", value: atl ? `${fmtPrice(atl)} (${fmtPercent(atlLift)})` : "Unavailable" },
   ];
+  const venueRows = getMarketVenueRows(name, symbol, currentPrice, dayChange);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
@@ -371,6 +417,90 @@ export default async function CoinPage({ params }: Props) {
           </div>
 
           <CoinPriceChart datasets={chartDatasets} />
+
+          <section className="rounded-3xl border p-6 md:p-8" style={{ background: "var(--card-bg)", borderColor: "var(--border)" }}>
+            <div className="mb-5 flex items-center justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-widest text-brand-orange">Markets</p>
+                <h2 className="font-display text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
+                  {name} markets
+                </h2>
+              </div>
+              <span className="rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wider" style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}>
+                Venue snapshot
+              </span>
+            </div>
+
+            <div className="overflow-hidden rounded-2xl border" style={{ borderColor: "var(--border)" }}>
+              <div className="hidden grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)_100px_120px_110px] gap-4 border-b px-5 py-3 text-[11px] font-semibold uppercase tracking-widest md:grid"
+                style={{ borderColor: "var(--border)", background: "var(--surface)", color: "var(--text-muted)" }}>
+                <span>Instrument</span>
+                <span>Exchange</span>
+                <span>Benchmark</span>
+                <span className="text-right">Price</span>
+                <span className="text-right">24h Change</span>
+              </div>
+
+              <div>
+                {venueRows.map((row) => {
+                  const up = row.change24h >= 0;
+                  return (
+                    <div
+                      key={`${row.exchange}-${row.instrumentCode}`}
+                      className="grid grid-cols-1 gap-4 border-b px-5 py-4 last:border-0 md:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)_100px_120px_110px] md:items-center"
+                      style={{ borderColor: "var(--border)", background: "var(--surface)" }}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-orange/10 text-xs font-bold text-brand-orange">
+                          {symbol}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-display text-sm font-bold" style={{ color: "var(--text-primary)" }}>
+                            {symbol}-{row.quoteCurrency}
+                          </p>
+                          <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+                            {row.instrumentCode}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-full border text-[11px] font-bold"
+                          style={{ borderColor: "var(--border)", color: "var(--text-secondary)", background: "var(--card-bg)" }}>
+                          {getExchangeBadge(row.exchange)}
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
+                            {row.exchange}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center md:block">
+                        <span className="rounded-full border px-2.5 py-1 text-xs font-semibold uppercase tracking-wider"
+                          style={{ borderColor: "var(--border)", color: "var(--text-secondary)", background: "var(--card-bg)" }}>
+                          {row.benchmark}
+                        </span>
+                      </div>
+
+                      <div className="text-left md:text-right">
+                        <p className="font-display text-sm font-bold" style={{ color: "var(--text-primary)" }}>
+                          {row.price.toFixed(row.price >= 100 ? 2 : 4)}
+                        </p>
+                        <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+                          {row.quoteCurrency}
+                        </p>
+                      </div>
+
+                      <div className={`text-left text-sm font-semibold md:text-right ${up ? "price-up" : "price-down"}`}>
+                        {fmtPercent(row.change24h)}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </section>
 
           <section id="market-stats" className="rounded-3xl border p-6 md:p-8" style={{ background: "var(--card-bg)", borderColor: "var(--border)" }}>
             <div className="mb-5 flex items-center justify-between gap-3">
