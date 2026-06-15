@@ -27,7 +27,6 @@ const PERIODS: Array<{ label: string; days: string; displayLabel: string }> = [
   { label: "24H", days: "1", displayLabel: "24H" },
   { label: "7D", days: "7", displayLabel: "1W" },
   { label: "30D", days: "30", displayLabel: "1M" },
-  { label: "1Y", days: "365", displayLabel: "1Y" },
 ];
 
 function imageBackground(image?: string) {
@@ -684,8 +683,8 @@ export function HomePageClient({
                   <svg viewBox="0 0 400 130" style={{ width: "100%", height: "100%" }} preserveAspectRatio="none">
                     <defs>
                       <linearGradient id="btcg" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#0f766e" stopOpacity="0.22" />
-                        <stop offset="100%" stopColor="#0f766e" stopOpacity="0" />
+                        <stop offset="0%" stopColor="#7b2ff7" stopOpacity="0.24" />
+                        <stop offset="100%" stopColor="#7b2ff7" stopOpacity="0" />
                       </linearGradient>
                     </defs>
                     {chartSnapshot.area ? <path d={chartSnapshot.area} fill="url(#btcg)" /> : null}
@@ -693,7 +692,7 @@ export function HomePageClient({
                       <path
                         d={chartSnapshot.line}
                         fill="none"
-                        stroke="#0f766e"
+                        stroke="#7b2ff7"
                         strokeWidth="2.4"
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -714,7 +713,7 @@ export function HomePageClient({
                           y1="0"
                           x2={hoveredPoint.x}
                           y2="130"
-                          stroke="rgba(15,118,110,0.22)"
+                          stroke="rgba(123,47,247,0.24)"
                           strokeWidth="1.2"
                           strokeDasharray="4 4"
                         />
@@ -723,7 +722,7 @@ export function HomePageClient({
                           cy={hoveredPoint.y}
                           r="4.5"
                           fill="#fff"
-                          stroke="#0f766e"
+                          stroke="#7b2ff7"
                           strokeWidth="2.5"
                         />
                       </>
