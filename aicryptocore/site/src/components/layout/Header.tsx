@@ -1,17 +1,31 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, User } from 'lucide-react'
 import { SearchBar } from '@/components/ui/SearchBar'
-import { NAV_CATEGORIES } from '@/lib/categories'
+import { ThemeToggle } from '@/components/ui/ThemeToggle'
+
+const NAV_ITEMS = [
+  { label: 'News',              href: '/news' },
+  { label: 'Altcoin Insights',  href: '/altcoin-insights' },
+
+  { label: 'Crypto AI Tools',   href: '/crypto-ai-tools' },
+  { label: 'Mining',            href: '/mining' },
+  { label: 'Top Projects',      href: '/top-projects' },
+  { label: 'Press Release',     href: '/press-release' },
+  { label: 'Blockchain',        href: '/blockchain' },
+  { label: 'Crypto Investment', href: '/crypto-investment' },
+  { label: 'Scams & Security',  href: '/scams-security' },
+]
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const pathname = usePathname()
+  const navRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     function handleScroll() {
@@ -21,16 +35,22 @@ export function Header() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMobileOpen(false)
+  }, [pathname])
+
   return (
     <>
       <header
-        className={`sticky top-0 z-40 h-16 flex items-center border-b transition-all duration-200 ${
-          scrolled
-            ? 'bg-[#032B22]/92 backdrop-blur-md border-teal-800/40'
-            : 'bg-[#032B22] border-teal-800/20'
+        className={`relative z-40 flex flex-col transition-all duration-200 bg-[var(--color-bg-nav)] backdrop-blur-md border-b border-black/10 dark:border-white/[0.05] ${
+          scrolled ? 'shadow-md' : ''
         }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 w-full flex items-center gap-4">
+        {/* Row 1: Logo & Utilities (Header Main) */}
+        <div className="h-16 w-full max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between gap-4">
+          
+          {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 shrink-0">
             <Image
               src="/logo/logo.png"
@@ -39,85 +59,124 @@ export function Header() {
               height={36}
               className="rounded-lg"
             />
-            <div className="hidden sm:block">
-              <span className="font-bold text-teal-100 text-lg block" style={{ fontFamily: 'var(--font-display)' }}>
-                AI Crypto
-              </span>
-              <span className="text-[10px] tracking-[0.22em] text-teal-500 uppercase">
-                AI × Crypto Intelligence
-              </span>
-            </div>
+            <span className="font-bold text-[var(--color-text-primary)] text-xl hidden sm:block tracking-tight" style={{ fontFamily: 'var(--font-display)' }}>
+              AiCryptoCore
+            </span>
           </Link>
 
-          <nav className="hidden lg:flex items-center gap-1 flex-1 justify-center flex-wrap">
-            {NAV_CATEGORIES.map((cat) => (
-              <Link
-                key={cat.slug}
-                href={`/${cat.slug}`}
-                aria-current={pathname.startsWith(`/${cat.slug}`) ? 'page' : undefined}
-                className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${
-                  pathname.startsWith(`/${cat.slug}`)
-                    ? 'text-teal-300 bg-teal-800/50'
-                    : 'text-teal-300 hover:text-teal-100 hover:bg-teal-800/40'
-                }`}
-              >
-                {cat.label}
-              </Link>
-            ))}
-          </nav>
-
-          <div className="flex items-center gap-2 ml-auto lg:ml-0">
+          {/* Center Space / Search on Desktop */}
+          <div className="hidden lg:flex flex-1 items-center justify-end max-w-sm ml-auto">
             <SearchBar />
-            <Link
-              href="/about"
-              className="hidden sm:inline-flex items-center rounded-full bg-amber-400 px-4 py-2 text-sm font-semibold text-amber-950 transition-colors hover:bg-amber-300"
-            >
-              Sign in
-            </Link>
+          </div>
 
+          {/* Right: Utilities */}
+          <div className="hidden lg:flex items-center gap-3 shrink-0 ml-6">
+            <ThemeToggle />
+            <span className="w-px h-4 bg-white/[0.08] dark:bg-white/[0.1] bg-black/10" />
+            
+            <Link
+              href="/profile"
+              aria-label="Profile"
+              className="flex items-center gap-1.5 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors group"
+            >
+              <span className="w-7 h-7 rounded-full bg-black/[0.05] dark:bg-white/[0.08] border border-black/10 dark:border-white/[0.05] flex items-center justify-center group-hover:border-[var(--color-border-teal)] transition-colors">
+                <User size={14} />
+              </span>
+              <span className="font-medium">Profile</span>
+            </Link>
+            
+            <span className="w-px h-4 bg-white/[0.08] dark:bg-white/[0.1] bg-black/10" />
+            
+            <Link
+              href="/subscribe"
+              className="flex items-center justify-center transition-all duration-150 hover:scale-105 shadow-sm btn-gradient"
+              style={{ padding: '6px 16px', borderRadius: '9999px', fontSize: '14px' }}
+            >
+              Subscribe
+            </Link>
+          </div>
+
+          {/* Mobile hamburger & utils */}
+          <div className="flex items-center gap-3 lg:hidden shrink-0 ml-auto">
+            <ThemeToggle />
+            <Link href="/profile" aria-label="Profile" className="w-8 h-8 rounded-full bg-white/[0.05] border border-black/10 dark:border-white/[0.05] flex items-center justify-center">
+              <User size={14} className="text-[var(--color-text-secondary)]" />
+            </Link>
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
               aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
-              className="lg:hidden p-2 rounded-lg text-teal-300 hover:text-teal-100 hover:bg-teal-800/50 transition-colors"
+              className="p-1.5 rounded-lg text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-white/[0.05] transition-colors"
             >
-              {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+              {mobileOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
+          </div>
+        </div>
+
+        {/* Row 2: Desktop Navigation Bar (Scrollable) */}
+        <div className="hidden lg:block w-full border-t border-black/10 dark:border-white/[0.05] bg-[var(--color-bg-nav)]/50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6">
+            <nav 
+              ref={navRef}
+              className="flex flex-wrap items-center justify-center gap-2 py-2"
+            >
+              {NAV_ITEMS.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  aria-current={pathname === item.href ? 'page' : undefined}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-150 ${
+                    pathname === item.href
+                      ? 'text-[var(--color-text-teal)] bg-[var(--color-border-teal)]/20 shadow-sm'
+                      : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-white/[0.04]'
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
           </div>
         </div>
       </header>
 
+      {/* Mobile Nav Drawer */}
       <div
         className={`fixed inset-0 z-30 lg:hidden transition-opacity duration-300 ${mobileOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
       >
-        <div className="absolute inset-0 bg-black/50" onClick={() => setMobileOpen(false)} />
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
         <nav
-          className={`absolute left-0 top-16 bottom-0 w-80 bg-[#032B22] border-r border-teal-800/40 overflow-y-auto transition-transform duration-300 ${
+          className={`absolute left-0 top-16 bottom-0 w-[280px] bg-surface border-r border-black/10 dark:border-white/[0.05] overflow-y-auto transition-transform duration-300 flex flex-col ${
             mobileOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
         >
-          <div className="p-4">
-            {NAV_CATEGORIES.map((cat) => (
-              <div key={cat.slug} className="mb-4">
-                <Link
-                  href={`/${cat.slug}`}
-                  onClick={() => setMobileOpen(false)}
-                  className="flex items-center gap-2 py-2 text-sm font-semibold text-teal-200 hover:text-teal-100 border-b border-teal-800/40 mb-2"
-                >
-                  {cat.label}
-                </Link>
-              </div>
-            ))}
-            <div className="pt-4 border-t border-teal-800/40 space-y-2">
-              <Link href="/search" onClick={() => setMobileOpen(false)} className="block py-2 text-sm text-teal-400 hover:text-teal-200">Search</Link>
-              <Link href="/about" onClick={() => setMobileOpen(false)} className="block py-2 text-sm text-teal-400 hover:text-teal-200">About</Link>
-              <Link
-                href="/about"
-                onClick={() => setMobileOpen(false)}
-                className="inline-flex rounded-full bg-amber-400 px-4 py-2 text-sm font-semibold text-amber-950"
-              >
-                Sign in
-              </Link>
+          <div className="p-4 flex-1">
+            <div className="mb-6">
+              <SearchBar />
             </div>
+            <div className="space-y-1">
+              {NAV_ITEMS.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`block py-3 px-4 rounded-lg font-medium transition-colors ${
+                    pathname === item.href
+                      ? 'text-[var(--color-text-teal)] bg-[var(--color-border-teal)]/10'
+                      : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-white/[0.04]'
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+          
+          <div className="p-4 border-t border-black/10 dark:border-white/[0.05]">
+            <Link
+              href="/subscribe"
+              className="flex items-center justify-center w-full transition-all shadow-md btn-gradient"
+              style={{ padding: '12px', borderRadius: '12px', fontSize: '16px' }}
+            >
+              Subscribe Now
+            </Link>
           </div>
         </nav>
       </div>

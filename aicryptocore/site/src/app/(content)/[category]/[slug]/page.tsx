@@ -1,63 +1,54 @@
-import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import type { Metadata } from 'next'
+import { ArticleHeader } from '@/components/article/ArticleHeader'
 import { ArticleBody } from '@/components/article/ArticleBody'
 import { ArticleFooter } from '@/components/article/ArticleFooter'
-import { ArticleHeader } from '@/components/article/ArticleHeader'
-import { ReadingProgress } from '@/components/article/ReadingProgress'
 import { RelatedArticles } from '@/components/article/RelatedArticles'
+import { ReadingProgress } from '@/components/article/ReadingProgress'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { ArticleJsonLd, BreadcrumbJsonLd } from '@/components/seo/JsonLd'
-import { getArticleBySlug, getAllArticles, getRelatedArticles, getTrendingArticles } from '@/lib/content'
-import { getCategoryLabel } from '@/lib/categories'
-import { SITE_URL } from '@/lib/constants'
+import { getAllArticles, getArticleBySlug, getRelatedArticles, getTrendingArticles } from '@/lib/content'
+import { getCategoryBySlug } from '@/lib/categories'
 import { generateArticleMetadata } from '@/lib/seo'
+import { SITE_URL } from '@/lib/constants'
 
-export const revalidate = 300
+export const revalidate = 3600
 export const dynamicParams = false
 
-interface ArticlePageProps {
+interface PageProps {
   params: Promise<{ category: string; slug: string }>
 }
 
 export async function generateStaticParams() {
   const articles = await getAllArticles()
-
-  return articles.map((article) => ({
-    category: article.category,
-    slug: article.slug,
+  return articles.map((a) => ({
+    category: a.category,
+    slug: a.slug,
   }))
 }
 
-export async function generateMetadata({ params }: ArticlePageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { category, slug } = await params
   const article = await getArticleBySlug(category, slug)
-
-  return article ? generateArticleMetadata(article) : {}
+  if (!article) return {}
+  return generateArticleMetadata(article)
 }
 
-export default async function ArticlePage({ params }: ArticlePageProps) {
-  const { category, slug } = await params
-  const article = await getArticleBySlug(category, slug)
+export default async function ArticlePage({ params }: PageProps) {
+  const { category: catSlug, slug } = await params
+  const article = await getArticleBySlug(catSlug, slug)
 
-  if (!article) {
-    notFound()
-  }
+  if (!article || article.category !== catSlug) notFound()
 
   const [relatedArticles, trendingArticles] = await Promise.all([
     getRelatedArticles(article, 3),
     getTrendingArticles(5),
   ])
+  const category = getCategoryBySlug(catSlug)
 
   const breadcrumbItems = [
-    { name: 'Home', url: SITE_URL },
-    {
-      name: getCategoryLabel(article.category),
-      url: `${SITE_URL}/${article.category}`,
-    },
-    {
-      name: article.title,
-      url: `${SITE_URL}${article.href}`,
-    },
+    { name: category?.label ?? catSlug, url: `${SITE_URL}/${catSlug}` },
+    { name: article.title, url: `${SITE_URL}${article.href}` },
   ]
 
   return (
@@ -67,7 +58,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
       <BreadcrumbJsonLd items={breadcrumbItems} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-10">
           <article className="min-w-0">
             <ArticleHeader article={article} />
             <ArticleBody article={article} />

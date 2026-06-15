@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import { Plus_Jakarta_Sans, Inter, Lora, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 import { Header } from '@/components/layout/Header'
-import { Footer } from '@/components/layout/Footer'
 import { PriceTicker } from '@/components/data/PriceTicker'
+import { Footer } from '@/components/layout/Footer'
 import { WebSiteJsonLd } from '@/components/seo/JsonLd'
 import { SITE_NAME, SITE_DESCRIPTION, SITE_URL, TWITTER_HANDLE } from '@/lib/constants'
 
@@ -69,15 +69,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
         <WebSiteJsonLd />
       </head>
-      <body className="min-h-screen flex flex-col" style={{ fontFamily: 'var(--font-ui)' }}>
+      <body
+        className="min-h-screen flex flex-col"
+        style={{ background: 'var(--gradient-page)', backgroundAttachment: 'fixed', fontFamily: 'var(--font-ui)', color: 'var(--color-text-primary)' }}
+      >
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-teal-500 focus:text-teal-900 focus:rounded"
         >
           Skip to content
         </a>
-        <Header />
         <PriceTicker />
+        <Header />
         <main id="main-content" className="flex-1">
           {children}
         </main>

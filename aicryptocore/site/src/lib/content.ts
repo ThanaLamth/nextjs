@@ -42,7 +42,7 @@ export async function getArticlesBySubcategory(subcategory: string, limit = 24):
 }
 
 export async function getFeaturedArticles(count = 1): Promise<Article[]> {
-  return ARTICLES.filter((article) => article.featured).slice(0, count)
+  return sortByPublishedDate(ARTICLES.filter((article) => article.featured)).slice(0, count)
 }
 
 export async function getLatestArticles(count = 6): Promise<Article[]> {
@@ -60,15 +60,15 @@ export async function getRelatedArticles(article: Article, count = 3): Promise<A
 }
 
 export async function getSponsoredArticles(): Promise<Article[]> {
-  return ARTICLES.filter((article) => article.sponsored)
+  return sortByPublishedDate(ARTICLES.filter((article) => article.sponsored))
 }
 
 export async function getPressReleaseArticles(limit = 24): Promise<Article[]> {
-  return ARTICLES.filter((article) => article.pressRelease).slice(0, limit)
+  return sortByPublishedDate(ARTICLES.filter((article) => article.pressRelease)).slice(0, limit)
 }
 
 export async function getTrendingArticles(count = 5): Promise<Article[]> {
-  return sortByPublishedDate(ARTICLES.filter((article) => article.featured || article.category === 'ai-agents')).slice(0, count)
+  return sortByPublishedDate(ARTICLES).slice(0, count)
 }
 
 export async function searchDemoArticles(query: string, category?: string, limit = 24): Promise<Article[]> {

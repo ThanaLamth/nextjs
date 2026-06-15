@@ -10,7 +10,7 @@ export function ThemeToggle() {
     <button
       onClick={toggle}
       aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-      className="relative p-2 rounded-lg text-teal-300 hover:text-teal-100 hover:bg-teal-800/50 transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400"
+      className="relative p-2 rounded-lg text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-border-default)] transition-all duration-150 focus-ring"
     >
       <span
         className={`absolute inset-0 flex items-center justify-center transition-opacity duration-200 ${theme === 'dark' ? 'opacity-100' : 'opacity-0'}`}
@@ -22,9 +22,7 @@ export function ThemeToggle() {
       >
         <Sun size={18} />
       </span>
-      <span className="opacity-0">
-        <Moon size={18} />
-      </span>
+      <span className="opacity-0 pointer-events-none"><Moon size={18} /></span>
     </button>
   )
 }

@@ -1,68 +1,163 @@
-import type { Metadata } from 'next'
-import { HomepageExperience } from '@/components/home/HomepageExperience'
-import { CATEGORIES, getCategoryBySlug } from '@/lib/categories'
-import { getArticlesByCategory, getFeaturedArticles } from '@/lib/content'
-
-export const metadata: Metadata = {
-  title: 'AI × Crypto Intelligence',
-  description:
-    'AiCryptoCore is a category-driven intelligence hub for operators tracking AI Agents, AI Infrastructure, AI Trading, AI Data, and AI Ecosystem shifts.',
-}
+import React from 'react'
+import { LayoutGrid, Cpu, Database, Coins } from 'lucide-react'
+import { HeroSection } from '@/components/layout/HeroSection'
+import { CategoryNavRow } from '@/components/layout/CategoryNavRow'
+import { CategorySection } from '@/components/layout/CategorySection'
+import { AgentEconomicsSection } from '@/components/layout/AgentEconomicsSection'
+import { Sidebar } from '@/components/layout/Sidebar'
+import { ArticleCard } from '@/components/article/ArticleCard'
+import {
+  getAllArticles,
+  getFeaturedArticles,
+  getArticlesByCategory,
+  getTrendingArticles,
+} from '@/lib/content'
+import { CATEGORIES } from '@/lib/categories'
 
 export const revalidate = 300
+export const metadata = {
+  title: 'AI × Crypto Intersection Analyst',
+  description:
+    'Premium news and analysis at the intersection of Artificial Intelligence and Web3/Crypto.',
+}
 
 export default async function HomePage() {
-  const featuredArticle = (await getFeaturedArticles(1))[0]
+  const [allArticles, featuredArticles, trendingArticles] = await Promise.all([
+    getAllArticles(),
+    getFeaturedArticles(1),
+    getTrendingArticles(5),
+  ])
+  const featuredArticle = featuredArticles[0]
 
-  if (!featuredArticle) {
-    return null
-  }
-
-  const categoryCollections = await Promise.all(
-    CATEGORIES.map(async (category) => ({
-      category,
-      articles: await getArticlesByCategory(category.slug, 4),
-    }))
+  const mainCategories = CATEGORIES.filter(
+    (c) => c.slug !== 'sponsored-articles' && c.slug !== 'press-release'
   )
 
-  const usedSlugs = new Set<string>([featuredArticle.slug])
+  const recentArticles = allArticles
+    .filter((a) => a.slug !== featuredArticle?.slug)
+    .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
 
-  const aiAgentsInsights =
-    categoryCollections
-      .find(({ category }) => category.slug === 'ai-agents')
-      ?.articles.filter((article) => article.slug !== featuredArticle.slug)
-      .slice(0, 4) ?? []
+  const statBoxes = [
+    { label: 'News', count: allArticles.filter((a) => a.category === 'news').length + 68, color: '#5EEAD4', bg: 'rgba(20,184,166,0.12)' },
+    { label: 'Altcoins', count: allArticles.filter((a) => a.category === 'altcoin-insights').length + 44, color: '#93C5FD', bg: 'rgba(147,197,253,0.10)' },
+    { label: 'AI Tools', count: allArticles.filter((a) => a.category === 'crypto-ai-tools').length + 79, color: '#FCD34D', bg: 'rgba(252,211,77,0.10)' },
+    { label: 'Mining', count: allArticles.filter((a) => a.category === 'mining').length + 36, color: '#C4B5FD', bg: 'rgba(196,181,253,0.10)' },
+  ]
 
-  aiAgentsInsights.forEach((article) => usedSlugs.add(article.slug))
+  const platformStats = [
+    { value: '1,847', label: 'Platforms', icon: LayoutGrid },
+    { value: '1,248', label: 'AI Models', icon: Cpu },
+    { value: '40,204', label: 'Data Points', icon: Database },
+    { value: '14T', label: 'Market Cap', icon: Coins },
+  ]
 
-  const categoryHighlights = categoryCollections.map(({ category, articles }) => ({
-    category,
-    articles:
-      category.slug === 'ai-agents'
-        ? aiAgentsInsights
-        : articles.filter((article) => !usedSlugs.has(article.slug)).slice(0, 2),
-  }))
-
-  const normalizedHighlights = categoryHighlights.map((highlight) => {
-    if (highlight.articles.length > 0) {
-      return highlight
-    }
-
-    const fallbackCategory = getCategoryBySlug(highlight.category.slug)
-
-    return {
-      category: highlight.category,
-      articles:
-        categoryCollections.find(({ category }) => category.slug === fallbackCategory?.slug)?.articles.slice(0, 2) ??
-        [],
-    }
-  })
+  const gridArticles = recentArticles.slice(0, 4)
+  const altcoinInsights = await getArticlesByCategory('altcoin-insights', 4)
+  const topProjects = await getArticlesByCategory('top-projects', 4)
 
   return (
-    <HomepageExperience
-      featuredArticle={featuredArticle}
-      topInsights={aiAgentsInsights}
-      categoryHighlights={normalizedHighlights}
-    />
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+
+      {/* ── HERO: 2-col ── */}
+      {featuredArticle && (
+        <HeroSection
+          featured={featuredArticle}
+          recentArticles={recentArticles}
+          statBoxes={statBoxes}
+        />
+      )}
+
+      {/* ── PLATFORM STATS ── */}
+      <div className="relative mb-6 z-0 shadow-[0_4px_20px_rgba(20,184,166,0.08)] bg-surface">
+        {/* Top & Bottom Gradient Borders */}
+        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-teal opacity-30 pointer-events-none -z-10"></div>
+        <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-teal opacity-30 pointer-events-none -z-10"></div>
+        
+        {/* Inner Container */}
+        <div className="flex items-center gap-0">
+          {platformStats.map((stat, idx) => {
+            const Icon = stat.icon
+            return (
+              <React.Fragment key={stat.label}>
+                <div className="flex-1 px-4 py-3 flex items-center justify-center gap-3.5 hover:bg-surface-elevated transition-colors">
+                  <Icon size={22} className="text-[var(--color-text-teal)] shrink-0 opacity-80" strokeWidth={1.5} />
+                  <div className="text-left">
+                    <div className="text-xl font-bold leading-none text-[var(--color-text-primary)] mb-1"
+                      style={{ fontFamily: 'var(--font-mono)' }}>
+                      {stat.value}
+                    </div>
+                    <div className="text-xs text-[var(--color-text-secondary)]">
+                      {stat.label}
+                    </div>
+                  </div>
+                </div>
+                {idx < platformStats.length - 1 && (
+                  <div className="w-[1px] self-stretch bg-gradient-teal opacity-25"></div>
+                )}
+              </React.Fragment>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* ── CATEGORY NAV PILLS ── */}
+      <CategoryNavRow />
+
+      {/* ── MAIN 2-COL ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_268px] gap-7">
+        <div className="min-w-0">
+
+          {/* 4-col article grid */}
+          {gridArticles.length > 0 && (
+            <section className="mb-8">
+              <h2
+                className="text-base font-bold text-[var(--color-text-primary)] mb-4"
+                style={{ fontFamily: 'var(--font-display)' }}
+              >
+                Featured Stories
+              </h2>
+              <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
+                {gridArticles.map((article) => (
+                  <ArticleCard key={article.slug} article={article} variant="default" />
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Agent Economics ngay sau Featured Stories */}
+          <AgentEconomicsSection />
+
+          {/* Altcoin Insights */}
+          {mainCategories
+            .filter((c) => c.slug === 'altcoin-insights')
+            .map((category) => (
+              <CategorySection
+                key={category.slug}
+                category={category}
+                articles={altcoinInsights}
+                layout="grid"
+              />
+            ))}
+
+          {/* Top Projects section */}
+          {mainCategories
+            .filter((c) => c.slug === 'top-projects')
+            .map((category) => (
+              <CategorySection
+                key={category.slug}
+                category={category}
+                articles={topProjects}
+                layout="horizontal"
+              />
+            ))}
+        </div>
+
+        <div className="hidden lg:block">
+          <div className="sticky top-20">
+            <Sidebar trendingArticles={trendingArticles} />
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }
